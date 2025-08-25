@@ -1,0 +1,72 @@
+name: trading-post-frontend-689bdee000098bd9d55c
+region: nyc3
+
+# For direct file deployment, we use a service instead of static_sites
+services:
+- name: trading-post-frontend
+  # Using a simple Node.js service to serve static files
+  build_command: |
+    cd trading-app-frontend &&
+    npm install --legacy-peer-deps &&
+    npm run build &&
+    cd .. &&
+    npm install express &&
+    echo 'const express = require("express"); const app = express(); const port = process.env.PORT || 3000; app.use(express.static("trading-app-frontend/build")); app.get("*", (req, res) => { res.sendFile(__dirname + "/trading-app-frontend/build/index.html"); }); app.listen(port, () => { console.log(`Server running on port ${port}`); });' > server.js
+  run_command: node server.js
+  environment_slug: node-js
+  instance_size_slug: basic-xxs
+  instance_count: 1
+  http_port: 3000
+  routes:
+  - path: /
+  
+  # Environment Variables for Trading Post Appwrite Project: 689bdee000098bd9d55c
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: PORT
+    value: "3000"
+  - key: REACT_APP_APPWRITE_ENDPOINT
+    value: https://nyc.cloud.appwrite.io/v1
+  - key: REACT_APP_APPWRITE_PROJECT_ID
+    value: 689bdee000098bd9d55c
+  - key: REACT_APP_APPWRITE_PROJECT_NAME
+    value: Trading Post Frontend
+  - key: VITE_APPWRITE_ENDPOINT
+    value: https://nyc.cloud.appwrite.io/v1
+  - key: VITE_APPWRITE_PROJECT_ID
+    value: 689bdee000098bd9d55c
+  - key: REACT_APP_APPWRITE_DATABASE_ID
+    value: trading_post_db
+  - key: REACT_APP_APPWRITE_USERS_COLLECTION_ID
+    value: users
+  - key: REACT_APP_APPWRITE_ITEMS_COLLECTION_ID
+    value: items
+  - key: REACT_APP_APPWRITE_WANTS_COLLECTION_ID
+    value: wants
+  - key: REACT_APP_APPWRITE_TRADES_COLLECTION_ID
+    value: trades
+  - key: REACT_APP_APPWRITE_MESSAGES_COLLECTION_ID
+    value: messages
+  - key: REACT_APP_APPWRITE_REVIEWS_COLLECTION_ID
+    value: reviews
+  - key: REACT_APP_APPWRITE_NOTIFICATIONS_COLLECTION_ID
+    value: notifications
+  - key: REACT_APP_APPWRITE_ITEM_IMAGES_BUCKET_ID
+    value: item_images
+  - key: REACT_APP_APPWRITE_PROFILE_IMAGES_BUCKET_ID
+    value: profile_images
+  - key: REACT_APP_APPWRITE_CHAT_ATTACHMENTS_BUCKET_ID
+    value: chat_attachments
+  - key: REACT_APP_ENVIRONMENT
+    value: production
+  - key: REACT_APP_ENABLE_SSO
+    value: "true"
+  - key: REACT_APP_ENABLE_OAUTH
+    value: "true"
+  - key: REACT_APP_ENABLE_EMAIL_AUTH
+    value: "true"
+  - key: REACT_APP_OAUTH_PROVIDERS
+    value: google,github,facebook
+  - key: REACT_APP_ENABLE_ANALYTICS
+    value: "false"

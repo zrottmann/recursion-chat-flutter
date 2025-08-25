@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ULTRA CORS Diagnosis - Trading Post</title>
+    <style>
+        body { font-family: monospace; line-height: 1.6; margin: 20px; }
+        .test-section { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .pass { color: #28a745; font-weight: bold; }
+        .fail { color: #dc3545; font-weight: bold; }
+        .info { color: #17a2b8; }
+        .warning { color: #ffc107; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .header { background: #007bff; color: white; padding: 10px; margin: -15px -15px 15px -15px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .progress { background: #e9ecef; height: 20px; border-radius: 10px; margin: 10px 0; }
+        .progress-bar { background: #007bff; height: 100%; border-radius: 10px; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+    <h1>🔬 ULTRA CORS DIAGNOSIS - Trading Post</h1>
+    
+    <div class="test-section">
+        <div class="header">🎯 Configuration Analysis</div>
+        <div id="config-analysis"></div>
+    </div>
+    
+    <div class="test-section">
+        <div class="header">🌐 Comprehensive Endpoint Testing</div>
+        <div class="progress">
+            <div class="progress-bar" id="progress" style="width: 0%"></div>
+        </div>
+        <div id="endpoint-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <div class="header">🔍 Platform Registration Analysis</div>
+        <div id="platform-analysis"></div>
+    </div>
+    
+    <div class="test-section">
+        <div class="header">⚡ Real Appwrite SDK Test</div>
+        <div id="sdk-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <div class="header">🛠️ Recommended Solutions</div>
+        <div id="solutions"></div>
+    </div>
+    
+    <button onclick="runFullDiagnosis()">🚀 Run Ultra Diagnosis</button>
+    <button onclick="clearResults()">🗑️ Clear Results</button>
+    
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.1"></script>
+    <script>
+        // Configuration
+        const configs = [
+            {
+                name: 'NYC Region (Current)',
+                endpoint: 'https://nyc.cloud.appwrite.io/v1',
+                projectId: '689bdee000098bd9d55c',
+                primary: true
+            },
+            {
+                name: 'Global Region (Alternative)',
+                endpoint: 'https://cloud.appwrite.io/v1',
+                projectId: '689bdee000098bd9d55c',
+                primary: false
+            }
+        ];
+        
+        const origins = [
+            'https://tradingpost.appwrite.network',
+            'https://689cb415001a367e69f8.appwrite.global',
+            window.location.origin
+        ];
+        
+        let testResults = [];
+        let currentProgress = 0;
+        const totalTests = configs.length * 8 + 5; // Estimated total tests
+        
+        function log(section, message, type = 'info', details = null) {
+            const div = document.getElementById(section);
+            if (!div) return;
+            
+            const p = document.createElement('div');
+            p.className = type;
+            p.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            if (details) {
+                const pre = document.createElement('pre');
+                pre.textContent = typeof details === 'object' ? JSON.stringify(details, null, 2) : details;
+                p.appendChild(pre);
+            }
+            
+            div.appendChild(p);
+            div.scrollTop = div.scrollHeight;
+        }
+        
+        function updateProgress() {
+            currentProgress++;
+            const percent = Math.min((currentProgress / totalTests) * 100, 100);
+            document.getElementById('progress').style.width = percent + '%';
+        }
+        
+        function clearResults() {
+            ['config-analysis', 'endpoint-tests', 'platform-analysis', 'sdk-tests', 'solutions'].forEach(id => {
+                document.getElementById(id).innerHTML = '';
+            });
+            testResults = [];
+            currentProgress = 0;
+            updateProgress();
+        }
+        
+        async function analyzeConfiguration() {
+            log('config-analysis', '🔍 Analyzing current configuration...', 'info');
+            
+            const currentOrigin = window.location.origin;
+            const isProduction = currentOrigin.includes('appwrite.network');
+            
+            const analysis = {
+                currentOrigin: currentOrigin,
+                isProduction: isProduction,
+                expectedPlatforms: origins,
+                configuredEndpoints: configs.map(c => c.endpoint),
+                browserInfo: {
+                    userAgent: navigator.userAgent,
+                    supportsESModules: typeof import === 'function',
+                    supportsFetch: typeof fetch !== 'undefined',
+                    supportsPreflightCORS: true
+                }
+            };
+            
+            log('config-analysis', '✅ Configuration analyzed', 'pass', analysis);
+            updateProgress();
+        }
+        
+        async function testEndpoint(config, testName, testFunction) {
+            try {
+                log('endpoint-tests', `🧪 Testing ${config.name}: ${testName}...`, 'info');
+                const result = await testFunction(config);
+                
+                const success = result.success || result.status < 400;
+                log('endpoint-tests', 
+                    `${success ? '✅' : '❌'} ${config.name} - ${testName}: ${success ? 'PASS' : 'FAIL'}`, 
+                    success ? 'pass' : 'fail', 
+                    result
+                );
+                
+                testResults.push({
+                    config: config.name,
+                    test: testName,
+                    success,
+                    result
+                });
+                
+                return result;
+            } catch (error) {
+                log('endpoint-tests', `❌ ${config.name} - ${testName}: ERROR`, 'fail', error.message);
+                testResults.push({
+                    config: config.name,
+                    test: testName,
+                    success: false,
+                    error: error.message
+                });
+            } finally {
+                updateProgress();
+            }
+        }
+        
+        async function testBasicConnectivity(config) {
+            const response = await fetch(config.endpoint + '/health', {
+                method: 'GET',
+                headers: {
+                    'X-Appwrite-Project': config.projectId
+                }
+            });
+            
+            return {
+                status: response.status,
+                corsHeaders: {
+                    allowOrigin: response.headers.get('access-control-allow-origin'),
+                    allowMethods: response.headers.get('access-control-allow-methods'),
+                    allowHeaders: response.headers.get('access-control-allow-headers')
+                },
+                success: response.status === 200 || response.status === 401
+            };
+        }
+        
+        async function testOptionsPreflightExplicit(config) {
+            const response = await fetch(config.endpoint + '/account', {
+                method: 'OPTIONS',
+                headers: {
+                    'Origin': window.location.origin,
+                    'Access-Control-Request-Method': 'POST',
+                    'Access-Control-Request-Headers': 'content-type,x-appwrite-project'
+                }
+            });
+            
+            return {
+                status: response.status,
+                corsHeaders: {
+                    allowOrigin: response.headers.get('access-control-allow-origin'),
+                    allowMethods: response.headers.get('access-control-allow-methods'),
+                    allowHeaders: response.headers.get('access-control-allow-headers'),
+                    maxAge: response.headers.get('access-control-max-age')
+                },
+                success: response.status === 200 || response.status === 204
+            };
+        }
+        
+        async function testAccountEndpoint(config) {
+            const response = await fetch(config.endpoint + '/account', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Appwrite-Project': config.projectId
+                }
+            });
+            
+            const data = await response.json();
+            
+            return {
+                status: response.status,
+                corsHeaders: {
+                    allowOrigin: response.headers.get('access-control-allow-origin')
+                },
+                responseData: data,
+                success: response.status === 401, // 401 is expected for unauthenticated requests
+                expectedError: response.status === 401 && data.code === 401
+            };
+        }
+        
+        async function testUserRegistration(config) {
+            const testUser = {
+                userId: `ultratest_${Date.now()}`,
+                email: `ultratest_${Date.now()}@corstest.com`,
+                password: 'UltraTest123!@#',
+                name: 'Ultra CORS Test User'
+            };
+            
+            const response = await fetch(config.endpoint + '/account', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Appwrite-Project': config.projectId
+                },
+                body: JSON.stringify(testUser)
+            });
+            
+            const data = await response.json();
+            
+            return {
+                status: response.status,
+                corsHeaders: {
+                    allowOrigin: response.headers.get('access-control-allow-origin')
+                },
+                responseData: data,
+                success: response.status === 201,
+                userCreated: response.status === 201,
+                testUser: testUser.email
+            };
+        }
+        
+        async function testWithAppwriteSDK(config) {
+            try {
+                log('sdk-tests', `🔧 Testing ${config.name} with official Appwrite SDK...`, 'info');
+                
+                // Initialize Appwrite client
+                const { Client, Account, ID } = Appwrite;
+                const client = new Client()
+                    .setEndpoint(config.endpoint)
+                    .setProject(config.projectId);
+                
+                const account = new Account(client);
+                
+                // Test 1: Get current session (should fail with 401)
+                try {
+                    const session = await account.get();
+                    log('sdk-tests', `❌ ${config.name}: Unexpected authenticated session`, 'fail', session);
+                    return { success: false, error: 'Unexpected authenticated session' };
+                } catch (sessionError) {
+                    if (sessionError.code === 401) {
+                        log('sdk-tests', `✅ ${config.name}: SDK correctly returns 401 for unauthenticated request`, 'pass');
+                    } else {
+                        log('sdk-tests', `❌ ${config.name}: SDK unexpected error`, 'fail', sessionError);
+                        return { success: false, error: sessionError.message };
+                    }
+                }
+                
+                // Test 2: Create test user (should work if CORS is configured)
+                const testUser = {
+                    userId: ID.unique(),
+                    email: `sdktest_${Date.now()}@corstest.com`,
+                    password: 'SDKTest123!@#',
+                    name: 'SDK CORS Test User'
+                };
+                
+                try {
+                    const user = await account.create(
+                        testUser.userId,
+                        testUser.email,
+                        testUser.password,
+                        testUser.name
+                    );
+                    
+                    log('sdk-tests', `✅ ${config.name}: SDK user creation successful`, 'pass', {
+                        userId: user.$id,
+                        email: user.email,
+                        created: user.$createdAt
+                    });
+                    
+                    return {
+                        success: true,
+                        userCreated: true,
+                        user: user,
+                        testEmail: testUser.email
+                    };
+                    
+                } catch (createError) {
+                    if (createError.message && createError.message.includes('CORS')) {
+                        log('sdk-tests', `❌ ${config.name}: SDK CORS error confirmed`, 'fail', createError);
+                        return { success: false, corsError: true, error: createError.message };
+                    } else if (createError.code === 409) {
+                        log('sdk-tests', `⚠️ ${config.name}: User already exists (expected)`, 'warning', createError);
+                        return { success: true, userExists: true };
+                    } else {
+                        log('sdk-tests', `❌ ${config.name}: SDK unexpected creation error`, 'fail', createError);
+                        return { success: false, error: createError.message };
+                    }
+                }
+                
+            } catch (error) {
+                log('sdk-tests', `❌ ${config.name}: SDK initialization failed`, 'fail', error);
+                return { success: false, error: error.message };
+            } finally {
+                updateProgress();
+            }
+        }
+        
+        async function analyzePlatformRegistration() {
+            log('platform-analysis', '🔍 Analyzing platform registration patterns...', 'info');
+            
+            const analysis = {
+                currentOrigin: window.location.origin,
+                expectedPlatforms: origins,
+                successfulTests: testResults.filter(r => r.success),
+                failedTests: testResults.filter(r => !r.success),
+                corsHeadersFound: testResults.filter(r => r.result?.corsHeaders?.allowOrigin),
+                registrationTests: testResults.filter(r => r.test.includes('Registration')),
+                preflightTests: testResults.filter(r => r.test.includes('Preflight'))
+            };
+            
+            // Determine likely issues
+            const issues = [];
+            const solutions = [];
+            
+            if (analysis.preflightTests.every(t => !t.success)) {
+                issues.push('OPTIONS preflight requests failing across all endpoints');
+                solutions.push('Platform registration issue - domain not properly registered');
+            }
+            
+            if (analysis.registrationTests.some(t => t.success && t.result?.status === 201)) {
+                issues.push('Registration works but CORS headers missing');
+                solutions.push('Appwrite CORS configuration incomplete');
+            }
+            
+            if (analysis.corsHeadersFound.length === 0) {
+                issues.push('No CORS headers found in any response');
+                solutions.push('Platform registration completely missing');
+            }
+            
+            analysis.identifiedIssues = issues;
+            analysis.recommendedSolutions = solutions;
+            
+            log('platform-analysis', '📊 Platform analysis complete', 'info', analysis);
+            
+            // Generate specific recommendations
+            const recommendations = [];
+            
+            if (issues.includes('Platform registration issue - domain not properly registered')) {
+                recommendations.push({
+                    priority: 'HIGH',
+                    action: 'Register platform in Appwrite Console',
+                    details: `Go to Appwrite Console → Project ${configs[0].projectId} → Settings → Platforms → Add Web Platform`,
+                    domains: origins
+                });
+            }
+            
+            if (issues.includes('Appwrite CORS configuration incomplete')) {
+                recommendations.push({
+                    priority: 'MEDIUM',
+                    action: 'Verify CORS settings in platform configuration',
+                    details: 'Check if registered platforms have correct hostname and are enabled'
+                });
+            }
+            
+            log('solutions', '🛠️ Recommended actions based on analysis:', 'info', recommendations);
+            updateProgress();
+        }
+        
+        async function runFullDiagnosis() {
+            clearResults();
+            log('config-analysis', '🚀 Starting ULTRA CORS diagnosis...', 'info');
+            
+            // Step 1: Analyze configuration
+            await analyzeConfiguration();
+            
+            // Step 2: Test all endpoints comprehensively
+            for (const config of configs) {
+                log('endpoint-tests', `🧪 Testing configuration: ${config.name}`, 'info');
+                
+                await testEndpoint(config, 'Basic Connectivity', testBasicConnectivity);
+                await testEndpoint(config, 'OPTIONS Preflight', testOptionsPreflightExplicit);
+                await testEndpoint(config, 'Account Endpoint', testAccountEndpoint);
+                await testEndpoint(config, 'User Registration', testUserRegistration);
+            }
+            
+            // Step 3: Test with official Appwrite SDK
+            for (const config of configs) {
+                await testWithAppwriteSDK(config);
+            }
+            
+            // Step 4: Analyze results and generate recommendations
+            await analyzePlatformRegistration();
+            
+            log('solutions', '✅ Ultra diagnosis complete!', 'pass');
+            log('solutions', `📊 Total tests run: ${testResults.length}`, 'info');
+            log('solutions', `✅ Successful tests: ${testResults.filter(r => r.success).length}`, 'pass');
+            log('solutions', `❌ Failed tests: ${testResults.filter(r => !r.success).length}`, 'fail');
+        }
+        
+        // Auto-run on page load
+        window.addEventListener('load', () => {
+            log('config-analysis', '🔬 Ultra CORS Diagnosis Tool loaded', 'info');
+            log('config-analysis', 'Click "Run Ultra Diagnosis" to start comprehensive testing', 'info');
+        });
+    </script>
+</body>
+</html>

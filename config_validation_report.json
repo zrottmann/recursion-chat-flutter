@@ -1,0 +1,13 @@
+{
+  "validation_passed": false,
+  "errors_found": 1,
+  "errors": [
+    "Failed to read .\\functions/api\\main.py: 'charmap' codec can't decode byte 0x9d in position 764: character maps to <undefined>"
+  ],
+  "fixes_applied": 0,
+  "fixes": [],
+  "configuration": {
+    "correct_project_id": "689bdee000098bd9d55c",
+    "correct_endpoint": "https://nyc.cloud.appwrite.io/v1"
+  }
+}

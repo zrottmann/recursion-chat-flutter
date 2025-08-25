@@ -1,0 +1,47 @@
+[build]
+  publish = "build"
+  command = "npm run build"
+
+# Environment variables for production
+[build.environment]
+  NODE_ENV = "production"
+  REACT_APP_APPWRITE_ENDPOINT = "https://nyc.cloud.appwrite.io/v1"
+  REACT_APP_APPWRITE_PROJECT_ID = "689bdaf500072795b0f6"
+  REACT_APP_APPWRITE_DATABASE_ID = "trading_post_db"
+  REACT_APP_APPWRITE_USERS_COLLECTION_ID = "users"
+  REACT_APP_APPWRITE_ITEMS_COLLECTION_ID = "items"
+  REACT_APP_APPWRITE_WANTS_COLLECTION_ID = "wants"
+  REACT_APP_APPWRITE_TRADES_COLLECTION_ID = "trades"
+  REACT_APP_APPWRITE_MESSAGES_COLLECTION_ID = "messages"
+  REACT_APP_APPWRITE_REVIEWS_COLLECTION_ID = "reviews"
+  REACT_APP_APPWRITE_NOTIFICATIONS_COLLECTION_ID = "notifications"
+  REACT_APP_APPWRITE_ITEM_IMAGES_BUCKET_ID = "item_images"
+  REACT_APP_APPWRITE_PROFILE_IMAGES_BUCKET_ID = "profile_images"
+  REACT_APP_APPWRITE_CHAT_ATTACHMENTS_BUCKET_ID = "chat_attachments"
+  REACT_APP_ENABLE_MICROSOFT_AUTH = "true"
+  REACT_APP_ENABLE_DISCORD_AUTH = "true"
+  REACT_APP_ENABLE_APPLE_AUTH = "true"
+  REACT_APP_ENABLE_MAGIC_LINK = "true"
+  REACT_APP_ENABLE_MFA = "true"
+
+# Redirects for React Router (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://nyc.cloud.appwrite.io https://*.google.com https://*.googleapis.com; frame-src 'self' https://*.google.com;"
+
+# Cache settings
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

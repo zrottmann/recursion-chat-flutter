@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Failed - Trading Post</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .error-icon {
+            font-size: 48px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        p {
+            color: #666;
+            margin: 0 0 20px 0;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .error-details {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 12px;
+            color: #6c757d;
+            text-align: left;
+            word-break: break-all;
+        }
+        .status {
+            font-size: 14px;
+            color: #dc3545;
+            margin-top: 20px;
+        }
+        .retry-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .retry-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon">❌</div>
+        <h1>Authentication Failed</h1>
+        <p>There was an error during the authentication process.</p>
+        <div class="error-details" id="error-details">
+            Loading error details...
+        </div>
+        <div class="status">
+            Please close this window and try again.
+        </div>
+        <button class="retry-button" onclick="closeWindow()">Close Window</button>
+    </div>
+
+    <script>
+        console.log('❌ [AUTH-ERROR] OAuth error page loaded');
+        console.log('❌ [AUTH-ERROR] URL:', window.location.href);
+        console.log('❌ [AUTH-ERROR] Hash:', window.location.hash);
+        console.log('❌ [AUTH-ERROR] Search:', window.location.search);
+        
+        // Extract error parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        
+        // Log all parameters for debugging
+        console.log('❌ [AUTH-ERROR] URL params:', Object.fromEntries(urlParams.entries()));
+        console.log('❌ [AUTH-ERROR] Hash params:', Object.fromEntries(hashParams.entries()));
+        
+        // Extract error information
+        const error = urlParams.get('error') || hashParams.get('error') || 'Unknown error';
+        const errorDescription = urlParams.get('error_description') || hashParams.get('error_description') || 'No description provided';
+        const state = urlParams.get('state') || hashParams.get('state');
+        
+        // Display error details
+        document.getElementById('error-details').innerHTML = `
+            <strong>Error:</strong> ${error}<br>
+            <strong>Description:</strong> ${errorDescription}<br>
+            ${state ? `<strong>State:</strong> ${state}<br>` : ''}
+            <strong>Full URL:</strong> ${window.location.href}
+        `;
+        
+        // Store error flag for parent window monitoring
+        try {
+            sessionStorage.setItem('oauth_error', 'true');
+            sessionStorage.setItem('oauth_error_details', JSON.stringify({
+                error: error,
+                error_description: errorDescription,
+                state: state,
+                timestamp: Date.now()
+            }));
+            console.log('✅ [AUTH-ERROR] Error details stored in sessionStorage');
+        } catch (e) {
+            console.log('⚠️ [AUTH-ERROR] Could not store in sessionStorage:', e.message);
+        }
+        
+        // Notify parent window (for popup monitoring)
+        try {
+            if (window.opener) {
+                console.log('❌ [AUTH-ERROR] Notifying parent window of error');
+                window.opener.postMessage({
+                    type: 'oauth_error',
+                    provider: 'google',
+                    error: error,
+                    error_description: errorDescription,
+                    timestamp: Date.now()
+                }, window.location.origin);
+            }
+        } catch (e) {
+            console.log('⚠️ [AUTH-ERROR] Could not notify parent window:', e.message);
+        }
+        
+        function closeWindow() {
+            console.log('❌ [AUTH-ERROR] Closing popup window');
+            if (window.opener) {
+                window.close();
+            } else {
+                // If not in popup, redirect to login page
+                window.location.href = '/login?error=oauth_failed';
+            }
+        }
+        
+        // Auto-close after 10 seconds
+        setTimeout(() => {
+            console.log('❌ [AUTH-ERROR] Auto-closing popup window after timeout');
+            closeWindow();
+        }, 10000);
+    </script>
+</body>
+</html>

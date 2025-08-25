@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trading Post - Community Marketplace</title>
+    <script>
+      // This is a workaround for client-side routing on Appwrite Sites
+      // When a 404 occurs, we redirect to the main app with the original path
+      const path = window.location.pathname;
+      const hash = window.location.hash;
+      const search = window.location.search;
+      
+      // If we're on a route that should be handled by React Router
+      if (path.includes('/auth/callback') || 
+          path.includes('/oauth/callback') || 
+          path.includes('/login') ||
+          path.includes('/signup') ||
+          path.includes('/profile') ||
+          path.includes('/listings') ||
+          path.includes('/matches') ||
+          path.includes('/messages') ||
+          path.includes('/saved') ||
+          path.includes('/users') ||
+          path.includes('/reviews') ||
+          path.includes('/design') ||
+          path.includes('/map')) {
+        // Store the intended path in sessionStorage
+        sessionStorage.setItem('redirectPath', path + search + hash);
+        // Log the redirect for debugging
+        console.log('🔄 404.html redirecting:', path, 'to', '/#' + path + search);
+        // Redirect to the main index with the path as hash
+        window.location.replace('/#' + path + search);
+      } else {
+        // For actual 404s, show an error page
+        document.addEventListener('DOMContentLoaded', function() {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error').style.display = 'block';
+        });
+      }
+    </script>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        max-width: 500px;
+        margin: 1rem;
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 1rem;
+      }
+      p {
+        color: #666;
+        line-height: 1.6;
+      }
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 2rem auto;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .button {
+        display: inline-block;
+        padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        transition: transform 0.2s;
+      }
+      .button:hover {
+        transform: translateY(-2px);
+      }
+      #error {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="loading">
+        <div class="spinner"></div>
+        <h1>Redirecting...</h1>
+        <p>Please wait while we redirect you to the correct page.</p>
+      </div>
+      
+      <div id="error">
+        <h1>404 - Page Not Found</h1>
+        <p>The page you're looking for doesn't exist.</p>
+        <a href="/" class="button">Go to Homepage</a>
+      </div>
+    </div>
+  </body>
+</html>

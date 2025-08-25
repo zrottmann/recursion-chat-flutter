@@ -1,0 +1,279 @@
+{
+  "project": {
+    "name": "Trading Post",
+    "description": "Monolithic Trading Post application deployed on Appwrite",
+    "projectId": "689bdee000098bd9d55c",
+    "endpoint": "https://nyc.cloud.appwrite.io/v1"
+  },
+  "database": {
+    "databaseId": "trading_post_db",
+    "collections": [
+      {
+        "id": "users",
+        "name": "Users",
+        "attributes": [
+          {"key": "email", "type": "email", "required": true},
+          {"key": "username", "type": "string", "size": 50, "required": true},
+          {"key": "fullName", "type": "string", "size": 100, "required": false},
+          {"key": "profileImage", "type": "string", "size": 255, "required": false},
+          {"key": "location", "type": "string", "size": 100, "required": false},
+          {"key": "isVerified", "type": "boolean", "default": false},
+          {"key": "createdAt", "type": "datetime", "required": true},
+          {"key": "updatedAt", "type": "datetime", "required": true}
+        ],
+        "indexes": [
+          {"key": "email_idx", "type": "unique", "attributes": ["email"]},
+          {"key": "username_idx", "type": "unique", "attributes": ["username"]}
+        ]
+      },
+      {
+        "id": "items",
+        "name": "Items",
+        "attributes": [
+          {"key": "userId", "type": "string", "size": 36, "required": true},
+          {"key": "title", "type": "string", "size": 200, "required": true},
+          {"key": "description", "type": "string", "size": 2000, "required": true},
+          {"key": "category", "type": "string", "size": 50, "required": true},
+          {"key": "condition", "type": "string", "size": 20, "required": true},
+          {"key": "images", "type": "string", "size": 2000, "array": true},
+          {"key": "location", "type": "string", "size": 100, "required": true},
+          {"key": "coordinates", "type": "float", "array": true},
+          {"key": "status", "type": "string", "size": 20, "default": "active"},
+          {"key": "createdAt", "type": "datetime", "required": true},
+          {"key": "updatedAt", "type": "datetime", "required": true}
+        ],
+        "indexes": [
+          {"key": "user_idx", "type": "key", "attributes": ["userId"]},
+          {"key": "category_idx", "type": "key", "attributes": ["category"]},
+          {"key": "status_idx", "type": "key", "attributes": ["status"]},
+          {"key": "created_idx", "type": "key", "attributes": ["createdAt"], "orders": ["DESC"]}
+        ]
+      },
+      {
+        "id": "wants",
+        "name": "Wants",
+        "attributes": [
+          {"key": "userId", "type": "string", "size": 36, "required": true},
+          {"key": "title", "type": "string", "size": 200, "required": true},
+          {"key": "description", "type": "string", "size": 1000, "required": false},
+          {"key": "category", "type": "string", "size": 50, "required": true},
+          {"key": "isActive", "type": "boolean", "default": true},
+          {"key": "createdAt", "type": "datetime", "required": true}
+        ],
+        "indexes": [
+          {"key": "user_wants_idx", "type": "key", "attributes": ["userId"]},
+          {"key": "category_wants_idx", "type": "key", "attributes": ["category"]}
+        ]
+      },
+      {
+        "id": "trades",
+        "name": "Trades",
+        "attributes": [
+          {"key": "initiatorId", "type": "string", "size": 36, "required": true},
+          {"key": "recipientId", "type": "string", "size": 36, "required": true},
+          {"key": "initiatorItemIds", "type": "string", "size": 36, "array": true},
+          {"key": "recipientItemIds", "type": "string", "size": 36, "array": true},
+          {"key": "status", "type": "string", "size": 20, "default": "pending"},
+          {"key": "completedAt", "type": "datetime", "required": false},
+          {"key": "createdAt", "type": "datetime", "required": true},
+          {"key": "updatedAt", "type": "datetime", "required": true}
+        ],
+        "indexes": [
+          {"key": "initiator_idx", "type": "key", "attributes": ["initiatorId"]},
+          {"key": "recipient_idx", "type": "key", "attributes": ["recipientId"]},
+          {"key": "trade_status_idx", "type": "key", "attributes": ["status"]}
+        ]
+      },
+      {
+        "id": "messages",
+        "name": "Messages",
+        "attributes": [
+          {"key": "senderId", "type": "string", "size": 36, "required": true},
+          {"key": "recipientId", "type": "string", "size": 36, "required": true},
+          {"key": "tradeId", "type": "string", "size": 36, "required": false},
+          {"key": "content", "type": "string", "size": 2000, "required": true},
+          {"key": "isRead", "type": "boolean", "default": false},
+          {"key": "attachments", "type": "string", "size": 255, "array": true},
+          {"key": "createdAt", "type": "datetime", "required": true}
+        ],
+        "indexes": [
+          {"key": "sender_msg_idx", "type": "key", "attributes": ["senderId"]},
+          {"key": "recipient_msg_idx", "type": "key", "attributes": ["recipientId"]},
+          {"key": "trade_msg_idx", "type": "key", "attributes": ["tradeId"]}
+        ]
+      },
+      {
+        "id": "reviews",
+        "name": "Reviews",
+        "attributes": [
+          {"key": "reviewerId", "type": "string", "size": 36, "required": true},
+          {"key": "reviewedId", "type": "string", "size": 36, "required": true},
+          {"key": "tradeId", "type": "string", "size": 36, "required": true},
+          {"key": "rating", "type": "integer", "min": 1, "max": 5, "required": true},
+          {"key": "comment", "type": "string", "size": 1000, "required": false},
+          {"key": "createdAt", "type": "datetime", "required": true}
+        ],
+        "indexes": [
+          {"key": "reviewer_idx", "type": "key", "attributes": ["reviewerId"]},
+          {"key": "reviewed_idx", "type": "key", "attributes": ["reviewedId"]},
+          {"key": "trade_review_idx", "type": "unique", "attributes": ["tradeId", "reviewerId"]}
+        ]
+      },
+      {
+        "id": "notifications",
+        "name": "Notifications",
+        "attributes": [
+          {"key": "userId", "type": "string", "size": 36, "required": true},
+          {"key": "type", "type": "string", "size": 50, "required": true},
+          {"key": "title", "type": "string", "size": 200, "required": true},
+          {"key": "message", "type": "string", "size": 500, "required": true},
+          {"key": "data", "type": "string", "size": 1000, "required": false},
+          {"key": "isRead", "type": "boolean", "default": false},
+          {"key": "createdAt", "type": "datetime", "required": true}
+        ],
+        "indexes": [
+          {"key": "user_notif_idx", "type": "key", "attributes": ["userId"]},
+          {"key": "unread_idx", "type": "key", "attributes": ["userId", "isRead"]}
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "buckets": [
+      {
+        "id": "item_images",
+        "name": "Item Images",
+        "permissions": ["read(\"any\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+        "fileSizeLimit": 10485760,
+        "allowedFileExtensions": [".jpg", ".jpeg", ".png", ".gif", ".webp"],
+        "encryption": true,
+        "antivirus": true
+      },
+      {
+        "id": "profile_images",
+        "name": "Profile Images",
+        "permissions": ["read(\"any\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+        "fileSizeLimit": 5242880,
+        "allowedFileExtensions": [".jpg", ".jpeg", ".png", ".webp"],
+        "encryption": true,
+        "antivirus": true
+      },
+      {
+        "id": "chat_attachments",
+        "name": "Chat Attachments",
+        "permissions": ["read(\"users\")", "create(\"users\")"],
+        "fileSizeLimit": 20971520,
+        "allowedFileExtensions": [".jpg", ".jpeg", ".png", ".pdf", ".doc", ".docx"],
+        "encryption": true,
+        "antivirus": true
+      }
+    ]
+  },
+  "functions": [
+    {
+      "id": "trading-post-api",
+      "name": "Trading Post API",
+      "runtime": "python-3.9",
+      "entrypoint": "main.py",
+      "path": "./functions/api",
+      "environment": {
+        "APPWRITE_FUNCTION_ENDPOINT": "https://cloud.appwrite.io/v1",
+        "APPWRITE_FUNCTION_PROJECT_ID": "689bdee000098bd9d55c"
+      },
+      "events": [],
+      "schedule": "",
+      "timeout": 30
+    },
+    {
+      "id": "ai-matching-service",
+      "name": "AI Matching Service",
+      "runtime": "python-3.9",
+      "entrypoint": "ai_matching.py",
+      "path": "./functions/ai-matching",
+      "environment": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}"
+      },
+      "events": ["databases.*.collections.items.documents.*.create"],
+      "schedule": "",
+      "timeout": 60
+    },
+    {
+      "id": "notification-service",
+      "name": "Notification Service",
+      "runtime": "node-20.0",
+      "entrypoint": "index.js",
+      "path": "./functions/notifications",
+      "events": [
+        "databases.*.collections.trades.documents.*.create",
+        "databases.*.collections.messages.documents.*.create"
+      ],
+      "schedule": "",
+      "timeout": 15
+    }
+  ],
+  "auth": {
+    "providers": {
+      "email": true,
+      "google": {
+        "enabled": true,
+        "clientId": "${OAUTH_GOOGLE_CLIENT_ID}",
+        "clientSecret": "${OAUTH_GOOGLE_CLIENT_SECRET}"
+      },
+      "github": {
+        "enabled": true,
+        "clientId": "${OAUTH_GITHUB_CLIENT_ID}",
+        "clientSecret": "${OAUTH_GITHUB_CLIENT_SECRET}"
+      },
+      "facebook": {
+        "enabled": false,
+        "appId": "${OAUTH_FACEBOOK_APP_ID}",
+        "appSecret": "${OAUTH_FACEBOOK_APP_SECRET}"
+      }
+    },
+    "security": {
+      "passwordMinLength": 8,
+      "passwordHistory": 3,
+      "maxSessions": 10,
+      "sessionLength": 604800
+    }
+  },
+  "security": {
+    "cors": {
+      "allowedOrigins": [
+        "http://localhost:3000",
+        "http://localhost:3002",
+        "https://trading-post.appwrite.io"
+      ],
+      "allowedHeaders": ["Content-Type", "Authorization", "X-Appwrite-Project"],
+      "allowedMethods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    },
+    "rateLimit": {
+      "enabled": true,
+      "requestsPerMinute": 60,
+      "requestsPerHour": 1000
+    },
+    "encryption": {
+      "atRest": true,
+      "inTransit": true
+    }
+  },
+  "deployment": {
+    "environment": "production",
+    "region": "us-east",
+    "autoScaling": {
+      "enabled": true,
+      "minInstances": 1,
+      "maxInstances": 10,
+      "targetCPU": 70
+    },
+    "monitoring": {
+      "enabled": true,
+      "alertEmail": "admin@tradingpost.com"
+    },
+    "backup": {
+      "enabled": true,
+      "frequency": "daily",
+      "retention": 30
+    }
+  }
+}

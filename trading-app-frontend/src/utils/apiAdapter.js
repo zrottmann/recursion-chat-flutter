@@ -1,0 +1,386 @@
+/**
+ * API Adapter
+ * Redirects old API calls to Appwrite services
+ * Fixes 405 Method Not Allowed errors by handling API calls locally
+ */
+
+import appwriteAuthService from '../services/appwriteAuthService';
+import appwriteDatabase from '../services/appwriteDatabase';
+import matchingService from '../services/matchingService';
+import itemsService from '../services/itemsService';
+import { DEBUG } from './fixDatabaseSchema';
+
+// Override fetch to intercept API calls
+const originalFetch = window.fetch;
+
+// Map of API endpoints to Appwrite service methods
+const apiHandlers = {
+  // Auth endpoints
+  '/api/auth/verify': async (options) => {
+    try {
+      const result = await appwriteAuthService.getCurrentUser();
+      return {
+        ok: true,
+        status: result.success ? 200 : 401,
+        data: result.user
+      };
+    } catch (error) {
+      return { ok: false, status: 401, data: { error: error.message } };
+    }
+  },
+  
+  '/api/auth/google/verify': async (options) => {
+    try {
+      const body = JSON.parse(options.body);
+      const result = await appwriteAuthService.handleOAuthCallback(
+        body.userId || body.token,
+        body.secret || body.token,
+        'google'
+      );
+      return {
+        ok: true,
+        status: result.success ? 200 : 401,
+        data: result
+      };
+    } catch (error) {
+      return { ok: false, status: 401, data: { error: error.message } };
+    }
+  },
+  
+  '/api/auth/google/callback': async (options) => {
+    return apiHandlers['/api/auth/google/verify'](options);
+  },
+  
+  '/api/auth/firebase/signin': async (options) => {
+    try {
+      const body = JSON.parse(options.body);
+      const result = await appwriteAuthService.signInWithEmail(
+        body.email,
+        body.password
+      );
+      return {
+        ok: true,
+        status: result.success ? 200 : 401,
+        data: result
+      };
+    } catch (error) {
+      return { ok: false, status: 401, data: { error: error.message } };
+    }
+  },
+  
+  // Profile endpoints
+  '/api/firebase/profile': async (options) => {
+    try {
+      const result = await appwriteAuthService.getUserProfile();
+      return {
+        ok: true,
+        status: result.success ? 200 : 404,
+        data: result.profile
+      };
+    } catch (error) {
+      return { ok: false, status: 404, data: { error: error.message } };
+    }
+  },
+  
+  // Search endpoints
+  '/api/search': async (options) => {
+    try {
+      const url = new URL(options.url || options.path, window.location.origin);
+      const params = Object.fromEntries(url.searchParams);
+      
+      const result = await appwriteDatabase.searchListings({
+        query: params.q || params.query,
+        category: params.category,
+        location: params.location,
+        limit: parseInt(params.limit) || 50,
+        offset: parseInt(params.offset) || 0
+      });
+      
+      return {
+        ok: true,
+        status: 200,
+        data: {
+          items: result.listings,
+          total: result.total
+        }
+      };
+    } catch (error) {
+      return { ok: false, status: 500, data: { error: error.message } };
+    }
+  },
+  
+  // Listings search endpoint
+  '/api/listings/search': async (options) => {
+    try {
+      const body = options.body ? JSON.parse(options.body) : {};
+      
+      const result = await appwriteDatabase.searchListings({
+        query: body.query || body.q,
+        category: body.category,
+        location: body.location,
+        condition: body.condition,
+        minPrice: body.minPrice,
+        maxPrice: body.maxPrice,
+        radius: body.radius || 50,
+        listingType: body.listingType,
+        sortBy: body.sortBy || 'newest',
+        saved: body.saved,
+        latitude: body.latitude,
+        longitude: body.longitude,
+        limit: body.limit || 50,
+        offset: body.offset || 0
+      });
+      
+      // Return array of listings directly for the component
+      return {
+        ok: true,
+        status: 200,
+        data: result.listings || []
+      };
+    } catch (error) {
+      console.error('Error in /api/listings/search handler:', error);
+      return { ok: false, status: 500, data: [] };
+    }
+  },
+  
+  // Photo-to-trade endpoints
+  '/api/photo-to-trade/start': async (options) => {
+    try {
+      const body = JSON.parse(options.body);
+      // Create a new item with AI analysis
+      const result = await itemsService.createItem({
+        title: 'Photo Item',
+        description: 'Analyzing...',
+        images: body.images || [],
+        category: 'other',
+        condition: 'good',
+        is_available: false // Draft until analyzed
+      });
+      
+      return {
+        ok: true,
+        status: 200,
+        data: {
+          session_id: result.item?.$id,
+          status: 'processing'
+        }
+      };
+    } catch (error) {
+      return { ok: false, status: 500, data: { error: error.message } };
+    }
+  },
+  
+  '/api/photo-to-trade/status': async (options) => {
+    try {
+      const url = new URL(options.url || options.path, window.location.origin);
+      const sessionId = url.pathname.split('/').pop();
+      
+      const result = await itemsService.getItem(sessionId);
+      
+      return {
+        ok: true,
+        status: 200,
+        data: {
+          status: result.item?.ai_status || 'completed',
+          progress: 100
+        }
+      };
+    } catch (error) {
+      return { ok: false, status: 404, data: { error: error.message } };
+    }
+  },
+  
+  '/api/photo-to-trade/results': async (options) => {
+    try {
+      const url = new URL(options.url || options.path, window.location.origin);
+      const sessionId = url.pathname.split('/').pop();
+      
+      const itemResult = await itemsService.getItem(sessionId);
+      const matchResult = await matchingService.generateMatches(sessionId);
+      
+      return {
+        ok: true,
+        status: 200,
+        data: {
+          item: itemResult.item,
+          matches: matchResult.matches || []
+        }
+      };
+    } catch (error) {
+      return { ok: false, status: 404, data: { error: error.message } };
+    }
+  },
+  
+  // Geocoding endpoints
+  '/api/geocode/zipcode': async (options) => {
+    try {
+      const url = new URL(options.url || options.path, window.location.origin);
+      const zipCode = url.pathname.split('/').pop();
+      
+      // Mock geocoding response for now
+      return {
+        ok: true,
+        status: 200,
+        data: {
+          latitude: 39.2904,
+          longitude: -76.6122,
+          city: 'Baltimore',
+          state: 'MD',
+          country: 'US'
+        }
+      };
+    } catch (error) {
+      return { ok: false, status: 404, data: { error: error.message } };
+    }
+  },
+  
+  // Listings save/unsave endpoints
+  '/api/listings/save': async (options) => {
+    try {
+      const url = new URL(options.url || options.path, window.location.origin);
+      const pathParts = url.pathname.split('/');
+      const listingId = pathParts[pathParts.indexOf('listings') + 1];
+      
+      if (options.method === 'DELETE') {
+        // Unsave item
+        const result = await appwriteDatabase.unsaveItem(listingId);
+        return {
+          ok: true,
+          status: 200,
+          data: { success: true, message: 'Item unsaved' }
+        };
+      } else {
+        // Save item
+        const result = await appwriteDatabase.saveItem(listingId);
+        return {
+          ok: true,
+          status: 200,
+          data: { success: true, message: 'Item saved' }
+        };
+      }
+    } catch (error) {
+      return { ok: false, status: 500, data: { error: error.message } };
+    }
+  }
+};
+
+// Intercept fetch calls
+window.fetch = async function(...args) {
+  const [url, options = {}] = args;
+  const urlString = typeof url === 'string' ? url : url.toString();
+  
+  // Check if this is an API call we should handle
+  for (const [endpoint, handler] of Object.entries(apiHandlers)) {
+    if (urlString.includes(endpoint)) {
+      DEBUG.log(`📡 Intercepting API call: ${endpoint}`, options);
+      
+      try {
+        const result = await handler({
+          url: urlString,
+          path: urlString,
+          ...options
+        });
+        
+        // Create a mock Response object
+        const response = new Response(JSON.stringify(result.data), {
+          status: result.status,
+          statusText: result.ok ? 'OK' : 'Error',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        DEBUG.log(`✅ API call handled: ${endpoint}`, result);
+        return response;
+        
+      } catch (error) {
+        DEBUG.error(`❌ API handler error for ${endpoint}:`, error);
+        
+        // Return error response
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500,
+          statusText: 'Internal Server Error',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+      }
+    }
+  }
+  
+  // Not an API call we handle, use original fetch
+  return originalFetch.apply(this, args);
+};
+
+// Also intercept XMLHttpRequest for axios
+const originalXHROpen = XMLHttpRequest.prototype.open;
+const originalXHRSend = XMLHttpRequest.prototype.send;
+
+XMLHttpRequest.prototype.open = function(method, url, ...args) {
+  this._interceptUrl = url;
+  this._interceptMethod = method;
+  return originalXHROpen.apply(this, [method, url, ...args]);
+};
+
+XMLHttpRequest.prototype.send = function(data) {
+  const url = this._interceptUrl;
+  
+  // Check if this is an API call we should handle
+  for (const [endpoint, handler] of Object.entries(apiHandlers)) {
+    if (url && url.includes(endpoint)) {
+      DEBUG.log(`📡 Intercepting XHR API call: ${endpoint}`, { method: this._interceptMethod, data });
+      
+      // Handle the request asynchronously
+      handler({
+        url,
+        path: url,
+        method: this._interceptMethod,
+        body: data
+      }).then(result => {
+        // Simulate XHR response
+        Object.defineProperty(this, 'status', { value: result.status });
+        Object.defineProperty(this, 'statusText', { value: result.ok ? 'OK' : 'Error' });
+        Object.defineProperty(this, 'responseText', { value: JSON.stringify(result.data) });
+        Object.defineProperty(this, 'response', { value: result.data });
+        Object.defineProperty(this, 'readyState', { value: 4 });
+        
+        // Trigger events
+        if (this.onreadystatechange) {
+          this.onreadystatechange();
+        }
+        if (this.onload) {
+          this.onload();
+        }
+        
+        DEBUG.log(`✅ XHR API call handled: ${endpoint}`, result);
+      }).catch(error => {
+        DEBUG.error(`❌ XHR API handler error for ${endpoint}:`, error);
+        
+        Object.defineProperty(this, 'status', { value: 500 });
+        Object.defineProperty(this, 'statusText', { value: 'Internal Server Error' });
+        Object.defineProperty(this, 'responseText', { value: JSON.stringify({ error: error.message }) });
+        Object.defineProperty(this, 'response', { value: { error: error.message } });
+        Object.defineProperty(this, 'readyState', { value: 4 });
+        
+        if (this.onerror) {
+          this.onerror();
+        }
+      });
+      
+      // Don't actually send the request
+      return;
+    }
+  }
+  
+  // Not an API call we handle, use original send
+  return originalXHRSend.apply(this, [data]);
+};
+
+// Initialize on load
+export function initApiAdapter() {
+  console.log('🔌 API Adapter initialized - redirecting old API calls to Appwrite services');
+  DEBUG.log('API Adapter active - monitoring API calls');
+}
+
+// Export for testing
+export { apiHandlers };

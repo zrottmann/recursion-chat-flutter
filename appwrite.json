@@ -1,0 +1,210 @@
+{
+    "projectId": "689bdee000098bd9d55c",
+    "projectName": "Trading Post",
+    "buildSettings": {
+        "installCommand": "cd trading-app-frontend && npm install --legacy-peer-deps",
+        "buildCommand": "cd trading-app-frontend && npm run build",
+        "outputDirectory": "trading-app-frontend/dist",
+        "nodeVersion": "20"
+    },
+    "functions": [
+        {
+            "$id": "trading-post-api",
+            "name": "Trading Post API",
+            "runtime": "python-3.11",
+            "source": "./functions/trading-post-api",
+            "entrypoint": "main.py",
+            "commands": "pip install -r requirements.txt",
+            "timeout": 30,
+            "enabled": true,
+            "logging": true,
+            "execute": [
+                "any"
+            ]
+        },
+        {
+            "$id": "user-auth",
+            "name": "User Authentication",
+            "runtime": "python-3.11",
+            "source": "./functions/user-auth",
+            "entrypoint": "auth.py",
+            "commands": "pip install -r requirements.txt",
+            "timeout": 15,
+            "enabled": true,
+            "logging": true,
+            "execute": [
+                "any"
+            ]
+        },
+        {
+            "$id": "trading-logic",
+            "name": "Trading Logic Functions",
+            "runtime": "python-3.11",
+            "source": "./functions/trading-logic",
+            "entrypoint": "trading.py",
+            "commands": "pip install -r requirements.txt",
+            "timeout": 30,
+            "enabled": true,
+            "logging": true,
+            "execute": [
+                "any"
+            ]
+        },
+        {
+            "$id": "ai-pricing",
+            "name": "AI Pricing System",
+            "runtime": "python-3.11",
+            "source": "./functions/ai-pricing",
+            "entrypoint": "main.py",
+            "commands": "pip install -r requirements.txt",
+            "timeout": 60,
+            "enabled": true,
+            "logging": true,
+            "execute": [
+                "any"
+            ]
+        },
+        {
+            "$id": "ai-matching",
+            "name": "AI Matching Engine",
+            "runtime": "python-3.11",
+            "source": "./functions/ai-matching",
+            "entrypoint": "main.py",
+            "commands": "pip install -r requirements.txt",
+            "timeout": 60,
+            "enabled": true,
+            "logging": true,
+            "execute": [
+                "any"
+            ]
+        }
+    ],
+    "databases": [
+        {
+            "$id": "trading_post_db",
+            "name": "Trading Post Database",
+            "enabled": true
+        }
+    ],
+    "collections": [
+        {
+            "$id": "users",
+            "name": "Users",
+            "permissions": [
+                "read(\"any\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        },
+        {
+            "$id": "items",
+            "name": "Items",
+            "permissions": [
+                "read(\"any\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        },
+        {
+            "$id": "trades",
+            "name": "Trades",
+            "permissions": [
+                "read(\"any\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        },
+        {
+            "$id": "messages",
+            "name": "Messages",
+            "permissions": [
+                "read(\"user:self\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        },
+        {
+            "$id": "reviews",
+            "name": "Reviews",
+            "permissions": [
+                "read(\"any\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        },
+        {
+            "$id": "wants",
+            "name": "User Wants",
+            "permissions": [
+                "read(\"any\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        },
+        {
+            "$id": "matches",
+            "name": "AI Matches",
+            "permissions": [
+                "read(\"user:self\")",
+                "create(\"any\")",
+                "update(\"any\")",
+                "delete(\"any\")"
+            ]
+        },
+        {
+            "$id": "notifications",
+            "name": "Notifications",
+            "permissions": [
+                "read(\"user:self\")",
+                "create(\"any\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        }
+    ],
+    "buckets": [
+        {
+            "$id": "item_images",
+            "name": "Item Images",
+            "permissions": [
+                "read(\"any\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        },
+        {
+            "$id": "profile_images",
+            "name": "Profile Images",
+            "permissions": [
+                "read(\"any\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        },
+        {
+            "$id": "chat_attachments",
+            "name": "Chat Attachments",
+            "permissions": [
+                "read(\"user:self\")",
+                "create(\"users\")",
+                "update(\"user:self\")",
+                "delete(\"user:self\")"
+            ]
+        }
+    ],
+    "sites": [
+        {
+            "name": "Trading Post",
+            "domain": "tradingpost.appwrite.network",
+            "directory": "trading-app-frontend/dist"
+        }
+    ]
+}

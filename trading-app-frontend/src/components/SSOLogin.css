@@ -1,0 +1,183 @@
+/**
+ * SSO Login Component Styles
+ */
+
+.sso-login-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.sso-providers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sso-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.sso-button:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: width 0.3s ease;
+}
+
+.sso-button:hover:before {
+  width: 100%;
+}
+
+.sso-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sso-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.sso-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.sso-icon {
+  font-size: 1.25rem;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Provider-specific styles */
+.btn-google {
+  background-color: #ffffff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+}
+
+.btn-google:hover {
+  background-color: #f8f9fa;
+  border-color: #dadce0;
+  color: #3c4043;
+}
+
+.btn-github {
+  background-color: #24292e;
+  color: #ffffff;
+  border: 1px solid #24292e;
+}
+
+.btn-github:hover {
+  background-color: #2f363d;
+  border-color: #2f363d;
+}
+
+.btn-facebook {
+  background-color: #1877f2;
+  color: #ffffff;
+  border: 1px solid #1877f2;
+}
+
+.btn-facebook:hover {
+  background-color: #166fe5;
+  border-color: #166fe5;
+}
+
+.btn-microsoft {
+  background-color: #0078d4;
+  color: #ffffff;
+  border: 1px solid #0078d4;
+}
+
+.btn-microsoft:hover {
+  background-color: #106ebe;
+  border-color: #106ebe;
+}
+
+.btn-discord {
+  background-color: #5865f2;
+  color: #ffffff;
+  border: 1px solid #5865f2;
+}
+
+.btn-discord:hover {
+  background-color: #4752c4;
+  border-color: #4752c4;
+}
+
+.btn-apple {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #000000;
+}
+
+.btn-apple:hover {
+  background-color: #1a1a1a;
+  border-color: #1a1a1a;
+}
+
+/* Animation for loading state */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.sso-button:disabled {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #f8f8f8 50%,
+    #f0f0f0 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .sso-button {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .sso-icon {
+    font-size: 1rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .btn-google {
+    background-color: #303134;
+    color: #e8eaed;
+    border-color: #5f6368;
+  }
+  
+  .btn-google:hover {
+    background-color: #3c4043;
+    border-color: #5f6368;
+    color: #e8eaed;
+  }
+}

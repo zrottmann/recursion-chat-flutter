@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <title>Trading Post - OAuth Authentication</title>
+    <script>
+      // ULTRA-SIMPLE OAuth callback handler - NO COMPLEXITY
+      console.log('🔐 [SIMPLE-CALLBACK] Starting ultra-simple OAuth redirect...');
+      console.log('🔐 [SIMPLE-CALLBACK] Current URL:', window.location.href);
+      
+      // Get URL components
+      const currentSearch = window.location.search;
+      const currentHash = window.location.hash;
+      
+      console.log('🔐 [SIMPLE-CALLBACK] Search params:', currentSearch);
+      console.log('🔐 [SIMPLE-CALLBACK] Hash:', currentHash);
+      
+      // Store for main app
+      try {
+        sessionStorage.setItem('oauth_callback_search', currentSearch);
+        sessionStorage.setItem('oauth_callback_hash', currentHash);
+        sessionStorage.setItem('oauth_callback_timestamp', new Date().toISOString());
+        console.log('✅ [SIMPLE-CALLBACK] Stored in sessionStorage');
+      } catch (e) {
+        console.error('❌ [SIMPLE-CALLBACK] SessionStorage failed:', e);
+      }
+      
+      // Build simple redirect URL - ALWAYS go to homepage
+      const redirectUrl = '/' + currentSearch + currentHash;
+      
+      console.log('🚀 [SIMPLE-CALLBACK] Redirecting to:', redirectUrl);
+      console.log('🚀 [SIMPLE-CALLBACK] Using window.location.replace() NOW');
+      
+      // IMMEDIATE redirect - NO delays, NO complexity
+      window.location.replace(redirectUrl);
+    </script>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        max-width: 400px;
+        margin: 1rem;
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+      }
+      p {
+        color: #666;
+        line-height: 1.6;
+        margin: 0.5rem 0;
+      }
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 1rem auto;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .icon {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">🔐</div>
+      <h1>Completing OAuth Authentication...</h1>
+      <div class="spinner"></div>
+      <p id="status">Redirecting to Trading Post...</p>
+      <p><small>If you are not redirected, <a href="/">click here</a>.</small></p>
+    </div>
+  </body>
+</html>

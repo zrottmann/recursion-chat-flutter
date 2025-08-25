@@ -1,0 +1,49 @@
+.public-user-profile {
+  padding-bottom: 2rem;
+}
+
+.user-info-card {
+  position: sticky;
+  top: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+.user-avatar {
+  width: 100px;
+  height: 100px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0 auto;
+}
+
+.user-info-card h3 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.user-info-card .text-muted {
+  font-size: 0.9rem;
+}
+
+.user-info-card .btn {
+  margin-top: 1rem;
+}
+
+.table-hover tbody tr:hover {
+  cursor: pointer;
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .user-info-card {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+}

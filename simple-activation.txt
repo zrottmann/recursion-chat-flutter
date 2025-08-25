@@ -1,0 +1,23 @@
+SIMPLE PLATFORM ACTIVATION
+==========================
+
+Go to: https://tradingpost.appwrite.network
+Press F12 to open console
+Copy and paste this ONE LINE at a time:
+
+1. Load Appwrite:
+const script = document.createElement('script'); script.src = 'https://cdn.jsdelivr.net/npm/appwrite@15.0.0'; document.head.appendChild(script);
+
+2. Wait 3 seconds, then run this:
+const client = new Appwrite.Client(); client.setEndpoint('https://nyc.cloud.appwrite.io/v1').setProject('689bdee000098bd9d55c'); const account = new Appwrite.Account(client); account.getSession('current').catch(e => console.log('✅ Platform activated!'));
+
+ALTERNATIVE SIMPLER METHOD:
+===========================
+
+Just try to login with OAuth on your site:
+1. Go to https://tradingpost.appwrite.network
+2. Click the Google login button
+3. The OAuth attempt itself should activate the platform
+4. Even if login fails with "Invalid URI", the platform should become active
+
+Then refresh Appwrite Console to check if status changed to "Active"

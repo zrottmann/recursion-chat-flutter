@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Library Test</title>
+    <style>
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        .controls {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #764ba2;
+        }
+        .status {
+            background: #242424;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .log-output {
+            background: #0d0d0d;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #1a1a1a;
+            border-left: 3px solid #444;
+            border-radius: 2px;
+        }
+        .log-entry.debug { border-left-color: #7f8c8d; }
+        .log-entry.info { border-left-color: #3498db; }
+        .log-entry.warn { border-left-color: #f39c12; }
+        .log-entry.error { border-left-color: #e74c3c; }
+        .log-entry.success { border-left-color: #27ae60; }
+        code {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Library Test</h1>
+        
+        <div class="status">
+            <h3>Status</h3>
+            <p>Debug Enabled: <code id="debug-status">checking...</code></p>
+            <p>Debug Level: <code id="debug-level">checking...</code></p>
+            <p>Namespace: <code id="namespace">trading-post:test</code></p>
+        </div>
+
+        <div class="controls">
+            <h3>Controls</h3>
+            <button onclick="enableDebug()">Enable Debug</button>
+            <button onclick="disableDebug()">Disable Debug</button>
+            <button onclick="clearLogs()">Clear Logs</button>
+            <button onclick="exportLogs()">Export Logs</button>
+            <hr style="border: 1px solid #444; margin: 15px 0;">
+            
+            <h4>Test Logging</h4>
+            <button onclick="testTrace()">Test Trace</button>
+            <button onclick="testDebug()">Test Debug</button>
+            <button onclick="testInfo()">Test Info</button>
+            <button onclick="testWarn()">Test Warn</button>
+            <button onclick="testError()">Test Error</button>
+            <button onclick="testSuccess()">Test Success</button>
+            <hr style="border: 1px solid #444; margin: 15px 0;">
+            
+            <h4>Advanced Features</h4>
+            <button onclick="testPerformance()">Test Performance</button>
+            <button onclick="testGroup()">Test Grouping</button>
+            <button onclick="testTable()">Test Table</button>
+            <button onclick="testHistory()">Show History</button>
+            <button onclick="testChild()">Test Child Logger</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+
+        <div class="log-output" id="log-output">
+            <h3>Log Output</h3>
+            <div id="logs">
+                <!-- Logs will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the debug library
+        import createDebugger from '../../shared-libs/debug-logger/index.js';
+        
+        // Create debugger instance
+        const debug = createDebugger('trading-post:test');
+        window.debug = debug; // Make it globally accessible
+        
+        // Update status
+        function updateStatus() {
+            document.getElementById('debug-status').textContent = debug.enabled ? 'ENABLED' : 'DISABLED';
+            document.getElementById('debug-level').textContent = debug.level;
+        }
+        
+        // Enable debug
+        window.enableDebug = function() {
+            localStorage.setItem('DEBUG', 'true');
+            localStorage.setItem('DEBUG:trading-post:test', 'true');
+            debug.setEnabled(true);
+            updateStatus();
+            addLogToUI('success', 'Debug enabled');
+            debug.success('Debug mode enabled!');
+        };
+        
+        // Disable debug
+        window.disableDebug = function() {
+            localStorage.removeItem('DEBUG');
+            localStorage.removeItem('DEBUG:trading-post:test');
+            debug.setEnabled(false);
+            updateStatus();
+            addLogToUI('info', 'Debug disabled');
+        };
+        
+        // Clear logs
+        window.clearLogs = function() {
+            document.getElementById('logs').innerHTML = '';
+            debug.clearHistory();
+            addLogToUI('info', 'Logs cleared');
+        };
+        
+        // Export logs
+        window.exportLogs = function() {
+            const json = debug.exportHistory('json');
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'debug-logs.json';
+            a.click();
+            addLogToUI('success', 'Logs exported to debug-logs.json');
+        };
+        
+        // Test functions
+        window.testTrace = function() {
+            debug.trace('This is a trace message', { detail: 'low-level debugging' });
+            addLogToUI('trace', 'Trace message sent');
+        };
+        
+        window.testDebug = function() {
+            debug.debug('This is a debug message', { data: { test: true } });
+            addLogToUI('debug', 'Debug message sent');
+        };
+        
+        window.testInfo = function() {
+            debug.info('This is an info message', { timestamp: new Date().toISOString() });
+            addLogToUI('info', 'Info message sent');
+        };
+        
+        window.testWarn = function() {
+            debug.warn('This is a warning message', { severity: 'medium' });
+            addLogToUI('warn', 'Warning message sent');
+        };
+        
+        window.testError = function() {
+            debug.error('This is an error message', new Error('Test error'));
+            addLogToUI('error', 'Error message sent');
+        };
+        
+        window.testSuccess = function() {
+            debug.success('Operation completed successfully!', { duration: '125ms' });
+            addLogToUI('success', 'Success message sent');
+        };
+        
+        window.testPerformance = function() {
+            const result = debug.measure('test-operation', () => {
+                // Simulate some work
+                let sum = 0;
+                for (let i = 0; i < 1000000; i++) {
+                    sum += i;
+                }
+                return sum;
+            });
+            addLogToUI('info', `Performance test completed. Result: ${result}`);
+        };
+        
+        window.testGroup = function() {
+            debug.group('Test Group');
+            debug.info('Message 1 in group');
+            debug.info('Message 2 in group');
+            debug.info('Message 3 in group');
+            debug.groupEnd();
+            addLogToUI('info', 'Group test completed');
+        };
+        
+        window.testTable = function() {
+            const data = [
+                { name: 'John', age: 30, city: 'New York' },
+                { name: 'Jane', age: 25, city: 'London' },
+                { name: 'Bob', age: 35, city: 'Paris' }
+            ];
+            debug.table(data);
+            addLogToUI('info', 'Table data sent to console');
+        };
+        
+        window.testHistory = function() {
+            const history = debug.getHistory({ limit: 10 });
+            addLogToUI('info', `History contains ${history.length} entries`);
+            console.log('Debug History:', history);
+        };
+        
+        window.testChild = function() {
+            const childDebug = debug.child('submodule');
+            childDebug.info('Message from child logger');
+            addLogToUI('info', 'Child logger test completed');
+        };
+        
+        window.runAllTests = async function() {
+            addLogToUI('info', 'Running all tests...');
+            
+            testTrace();
+            await sleep(100);
+            testDebug();
+            await sleep(100);
+            testInfo();
+            await sleep(100);
+            testWarn();
+            await sleep(100);
+            testError();
+            await sleep(100);
+            testSuccess();
+            await sleep(100);
+            testPerformance();
+            await sleep(100);
+            testGroup();
+            await sleep(100);
+            testTable();
+            await sleep(100);
+            testChild();
+            await sleep(100);
+            testHistory();
+            
+            addLogToUI('success', 'All tests completed!');
+        };
+        
+        // Helper function to add logs to UI
+        function addLogToUI(level, message) {
+            const logsContainer = document.getElementById('logs');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${level}`;
+            entry.innerHTML = `
+                <strong>[${new Date().toLocaleTimeString()}] [${level.toUpperCase()}]</strong> ${message}
+            `;
+            logsContainer.appendChild(entry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+        
+        // Helper sleep function
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        // Initialize
+        updateStatus();
+        addLogToUI('info', 'Debug library test page loaded');
+        
+        // Check if debug is enabled
+        if (debug.enabled) {
+            debug.success('Debug library initialized and ready!');
+            addLogToUI('success', 'Debug is enabled - check browser console for output');
+        } else {
+            addLogToUI('warn', 'Debug is disabled - click "Enable Debug" to start');
+        }
+        
+        // Make debug available globally for console testing
+        window.testDebug = debug;
+        console.log('Debug library available as window.testDebug');
+    </script>
+</body>
+</html>

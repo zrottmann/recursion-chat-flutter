@@ -1,0 +1,121 @@
+{
+  "name": "trading-post-appwrite",
+  "region": "nyc",
+  "services": [
+    {
+      "name": "web",
+      "github": {
+        "repo": "zrottmann/trading-post-app",
+        "branch": "main",
+        "deploy_on_push": true
+      },
+      "build_command": "cd trading-app-frontend && npm ci && npm run build && cd .. && pip install -r requirements.txt",
+      "run_command": "python -m uvicorn app_sqlite:app --host 0.0.0.0 --port 3000",
+      "environment_slug": "python",
+      "instance_size_slug": "basic-xs",
+      "instance_count": 1,
+      "http_port": 3000,
+      "routes": [
+        {
+          "path": "/"
+        }
+      ],
+      "envs": [
+        {
+          "key": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "key": "PORT",
+          "value": "3000"
+        },
+        {
+          "key": "APPWRITE_ENDPOINT",
+          "value": "https://nyc.cloud.appwrite.io/v1",
+          "type": "GENERAL"
+        },
+        {
+          "key": "APPWRITE_PROJECT_ID",
+          "value": "689bdaf500072795b0f6",
+          "type": "GENERAL"
+        },
+        {
+          "key": "APPWRITE_API_KEY",
+          "value": "standard_3f24ec4af7735370663bb71bb1833e940e485642b146ee160ca66a2cbb5f43a882d46b71a881b045d0410980baa30ce377e3fd493a119e0457fbdbf192b079c8de72e6263b21ea9047de4d38d9cf11c075bbc5cecbae17237e2dfbe142059151dd7f042c0dd02abc88af8348e6b95d632541f664dd4244027c35405aa6915fbc",
+          "type": "SECRET"
+        },
+        {
+          "key": "APPWRITE_DATABASE_ID",
+          "value": "recursion_chat_db",
+          "type": "GENERAL"
+        },
+        {
+          "key": "APPWRITE_USERS_COLLECTION_ID",
+          "value": "trading_post_users",
+          "type": "GENERAL"
+        },
+        {
+          "key": "APPWRITE_ITEMS_COLLECTION_ID",
+          "value": "trading_post_items",
+          "type": "GENERAL"
+        },
+        {
+          "key": "APPWRITE_TRADES_COLLECTION_ID",
+          "value": "trading_post_trades",
+          "type": "GENERAL"
+        },
+        {
+          "key": "APPWRITE_MESSAGES_COLLECTION_ID",
+          "value": "trading_post_messages",
+          "type": "GENERAL"
+        },
+        {
+          "key": "APPWRITE_REVIEWS_COLLECTION_ID",
+          "value": "trading_post_reviews",
+          "type": "GENERAL"
+        },
+        {
+          "key": "USE_APPWRITE_AUTH",
+          "value": "true",
+          "type": "GENERAL"
+        },
+        {
+          "key": "USE_APPWRITE_DATABASE",
+          "value": "true",
+          "type": "GENERAL"
+        },
+        {
+          "key": "USE_APPWRITE_STORAGE",
+          "value": "true",
+          "type": "GENERAL"
+        },
+        {
+          "key": "REACT_APP_APPWRITE_ENDPOINT",
+          "value": "https://nyc.cloud.appwrite.io/v1",
+          "type": "GENERAL"
+        },
+        {
+          "key": "REACT_APP_APPWRITE_PROJECT_ID",
+          "value": "689bdaf500072795b0f6",
+          "type": "GENERAL"
+        },
+        {
+          "key": "REACT_APP_APPWRITE_DATABASE_ID",
+          "value": "recursion_chat_db",
+          "type": "GENERAL"
+        }
+      ],
+      "health_check": {
+        "http_path": "/health",
+        "initial_delay_seconds": 30,
+        "period_seconds": 10
+      }
+    }
+  ],
+  "domains": [
+    {
+      "domain": "tradingpost.recursionsystems.com",
+      "type": "PRIMARY"
+    }
+  ]
+}

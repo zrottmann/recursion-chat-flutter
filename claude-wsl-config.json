@@ -1,0 +1,120 @@
+{
+  "comment": "Claude WSL Integration Configuration",
+  "version": "1.0.0",
+  
+  "wsl": {
+    "distribution": "Ubuntu",
+    "claudePath": "/usr/local/bin/claude",
+    "shellPath": "/bin/bash",
+    "timeout": 300000,
+    "environment": {
+      "TERM": "xterm-256color",
+      "LANG": "en_US.UTF-8",
+      "LC_ALL": "en_US.UTF-8"
+    }
+  },
+  
+  "windows": {
+    "claudePath": "%APPDATA%\\npm\\node_modules\\@anthropic-ai\\claude-code\\cli.js",
+    "nodeExecutable": "node"
+  },
+  
+  "detection": {
+    "comment": "Patterns that trigger WSL usage",
+    "bashIndicators": [
+      "^bash\\b",
+      "^sh\\b",
+      "^\\$\\s",
+      "&&",
+      "\\|\\|",
+      ";\\s*$",
+      "`[^`]+`",
+      "\\$\\([^)]+\\)"
+    ],
+    "forceWSLTools": [
+      "Bash",
+      "bash",
+      "shell",
+      "terminal"
+    ],
+    "forceWindowsTools": [
+      "powershell",
+      "cmd"
+    ]
+  },
+  
+  "pathMapping": {
+    "comment": "Automatic path conversion between Windows and WSL",
+    "enabled": true,
+    "windowsToWSL": {
+      "C:\\\\": "/mnt/c/",
+      "D:\\\\": "/mnt/d/",
+      "E:\\\\": "/mnt/e/"
+    },
+    "wslToWindows": {
+      "/mnt/c/": "C:\\",
+      "/mnt/d/": "D:\\",
+      "/mnt/e/": "E:\\"
+    }
+  },
+  
+  "performance": {
+    "cacheResults": true,
+    "maxCacheAge": 3600,
+    "parallelExecution": true,
+    "streamOutput": true
+  },
+  
+  "security": {
+    "allowedCommands": [
+      "ls", "cat", "grep", "find", "awk", "sed", "sort", "uniq",
+      "git", "npm", "node", "python", "pip", "curl", "wget",
+      "docker", "kubectl", "terraform", "ansible"
+    ],
+    "blockedCommands": [
+      "rm -rf /",
+      "dd if=",
+      ":(){ :|:& };:",
+      "mkfs",
+      "fdisk"
+    ],
+    "requireConfirmation": [
+      "sudo",
+      "rm -r",
+      "chmod 777",
+      "chown"
+    ]
+  },
+  
+  "logging": {
+    "level": "info",
+    "file": "%USERPROFILE%\\.claude-wsl\\claude-wsl.log",
+    "maxSize": "10MB",
+    "maxFiles": 5,
+    "console": true
+  },
+  
+  "integration": {
+    "inheritEnvironment": true,
+    "preserveWorkingDirectory": true,
+    "forwardSignals": true,
+    "handleStdin": true,
+    "bufferOutput": false
+  },
+  
+  "troubleshooting": {
+    "fallbackToWindows": true,
+    "retryAttempts": 3,
+    "retryDelay": 1000,
+    "debugMode": false,
+    "verboseErrors": true
+  },
+  
+  "experimental": {
+    "comment": "Experimental features - use with caution",
+    "smartDetection": true,
+    "contextAwareRouting": false,
+    "hybridExecution": false,
+    "crossPlatformPipes": false
+  }
+}

@@ -1,0 +1,73 @@
+name: trading-post-frontend-deploy
+region: nyc3
+
+static_sites:
+- name: trading-post-site
+  github:
+    repo: zrottmann/trading-post-app
+    branch: main
+    deploy_on_push: true
+  build_command: cd trading-app-frontend && npm install --legacy-peer-deps && npm run build
+  output_dir: /trading-app-frontend/build
+  index_document: index.html
+  catchall_document: index.html
+  source_dir: /
+  
+  # Environment Variables for Trading Post Site ID: 689bdee000098bd9d55c
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: REACT_APP_APPWRITE_ENDPOINT
+    value: https://nyc.cloud.appwrite.io/v1
+  - key: REACT_APP_APPWRITE_PROJECT_ID
+    value: 689bdee000098bd9d55c
+  - key: REACT_APP_APPWRITE_PROJECT_NAME
+    value: Trading Post Frontend
+  # Also add VITE_ prefixes for compatibility
+  - key: VITE_APPWRITE_ENDPOINT
+    value: https://nyc.cloud.appwrite.io/v1
+  - key: VITE_APPWRITE_PROJECT_ID
+    value: 689bdee000098bd9d55c
+  - key: VITE_APPWRITE_PROJECT_NAME
+    value: Trading Post Frontend
+  - key: REACT_APP_APPWRITE_DATABASE_ID
+    value: trading_post_db
+  - key: REACT_APP_APPWRITE_USERS_COLLECTION_ID
+    value: users
+  - key: REACT_APP_APPWRITE_ITEMS_COLLECTION_ID
+    value: items
+  - key: REACT_APP_APPWRITE_WANTS_COLLECTION_ID
+    value: wants
+  - key: REACT_APP_APPWRITE_TRADES_COLLECTION_ID
+    value: trades
+  - key: REACT_APP_APPWRITE_MESSAGES_COLLECTION_ID
+    value: messages
+  - key: REACT_APP_APPWRITE_REVIEWS_COLLECTION_ID
+    value: reviews
+  - key: REACT_APP_APPWRITE_NOTIFICATIONS_COLLECTION_ID
+    value: notifications
+  - key: REACT_APP_APPWRITE_ITEM_IMAGES_BUCKET_ID
+    value: item_images
+  - key: REACT_APP_APPWRITE_PROFILE_IMAGES_BUCKET_ID
+    value: profile_images
+  - key: REACT_APP_APPWRITE_CHAT_ATTACHMENTS_BUCKET_ID
+    value: chat_attachments
+  - key: REACT_APP_ENVIRONMENT
+    value: production
+  - key: REACT_APP_ENABLE_SSO
+    value: "true"
+  - key: REACT_APP_ENABLE_OAUTH
+    value: "true"
+  - key: REACT_APP_ENABLE_EMAIL_AUTH
+    value: "true"
+  - key: REACT_APP_OAUTH_PROVIDERS
+    value: google,github,facebook
+  - key: REACT_APP_ENABLE_ANALYTICS
+    value: "false"
+  # Note: These URLs will need to be updated once the site is deployed
+  - key: REACT_APP_OAUTH_CALLBACK_URL
+    value: https://trading-post-site.ondigitalocean.app/auth/callback
+  - key: REACT_APP_OAUTH_ERROR_URL
+    value: https://trading-post-site.ondigitalocean.app/auth/error
+  - key: REACT_APP_API_URL
+    value: https://trading-post-site.ondigitalocean.app

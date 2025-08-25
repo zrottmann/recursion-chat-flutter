@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Callback - Trading Post</title>
+    <script>
+        // ULTRA-SIMPLE immediate redirect to homepage
+        console.log("🔄 [AUTH/CALLBACK] ULTRA-SIMPLE redirect starting...");
+        console.log("🔄 [AUTH/CALLBACK] Current URL:", window.location.href);
+        
+        const search = window.location.search;
+        const hash = window.location.hash;
+        const redirectUrl = "/" + search + hash;
+        
+        console.log("🔄 [AUTH/CALLBACK] Redirecting to:", redirectUrl);
+        
+        // Store OAuth params
+        try {
+            sessionStorage.setItem('oauth_callback_search', search);
+            sessionStorage.setItem('oauth_callback_hash', hash);
+            sessionStorage.setItem('oauth_callback_timestamp', new Date().toISOString());
+        } catch (e) {
+            console.error('SessionStorage failed:', e);
+        }
+        
+        // IMMEDIATE redirect
+        window.location.replace(redirectUrl);
+    </script>
+</head>
+<body>
+    <p>Redirecting to Trading Post...</p>
+</body>
+</html>

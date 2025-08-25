@@ -1,0 +1,619 @@
+{
+  "projectId": "trading-post-v2",
+  "projectName": "Trading Post v2.0",
+  "settings": {
+    "services": {
+      "account": true,
+      "avatars": true,
+      "databases": true,
+      "functions": true,
+      "health": true,
+      "locale": true,
+      "messaging": true,
+      "storage": true,
+      "teams": true,
+      "users": true
+    }
+  },
+  "auth": {
+    "duration": 31536000,
+    "limit": 100,
+    "sessionAlerts": true,
+    "passwordHistory": 0,
+    "passwordDictionary": false,
+    "personalDataCheck": false
+  },
+  "databases": [
+    {
+      "id": "trading_post_db",
+      "name": "Trading Post Database",
+      "enabled": true,
+      "collections": [
+        {
+          "id": "users",
+          "name": "Users",
+          "permissions": ["read(\"any\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "username",
+              "type": "string",
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "email",
+              "type": "string",
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "profile_picture",
+              "type": "string",
+              "size": 2048,
+              "required": false
+            },
+            {
+              "key": "location",
+              "type": "string",
+              "size": 255,
+              "required": false
+            },
+            {
+              "key": "bio",
+              "type": "string",
+              "size": 1000,
+              "required": false
+            },
+            {
+              "key": "reputation_score",
+              "type": "integer",
+              "min": 0,
+              "max": 1000,
+              "default": 100,
+              "required": true
+            },
+            {
+              "key": "trades_completed",
+              "type": "integer",
+              "min": 0,
+              "default": 0,
+              "required": true
+            },
+            {
+              "key": "is_verified",
+              "type": "boolean",
+              "default": false,
+              "required": true
+            },
+            {
+              "key": "last_active",
+              "type": "datetime",
+              "required": false
+            },
+            {
+              "key": "preferences",
+              "type": "string",
+              "size": 2048,
+              "required": false
+            }
+          ],
+          "indexes": [
+            {
+              "key": "username_index",
+              "type": "unique",
+              "attributes": ["username"]
+            },
+            {
+              "key": "email_index",
+              "type": "unique",
+              "attributes": ["email"]
+            },
+            {
+              "key": "reputation_index",
+              "type": "key",
+              "attributes": ["reputation_score"]
+            }
+          ]
+        },
+        {
+          "id": "items",
+          "name": "Items",
+          "permissions": ["read(\"any\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "title",
+              "type": "string",
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "description",
+              "type": "string",
+              "size": 2000,
+              "required": true
+            },
+            {
+              "key": "category",
+              "type": "string",
+              "size": 100,
+              "required": true
+            },
+            {
+              "key": "condition",
+              "type": "string",
+              "size": 50,
+              "required": true
+            },
+            {
+              "key": "estimated_value",
+              "type": "double",
+              "min": 0,
+              "required": false
+            },
+            {
+              "key": "ai_analysis",
+              "type": "string",
+              "size": 5000,
+              "required": false
+            },
+            {
+              "key": "photos",
+              "type": "string",
+              "size": 5000,
+              "required": false
+            },
+            {
+              "key": "location",
+              "type": "string",
+              "size": 255,
+              "required": false
+            },
+            {
+              "key": "status",
+              "type": "string",
+              "size": 50,
+              "default": "available",
+              "required": true
+            },
+            {
+              "key": "owner_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "views_count",
+              "type": "integer",
+              "min": 0,
+              "default": 0,
+              "required": true
+            },
+            {
+              "key": "created_at",
+              "type": "datetime",
+              "required": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "owner_index",
+              "type": "key",
+              "attributes": ["owner_id"]
+            },
+            {
+              "key": "category_index",
+              "type": "key",
+              "attributes": ["category"]
+            },
+            {
+              "key": "status_index",
+              "type": "key",
+              "attributes": ["status"]
+            },
+            {
+              "key": "created_index",
+              "type": "key",
+              "attributes": ["created_at"]
+            }
+          ]
+        },
+        {
+          "id": "wants",
+          "name": "Wants",
+          "permissions": ["read(\"any\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "title",
+              "type": "string",
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "description",
+              "type": "string",
+              "size": 2000,
+              "required": true
+            },
+            {
+              "key": "category",
+              "type": "string",
+              "size": 100,
+              "required": true
+            },
+            {
+              "key": "max_value",
+              "type": "double",
+              "min": 0,
+              "required": false
+            },
+            {
+              "key": "location",
+              "type": "string",
+              "size": 255,
+              "required": false
+            },
+            {
+              "key": "status",
+              "type": "string",
+              "size": 50,
+              "default": "active",
+              "required": true
+            },
+            {
+              "key": "user_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "created_at",
+              "type": "datetime",
+              "required": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "user_index",
+              "type": "key",
+              "attributes": ["user_id"]
+            },
+            {
+              "key": "category_index",
+              "type": "key",
+              "attributes": ["category"]
+            },
+            {
+              "key": "status_index",
+              "type": "key",
+              "attributes": ["status"]
+            }
+          ]
+        },
+        {
+          "id": "trades",
+          "name": "Trades",
+          "permissions": ["read(\"users\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "item_offered_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "item_requested_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "offerer_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "recipient_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "status",
+              "type": "string",
+              "size": 50,
+              "default": "pending",
+              "required": true
+            },
+            {
+              "key": "message",
+              "type": "string",
+              "size": 1000,
+              "required": false
+            },
+            {
+              "key": "created_at",
+              "type": "datetime",
+              "required": true
+            },
+            {
+              "key": "updated_at",
+              "type": "datetime",
+              "required": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "offerer_index",
+              "type": "key",
+              "attributes": ["offerer_id"]
+            },
+            {
+              "key": "recipient_index",
+              "type": "key",
+              "attributes": ["recipient_id"]
+            },
+            {
+              "key": "status_index",
+              "type": "key",
+              "attributes": ["status"]
+            }
+          ]
+        },
+        {
+          "id": "messages",
+          "name": "Messages",
+          "permissions": ["read(\"users\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "sender_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "recipient_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "content",
+              "type": "string",
+              "size": 2000,
+              "required": true
+            },
+            {
+              "key": "message_type",
+              "type": "string",
+              "size": 50,
+              "default": "text",
+              "required": true
+            },
+            {
+              "key": "is_read",
+              "type": "boolean",
+              "default": false,
+              "required": true
+            },
+            {
+              "key": "read_at",
+              "type": "datetime",
+              "required": false
+            },
+            {
+              "key": "created_at",
+              "type": "datetime",
+              "required": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "sender_index",
+              "type": "key",
+              "attributes": ["sender_id"]
+            },
+            {
+              "key": "recipient_index",
+              "type": "key",
+              "attributes": ["recipient_id"]
+            },
+            {
+              "key": "created_index",
+              "type": "key",
+              "attributes": ["created_at"]
+            }
+          ]
+        },
+        {
+          "id": "reviews",
+          "name": "Reviews",
+          "permissions": ["read(\"any\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "reviewer_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "reviewed_user_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "trade_id",
+              "type": "string",
+              "size": 36,
+              "required": false
+            },
+            {
+              "key": "rating",
+              "type": "integer",
+              "min": 1,
+              "max": 5,
+              "required": true
+            },
+            {
+              "key": "comment",
+              "type": "string",
+              "size": 1000,
+              "required": false
+            },
+            {
+              "key": "created_at",
+              "type": "datetime",
+              "required": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "reviewer_index",
+              "type": "key",
+              "attributes": ["reviewer_id"]
+            },
+            {
+              "key": "reviewed_user_index",
+              "type": "key",
+              "attributes": ["reviewed_user_id"]
+            },
+            {
+              "key": "rating_index",
+              "type": "key",
+              "attributes": ["rating"]
+            }
+          ]
+        },
+        {
+          "id": "notifications",
+          "name": "Notifications",
+          "permissions": ["read(\"users\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+          "documentSecurity": true,
+          "attributes": [
+            {
+              "key": "user_id",
+              "type": "string",
+              "size": 36,
+              "required": true
+            },
+            {
+              "key": "type",
+              "type": "string",
+              "size": 50,
+              "required": true
+            },
+            {
+              "key": "title",
+              "type": "string",
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "message",
+              "type": "string",
+              "size": 1000,
+              "required": true
+            },
+            {
+              "key": "is_read",
+              "type": "boolean",
+              "default": false,
+              "required": true
+            },
+            {
+              "key": "priority",
+              "type": "string",
+              "size": 20,
+              "default": "normal",
+              "required": true
+            },
+            {
+              "key": "action_url",
+              "type": "string",
+              "size": 500,
+              "required": false
+            },
+            {
+              "key": "created_at",
+              "type": "datetime",
+              "required": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "user_index",
+              "type": "key",
+              "attributes": ["user_id"]
+            },
+            {
+              "key": "type_index",
+              "type": "key",
+              "attributes": ["type"]
+            },
+            {
+              "key": "is_read_index",
+              "type": "key",
+              "attributes": ["is_read"]
+            },
+            {
+              "key": "created_index",
+              "type": "key",
+              "attributes": ["created_at"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "storage": {
+    "buckets": [
+      {
+        "id": "item_images",
+        "name": "Item Images",
+        "permissions": ["read(\"any\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+        "fileSecurity": true,
+        "enabled": true,
+        "maximumFileSize": 10485760,
+        "allowedFileExtensions": ["jpg", "jpeg", "png", "gif", "webp"],
+        "compression": "gzip",
+        "encryption": true,
+        "antivirus": true
+      },
+      {
+        "id": "profile_images",
+        "name": "Profile Images",
+        "permissions": ["read(\"any\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+        "fileSecurity": true,
+        "enabled": true,
+        "maximumFileSize": 2097152,
+        "allowedFileExtensions": ["jpg", "jpeg", "png", "webp"],
+        "compression": "gzip",
+        "encryption": true,
+        "antivirus": true
+      },
+      {
+        "id": "chat_attachments",
+        "name": "Chat Attachments",
+        "permissions": ["read(\"users\")", "create(\"users\")", "update(\"users\")", "delete(\"users\")"],
+        "fileSecurity": true,
+        "enabled": true,
+        "maximumFileSize": 5242880,
+        "allowedFileExtensions": ["jpg", "jpeg", "png", "gif", "webp", "pdf", "doc", "docx"],
+        "compression": "gzip",
+        "encryption": true,
+        "antivirus": true
+      }
+    ]
+  },
+  "functions": [],
+  "messaging": {
+    "providers": []
+  }
+}

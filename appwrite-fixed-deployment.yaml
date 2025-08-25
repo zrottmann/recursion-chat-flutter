@@ -1,0 +1,85 @@
+name: trading-post-appwrite-fixed
+region: nyc3
+
+static_sites:
+- name: trading-post-frontend
+  github:
+    repo: zrottmann/tradingpost
+    branch: main
+    deploy_on_push: true
+  source_dir: /active-projects/trading-post/trading-app-frontend
+  output_dir: /dist
+  index_document: index.html
+  catchall_document: index.html
+  
+  # Fixed build command with proper dependency installation
+  build_command: |
+    echo "=== Starting Trading Post build with fixed configuration ==="
+    echo "Node version: $(node --version)"
+    echo "NPM version: $(npm --version)"
+    echo "Current directory: $(pwd)"
+    
+    # Clean any cached dependencies
+    echo "Cleaning existing dependencies..."
+    rm -rf node_modules package-lock.json
+    
+    # Install dependencies with legacy peer deps (handles React 19)
+    echo "Installing dependencies with legacy peer deps..."
+    npm install --legacy-peer-deps --verbose
+    
+    # Verify vite is available
+    echo "Verifying vite installation..."
+    npx vite --version || echo "Vite not found via npx, checking node_modules..."
+    ls -la node_modules/.bin/vite || echo "Vite binary not found"
+    
+    # Build the application using the exact package.json script
+    echo "Building application..."
+    npm run build:prod
+    
+    # Verify build output
+    echo "Build completed. Checking output directory..."
+    ls -la dist/
+    echo "=== Build process completed ==="
+  
+  # Production environment variables
+  envs:
+  - key: NODE_ENV
+    value: production
+  - key: REACT_APP_APPWRITE_ENDPOINT
+    value: https://nyc.cloud.appwrite.io/v1
+  - key: REACT_APP_APPWRITE_PROJECT_ID
+    value: 689bdee000098bd9d55c
+  - key: REACT_APP_APPWRITE_PROJECT_NAME
+    value: Trading Post
+  - key: REACT_APP_APPWRITE_DATABASE_ID
+    value: trading_post_db
+  - key: REACT_APP_APPWRITE_USERS_COLLECTION_ID
+    value: users
+  - key: REACT_APP_APPWRITE_ITEMS_COLLECTION_ID
+    value: items
+  - key: REACT_APP_APPWRITE_WANTS_COLLECTION_ID
+    value: wants
+  - key: REACT_APP_APPWRITE_TRADES_COLLECTION_ID
+    value: trades
+  - key: REACT_APP_APPWRITE_MESSAGES_COLLECTION_ID
+    value: messages
+  - key: REACT_APP_APPWRITE_REVIEWS_COLLECTION_ID
+    value: reviews
+  - key: REACT_APP_APPWRITE_NOTIFICATIONS_COLLECTION_ID
+    value: notifications
+  - key: REACT_APP_APPWRITE_ITEM_IMAGES_BUCKET_ID
+    value: item_images
+  - key: REACT_APP_APPWRITE_PROFILE_IMAGES_BUCKET_ID
+    value: profile_images
+  - key: REACT_APP_APPWRITE_CHAT_ATTACHMENTS_BUCKET_ID
+    value: chat_attachments
+  - key: REACT_APP_ENVIRONMENT
+    value: production
+  - key: REACT_APP_ENABLE_SSO
+    value: "true"
+  - key: REACT_APP_ENABLE_OAUTH
+    value: "true"
+  - key: REACT_APP_ENABLE_EMAIL_AUTH
+    value: "true"
+  - key: REACT_APP_OAUTH_PROVIDERS
+    value: google,github,facebook

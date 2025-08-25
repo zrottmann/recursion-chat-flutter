@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Debug Test - Trading Post</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .output {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            min-height: 100px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 OAuth Callback Debug Tool</h1>
+        <p>Use this tool to test OAuth callback redirection and debug any issues.</p>
+        
+        <div>
+            <h3>Test OAuth Callback URLs:</h3>
+            <button class="test-button" onclick="testCallback('/auth/callback')">Test /auth/callback</button>
+            <button class="test-button" onclick="testCallback('/auth/callback#')">Test /auth/callback#</button>
+            <button class="test-button" onclick="testCallback('/auth/callback?userId=test123&secret=abc123')">Test with OAuth params</button>
+            <button class="test-button" onclick="testCallback('/oauth/callback')">Test /oauth/callback</button>
+            <button class="test-button" onclick="clearOutput()">Clear Output</button>
+        </div>
+        
+        <div>
+            <h3>Direct OAuth Simulation:</h3>
+            <button class="test-button" onclick="simulateOAuth()">Simulate OAuth Login Flow</button>
+            <button class="test-button" onclick="checkSessionStorage()">Check SessionStorage</button>
+            <button class="test-button" onclick="testMainApp()">Test Main App</button>
+        </div>
+        
+        <div>
+            <h3>Output:</h3>
+            <div id="output" class="output">Ready to test OAuth callbacks...\n</div>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            output.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = 'Output cleared...\n';
+        }
+
+        function testCallback(path) {
+            log(`Testing callback: ${path}`, 'info');
+            
+            // Store test data
+            sessionStorage.setItem('test_callback_path', path);
+            sessionStorage.setItem('test_timestamp', new Date().toISOString());
+            
+            try {
+                // Test the callback URL
+                const testUrl = window.location.origin + path;
+                log(`Opening: ${testUrl}`, 'info');
+                
+                // Open in new window to test
+                const popup = window.open(testUrl, 'oauth_test', 'width=600,height=400');
+                
+                // Check if popup was blocked
+                if (!popup) {
+                    log('Popup blocked! Testing redirect in current window...', 'error');
+                    window.location.href = testUrl;
+                } else {
+                    log('Opened in popup window. Check if it redirects properly.', 'success');
+                    
+                    // Monitor popup
+                    const checkPopup = setInterval(() => {
+                        try {
+                            if (popup.closed) {
+                                clearInterval(checkPopup);
+                                log('Popup was closed.', 'info');
+                            } else if (popup.location.href !== testUrl) {
+                                log(`Popup redirected to: ${popup.location.href}`, 'success');
+                                clearInterval(checkPopup);
+                                popup.close();
+                            }
+                        } catch (e) {
+                            // Cross-origin error means redirect happened
+                            log('Popup redirected (cross-origin detected)', 'success');
+                            clearInterval(checkPopup);
+                            setTimeout(() => popup.close(), 1000);
+                        }
+                    }, 500);
+                }
+            } catch (error) {
+                log(`Error testing callback: ${error.message}`, 'error');
+            }
+        }
+
+        function simulateOAuth() {
+            log('Simulating complete OAuth flow...', 'info');
+            
+            // Simulate OAuth parameters
+            const oauthParams = new URLSearchParams({
+                userId: 'test_user_123',
+                secret: 'test_secret_abc',
+                provider: 'google'
+            });
+            
+            const callbackUrl = `/auth/callback?${oauthParams.toString()}`;
+            log(`Simulating OAuth redirect to: ${callbackUrl}`, 'info');
+            
+            // Store OAuth state
+            sessionStorage.setItem('oauth_state', 'test_state_123');
+            sessionStorage.setItem('oauth_test_mode', 'true');
+            
+            testCallback(callbackUrl);
+        }
+
+        function checkSessionStorage() {
+            log('Checking SessionStorage for OAuth data...', 'info');
+            
+            const keys = [
+                'oauth_callback_path',
+                'oauth_callback_search', 
+                'oauth_callback_hash',
+                'oauth_callback_processed',
+                'test_callback_path',
+                'oauth_state',
+                'oauth_test_mode'
+            ];
+            
+            keys.forEach(key => {
+                const value = sessionStorage.getItem(key);
+                if (value) {
+                    log(`${key}: ${value}`, 'success');
+                } else {
+                    log(`${key}: (not set)`, 'info');
+                }
+            });
+        }
+
+        function testMainApp() {
+            log('Testing main application...', 'info');
+            try {
+                const mainAppUrl = '/#/';
+                log(`Navigating to main app: ${mainAppUrl}`, 'info');
+                window.location.href = mainAppUrl;
+            } catch (error) {
+                log(`Error navigating to main app: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize
+        log('OAuth Debug Tool loaded successfully!', 'success');
+        log('Current URL: ' + window.location.href, 'info');
+        
+        // Check for any existing OAuth data
+        setTimeout(checkSessionStorage, 1000);
+    </script>
+</body>
+</html>

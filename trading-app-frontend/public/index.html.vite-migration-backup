@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Trading Post - Local community trading app" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <title>Trading Post</title>
+    <!-- Extension Compatibility Fixes -->
+    <script>
+      // Enhanced MutationObserver protection for browser extensions
+      (function() {
+        'use strict';
+        
+        if (typeof window === 'undefined') return;
+        
+        // Store original MutationObserver
+        const OriginalMutationObserver = window.MutationObserver;
+        if (!OriginalMutationObserver) return;
+        
+        // Enhanced MutationObserver wrapper
+        window.MutationObserver = function(callback) {
+          if (typeof callback !== 'function') {
+            console.warn('[Extension Protection] Invalid MutationObserver callback');
+            return new OriginalMutationObserver(function() {});
+          }
+          
+          const observer = new OriginalMutationObserver(function(mutations, obs) {
+            try {
+              // Filter out extension-related mutations
+              const safeMutations = mutations.filter(function(mutation) {
+                const target = mutation.target;
+                if (!target || typeof target !== 'object' || !target.nodeType) {
+                  return false;
+                }
+                
+                // Skip extension elements
+                if (target.id && (
+                  target.id.includes('extension') ||
+                  target.id.includes('chrome-extension') ||
+                  target.id.includes('web-client-content-script')
+                )) {
+                  return false;
+                }
+                
+                if (target.classList && (
+                  target.classList.contains('chrome-extension') ||
+                  target.classList.contains('extension-element') ||
+                  target.classList.contains('web-client-content-script')
+                )) {
+                  return false;
+                }
+                
+                return true;
+              });
+              
+              if (safeMutations.length > 0) {
+                callback(safeMutations, obs);
+              }
+            } catch (error) {
+              console.warn('[Extension Protection] MutationObserver callback error suppressed:', error.message);
+            }
+          });
+          
+          // Enhanced observe method with comprehensive validation
+          const originalObserve = observer.observe;
+          observer.observe = function(target, options) {
+            try {
+              // Comprehensive target validation
+              if (!target) {
+                console.warn('[Extension Protection] MutationObserver target is null/undefined');
+                return;
+              }
+              
+              if (typeof target !== 'object') {
+                console.warn('[Extension Protection] MutationObserver target is not an object');
+                return;
+              }
+              
+              if (!target.nodeType || typeof target.nodeType !== 'number') {
+                console.warn('[Extension Protection] MutationObserver target is not a valid DOM Node');
+                return;
+              }
+              
+              if (target.nodeType < 1 || target.nodeType > 12) {
+                console.warn('[Extension Protection] MutationObserver target has invalid nodeType:', target.nodeType);
+                return;
+              }
+              
+              // Skip extension elements
+              if (target.id && (
+                target.id.includes('extension') ||
+                target.id.includes('chrome-extension') ||
+                target.id.includes('web-client-content-script')
+              )) {
+                console.warn('[Extension Protection] Skipping extension element observation');
+                return;
+              }
+              
+              if (target.classList && (
+                target.classList.contains('chrome-extension') ||
+                target.classList.contains('extension-element') ||
+                target.classList.contains('web-client-content-script')
+              )) {
+                console.warn('[Extension Protection] Skipping extension element observation');
+                return;
+              }
+              
+              // Safe default options
+              const safeOptions = Object.assign({
+                childList: true,
+                subtree: false,
+                attributes: false,
+                attributeOldValue: false,
+                characterData: false,
+                characterDataOldValue: false
+              }, options || {});
+              
+              return originalObserve.call(this, target, safeOptions);
+            } catch (error) {
+              console.warn('[Extension Protection] MutationObserver observe error suppressed:', error.message);
+            }
+          };
+          
+          return observer;
+        };
+        
+        // Copy static properties
+        Object.setPrototypeOf(window.MutationObserver, OriginalMutationObserver);
+        Object.defineProperty(window.MutationObserver, 'name', { value: 'MutationObserver' });
+        
+        console.log('[Extension Protection] Enhanced MutationObserver protection loaded');
+      })();
+      
+      // Enhanced console error suppression for extensions
+      (function() {
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        const suppressPatterns = [
+          /Failed to execute 'observe' on 'MutationObserver'/,
+          /parameter 1 is not of type 'Node'/,
+          /web-client-content-script/,
+          /chrome-extension:/,
+          /extension.*content.*script/i
+        ];
+        
+        console.error = function() {
+          const message = Array.prototype.join.call(arguments, ' ');
+          if (!suppressPatterns.some(pattern => pattern.test(message))) {
+            originalError.apply(console, arguments);
+          }
+        };
+        
+        console.warn = function() {
+          const message = Array.prototype.join.call(arguments, ' ');
+          if (!suppressPatterns.some(pattern => pattern.test(message))) {
+            originalWarn.apply(console, arguments);
+          }
+        };
+        
+        console.log('[Extension Protection] Console error suppression loaded');
+      })();
+    </script>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>

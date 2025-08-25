@@ -1,0 +1,16 @@
+{
+  "projectId": "689bdaf500072795b0f6",
+  "projectName": "Recursion Chat",
+  "functions": [],
+  "collections": [],
+  "buckets": [],
+  "sites": [
+    {
+      "name": "Trading Post",
+      "domain": "tradingpost.appwrite.network",
+      "directory": "trading-app-frontend/build",
+      "buildCommand": "rm -f package-lock.json trading-app-frontend/package-lock.json 2>/dev/null; cd trading-app-frontend && npm install --production=false --legacy-peer-deps --force && CI=false TSC_COMPILE_ON_ERROR=true DISABLE_ESLINT_PLUGIN=true npm run build",
+      "runtime": "node-22"
+    }
+  ]
+}

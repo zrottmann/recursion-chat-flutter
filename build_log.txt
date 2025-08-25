@@ -1,0 +1,31 @@
+npm warn using --force Recommended protections disabled.
+
+> tradingpost-backend@1.0.0 build
+> cd trading-app-frontend && npm install --legacy-peer-deps --silent && npm run build:prod
+
+npm warn using --force Recommended protections disabled.
+
+> trading-app-frontend@1.0.0 build:prod
+> cross-env SKIP_PREFLIGHT_CHECK=true TSC_COMPILE_ON_ERROR=true DISABLE_ESLINT_PLUGIN=true CI=false NODE_OPTIONS=--max-old-space-size=4096 react-scripts build
+
+Creating an optimized production build...
+Compiled successfully.
+
+File sizes after gzip:
+
+  259.35 kB  build\static\js\main.406d4907.js
+  46.52 kB   build\static\css\main.c72d1415.css
+
+The project was built assuming it is hosted at /.
+You can control this with the homepage field in your package.json.
+
+The build folder is ready to be deployed.
+You may serve it with a static server:
+
+  npm install -g serve
+  serve -s build
+
+Find out more about deployment here:
+
+  https://cra.link/deployment
+

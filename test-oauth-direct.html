@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Direct Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@15.0.0"></script>
+</head>
+<body>
+    <h1>OAuth Direct Test</h1>
+    <button onclick="testOAuth()">Test Google OAuth</button>
+    <div id="result"></div>
+
+    <script>
+        const { Client, Account } = Appwrite;
+        
+        function testOAuth() {
+            const client = new Client();
+            client
+                .setEndpoint('https://nyc.cloud.appwrite.io/v1')
+                .setProject('689bdee000098bd9d55c');
+            
+            const account = new Account(client);
+            
+            // Try with the exact URLs that should work
+            const successUrl = 'https://tradingpost.appwrite.network/auth/callback';
+            const failureUrl = 'https://tradingpost.appwrite.network/auth/error';
+            
+            console.log('Testing OAuth with:', { successUrl, failureUrl });
+            
+            account.createOAuth2Session(
+                'google',
+                successUrl,
+                failureUrl
+            ).then(() => {
+                console.log('OAuth session created, redirecting...');
+            }).catch(error => {
+                console.error('OAuth error:', error);
+                document.getElementById('result').innerHTML = `
+                    <p style="color: red;">Error: ${error.message}</p>
+                    <p>Code: ${error.code}</p>
+                    <p>Type: ${error.type}</p>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>

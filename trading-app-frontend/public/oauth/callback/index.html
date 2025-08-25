@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trading Post - OAuth Authentication</title>
+    <script>
+      // OAuth callback handler - redirect to main app with proper routing
+      console.log('🔐 OAuth callback handler executing...');
+      
+      const path = window.location.pathname;
+      const hash = window.location.hash;
+      const search = window.location.search;
+      
+      console.log('📍 OAuth callback details:', {
+        path: path,
+        hash: hash,
+        search: search,
+        fullUrl: window.location.href
+      });
+      
+      // Store callback information for the main app
+      sessionStorage.setItem('oauth_callback_path', path);
+      sessionStorage.setItem('oauth_callback_search', search);
+      sessionStorage.setItem('oauth_callback_hash', hash);
+      sessionStorage.setItem('oauth_callback_processed', 'false');
+      
+      // Construct the redirect URL to the main app
+      const redirectUrl = '/#/oauth/callback' + search + hash;
+      
+      console.log('🚀 Redirecting to main app:', redirectUrl);
+      
+      // Redirect to the main app with the OAuth callback route
+      window.location.replace(redirectUrl);
+    </script>
+    <style>
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        text-align: center;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        max-width: 400px;
+        margin: 1rem;
+      }
+      h1 {
+        color: #333;
+        margin-bottom: 1rem;
+      }
+      p {
+        color: #666;
+        line-height: 1.6;
+      }
+      .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 2rem auto;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">🔐</div>
+      <h1>Completing OAuth Authentication...</h1>
+      <div class="spinner"></div>
+      <p>Please wait while we complete your OAuth authentication and redirect you to the Trading Post.</p>
+      <p><small>If you are not redirected automatically, <a href="/">click here to go to the homepage</a>.</small></p>
+    </div>
+  </body>
+</html>

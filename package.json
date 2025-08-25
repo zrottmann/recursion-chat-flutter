@@ -1,0 +1,40 @@
+{
+  "name": "trading-post",
+  "version": "1.0.8",
+  "type": "module",
+  "main": "app_sqlite.py",
+  "scripts": {
+    "install": "cd trading-app-frontend && npm install --legacy-peer-deps",
+    "postinstall": "cd trading-app-frontend && npm run build",
+    "dev": "cd trading-app-frontend && npm start",
+    "build": "cd trading-app-frontend && npm run build",
+    "build:simple": "cd trading-app-frontend && vite build --mode production",
+    "sites:build": "cd trading-app-frontend && npm install --legacy-peer-deps && npm run build",
+    "deploy:appwrite": "cd trading-app-frontend && npm install --legacy-peer-deps && npm run build",
+    "fix-database": "node fix-database-schema.js",
+    "validate-database": "node validate-database-schema.js",
+    "db:fix": "node fix-database-schema.js",
+    "db:check": "node validate-database-schema.js"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "keywords": [
+    "trading",
+    "marketplace",
+    "appwrite"
+  ],
+  "author": "zrottmann",
+  "license": "ISC",
+  "description": "Trading Post - A marketplace for trading items",
+  "devDependencies": {
+    "appwrite": "18.2.0"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "axios": "1.11.0",
+    "node-appwrite": "17.2.0",
+    "vite": "^6.0.2"
+  }
+}

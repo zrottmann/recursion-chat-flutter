@@ -1,0 +1,251 @@
+.firebase-auth-container {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-forms h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+/* SSO Buttons */
+.sso-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-sso {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  color: #333;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-sso:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-sso:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-sso img {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-google:hover {
+  background: #f8f9fa;
+  border-color: #4285f4;
+}
+
+.btn-facebook:hover {
+  background: #f0f2f5;
+  border-color: #1877f2;
+}
+
+.btn-apple:hover {
+  background: #f5f5f7;
+  border-color: #000;
+}
+
+/* Divider */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 25px 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #ddd;
+  transform: translateY(-50%);
+}
+
+.divider span {
+  position: relative;
+  padding: 0 15px;
+  background: white;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Email Form */
+.email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-field {
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #4285f4;
+  box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.btn-primary {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Auth Options */
+.auth-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #4285f4;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.btn-link:hover {
+  color: #1a73e8;
+  text-decoration: underline;
+}
+
+/* User Profile */
+.user-profile {
+  text-align: center;
+}
+
+.user-profile h3 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.profile-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  border: 3px solid #667eea;
+}
+
+.user-profile p {
+  color: #666;
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.btn-signout {
+  margin-top: 20px;
+  padding: 10px 24px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-signout:hover {
+  background: #c82333;
+}
+
+/* Messages */
+.error-message {
+  margin-top: 15px;
+  padding: 12px;
+  background: #fee;
+  color: #c33;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.success-message {
+  margin-top: 15px;
+  padding: 12px;
+  background: #e7f5e7;
+  color: #2d7a2d;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.warning {
+  color: #ff9800;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .firebase-auth-container {
+    margin: 20px;
+    padding: 20px;
+  }
+  
+  .auth-forms h2 {
+    font-size: 20px;
+  }
+  
+  .btn-sso {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+  
+  .input-field {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+}

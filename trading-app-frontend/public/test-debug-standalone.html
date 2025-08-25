@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Library Test - Standalone</title>
+    <style>
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #667eea;
+        }
+        .status {
+            background: #242424;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #764ba2;
+        }
+        .log-output {
+            background: #0d0d0d;
+            padding: 20px;
+            border-radius: 8px;
+            min-height: 300px;
+        }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+        .info { color: #3498db; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Library Test - Standalone</h1>
+        
+        <div class="status">
+            <h3>Status</h3>
+            <p>Debug Status: <span id="status" class="info">Loading...</span></p>
+            <p>Console Output: <span class="info">Check browser console (F12)</span></p>
+        </div>
+
+        <div>
+            <button onclick="testDebugLibrary()">Test Debug Library</button>
+            <button onclick="enableDebug()">Enable Debug Mode</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+
+        <div class="log-output">
+            <h3>Test Results</h3>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        // Inline debug library for testing
+        class SimpleDebugLogger {
+            constructor(namespace = 'app') {
+                this.namespace = namespace;
+                this.enabled = this.checkEnabled();
+                this.colors = {
+                    debug: '#7f8c8d',
+                    info: '#3498db',
+                    warn: '#f39c12',
+                    error: '#e74c3c',
+                    success: '#27ae60'
+                };
+            }
+
+            checkEnabled() {
+                return localStorage.getItem('DEBUG') === 'true' ||
+                       window.location.search.includes('debug=true');
+            }
+
+            log(level, ...args) {
+                if (!this.enabled) return;
+                
+                const timestamp = new Date().toISOString();
+                const prefix = `[${timestamp}] [${this.namespace}] [${level.toUpperCase()}]`;
+                const color = this.colors[level] || '#333';
+                
+                console.log(`%c${prefix}`, `color: ${color}; font-weight: bold;`, ...args);
+                
+                // Also add to UI
+                const resultsDiv = document.getElementById('results');
+                if (resultsDiv) {
+                    const entry = document.createElement('div');
+                    entry.className = level;
+                    entry.innerHTML = `<strong>${prefix}</strong> ${args.join(' ')}`;
+                    resultsDiv.appendChild(entry);
+                }
+            }
+
+            debug(...args) { this.log('debug', ...args); }
+            info(...args) { this.log('info', ...args); }
+            warn(...args) { this.log('warn', ...args); }
+            error(...args) { this.log('error', ...args); }
+            success(...args) { this.log('success', ...args); }
+        }
+
+        // Create global debug instance
+        const debug = new SimpleDebugLogger('test');
+        window.debugLib = debug;
+
+        // Update status
+        function updateStatus() {
+            const statusEl = document.getElementById('status');
+            if (debug.enabled) {
+                statusEl.textContent = 'ENABLED ✓';
+                statusEl.className = 'success';
+            } else {
+                statusEl.textContent = 'DISABLED';
+                statusEl.className = 'error';
+            }
+        }
+
+        // Test the debug library
+        function testDebugLibrary() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="info">Testing debug library...</div>';
+            
+            try {
+                debug.info('Debug library test started');
+                debug.debug('This is a debug message');
+                debug.info('This is an info message');
+                debug.warn('This is a warning message');
+                debug.error('This is an error message (test)');
+                debug.success('Debug library is working correctly!');
+                
+                resultsDiv.innerHTML += '<div class="success"><strong>✓ All tests passed!</strong></div>';
+                return true;
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="error"><strong>✗ Error:</strong> ${error.message}</div>`;
+                console.error('Test failed:', error);
+                return false;
+            }
+        }
+
+        // Enable debug mode
+        function enableDebug() {
+            localStorage.setItem('DEBUG', 'true');
+            debug.enabled = true;
+            updateStatus();
+            document.getElementById('results').innerHTML = '<div class="success">Debug mode enabled! Refresh to apply globally.</div>';
+        }
+
+        // Run all tests
+        function runAllTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+            
+            // Test 1: Basic functionality
+            resultsDiv.innerHTML += '<div class="info"><strong>Test 1: Basic Logging</strong></div>';
+            if (testDebugLibrary()) {
+                resultsDiv.innerHTML += '<div class="success">✓ Basic logging works</div>';
+            }
+            
+            // Test 2: Check localStorage
+            resultsDiv.innerHTML += '<div class="info"><strong>Test 2: LocalStorage Check</strong></div>';
+            const debugFlag = localStorage.getItem('DEBUG');
+            resultsDiv.innerHTML += `<div>DEBUG flag: ${debugFlag || 'not set'}</div>`;
+            
+            // Test 3: Global availability
+            resultsDiv.innerHTML += '<div class="info"><strong>Test 3: Global Availability</strong></div>';
+            if (window.debugLib) {
+                resultsDiv.innerHTML += '<div class="success">✓ Debug library available globally as window.debugLib</div>';
+            } else {
+                resultsDiv.innerHTML += '<div class="error">✗ Debug library not available globally</div>';
+            }
+            
+            // Test 4: Performance
+            resultsDiv.innerHTML += '<div class="info"><strong>Test 4: Performance Test</strong></div>';
+            const start = performance.now();
+            for (let i = 0; i < 100; i++) {
+                debug.debug(`Performance test ${i}`);
+            }
+            const duration = performance.now() - start;
+            resultsDiv.innerHTML += `<div class="success">✓ 100 logs in ${duration.toFixed(2)}ms</div>`;
+            
+            resultsDiv.innerHTML += '<div class="success"><strong>All tests completed!</strong></div>';
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            updateStatus();
+            document.getElementById('results').innerHTML = '<div class="info">Debug library loaded and ready. Click a button to test.</div>';
+            
+            // Log initialization
+            console.log('Debug library test page loaded');
+            console.log('Debug enabled:', debug.enabled);
+            console.log('Access debug library via window.debugLib');
+            
+            if (debug.enabled) {
+                debug.success('Debug mode is enabled!');
+            }
+        });
+    </script>
+</body>
+</html>

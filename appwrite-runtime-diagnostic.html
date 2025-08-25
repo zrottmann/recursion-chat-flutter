@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppWrite Runtime Diagnostic Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .status { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f1b0b7; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #b8daff; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        input, select { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 AppWrite Runtime Diagnostic Tool</h1>
+        <p>Critical diagnostic tool to identify and fix the persistent AppWrite project ID error.</p>
+
+        <!-- Configuration Input -->
+        <div class="section">
+            <h2>📋 Configuration Input</h2>
+            <label>AppWrite Endpoint:</label>
+            <input type="text" id="endpoint" value="https://nyc.cloud.appwrite.io/v1" />
+            
+            <label>Project ID:</label>
+            <input type="text" id="projectId" value="689bdee000098bd9d55c" />
+            
+            <label>Function ID (for testing):</label>
+            <input type="text" id="functionId" value="trading-post-backend" />
+            
+            <button onclick="testConfiguration()">🧪 Test Configuration</button>
+            <button onclick="testFunctionExecution()">⚡ Test Function Execution</button>
+        </div>
+
+        <!-- Results Display -->
+        <div class="section">
+            <h2>📊 Diagnostic Results</h2>
+            <div id="results"></div>
+        </div>
+
+        <!-- Environment Variables Check -->
+        <div class="section">
+            <h2>🌍 Environment Variables Check</h2>
+            <button onclick="checkEnvironmentVariables()">🔍 Check Environment Variables</button>
+            <div id="envResults"></div>
+        </div>
+
+        <!-- Browser Console Test -->
+        <div class="section">
+            <h2>🖥️ Browser Console Test</h2>
+            <button onclick="runBrowserTests()">🚀 Run Browser Tests</button>
+            <div id="browserResults"></div>
+        </div>
+    </div>
+
+    <!-- AppWrite SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@15.0.0/dist/appwrite.umd.js"></script>
+
+    <script>
+        const { Client, Account, Functions, Databases } = Appwrite;
+        
+        function log(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            resultsDiv.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testConfiguration() {
+            clearResults();
+            log('🔄 Starting AppWrite Configuration Test...', 'info');
+
+            const endpoint = document.getElementById('endpoint').value;
+            const projectId = document.getElementById('projectId').value;
+
+            try {
+                // Test 1: Basic Client Initialization
+                log('📝 Test 1: Client Initialization', 'info');
+                const client = new Client()
+                    .setEndpoint(endpoint)
+                    .setProject(projectId);
+
+                log(`✅ Client initialized successfully`, 'success');
+                log(`Endpoint: ${endpoint}`, 'info');
+                log(`Project ID: ${projectId}`, 'info');
+
+                // Test 2: Account Service Test
+                log('👤 Test 2: Account Service Connection', 'info');
+                const account = new Account(client);
+                
+                try {
+                    const user = await account.get();
+                    log(`✅ Account service connected - User: ${user.email || user.name}`, 'success');
+                } catch (error) {
+                    if (error.code === 401) {
+                        log(`✅ Account service connected (not authenticated - expected)`, 'success');
+                    } else {
+                        log(`❌ Account service error: ${error.message}`, 'error');
+                    }
+                }
+
+                // Test 3: Database Service Test
+                log('🗄️ Test 3: Database Service Connection', 'info');
+                const databases = new Databases(client);
+                
+                try {
+                    const databasesList = await databases.list();
+                    log(`✅ Database service connected - Found ${databasesList.databases.length} databases`, 'success');
+                } catch (error) {
+                    log(`❌ Database service error: ${error.message}`, 'error');
+                }
+
+                // Test 4: Functions Service Test
+                log('⚡ Test 4: Functions Service Connection', 'info');
+                const functions = new Functions(client);
+                
+                try {
+                    const functionsList = await functions.list();
+                    log(`✅ Functions service connected - Found ${functionsList.functions.length} functions`, 'success');
+                } catch (error) {
+                    log(`❌ Functions service error: ${error.message}`, 'error');
+                }
+
+            } catch (error) {
+                log(`❌ Critical Configuration Error: ${error.message}`, 'error');
+                log(`Error Details: ${JSON.stringify(error, null, 2)}`, 'error');
+            }
+        }
+
+        async function testFunctionExecution() {
+            log('🚀 Starting Function Execution Test...', 'info');
+
+            const endpoint = document.getElementById('endpoint').value;
+            const projectId = document.getElementById('projectId').value;
+            const functionId = document.getElementById('functionId').value;
+
+            try {
+                const client = new Client()
+                    .setEndpoint(endpoint)
+                    .setProject(projectId);
+
+                const functions = new Functions(client);
+
+                // Test simple function execution
+                const execution = await functions.createExecution(
+                    functionId,
+                    JSON.stringify({ action: 'test', data: {} }),
+                    false,
+                    '/test',
+                    'POST'
+                );
+
+                log(`✅ Function execution started - ID: ${execution.$id}`, 'success');
+                log(`Status: ${execution.status}`, 'info');
+
+                // Wait for completion
+                setTimeout(async () => {
+                    try {
+                        const result = await functions.getExecution(functionId, execution.$id);
+                        log(`Function completed - Status: ${result.status}`, result.status === 'completed' ? 'success' : 'warning');
+                        if (result.responseBody) {
+                            log(`Response: ${result.responseBody}`, 'info');
+                        }
+                        if (result.stderr) {
+                            log(`Errors: ${result.stderr}`, 'error');
+                        }
+                    } catch (error) {
+                        log(`Error checking execution: ${error.message}`, 'error');
+                    }
+                }, 3000);
+
+            } catch (error) {
+                log(`❌ Function Execution Error: ${error.message}`, 'error');
+                log(`Error Code: ${error.code}`, 'error');
+                log(`Error Type: ${error.type}`, 'error');
+                
+                if (error.code === 401 && error.message.includes('No Appwrite project was specified')) {
+                    log(`🎯 FOUND THE ISSUE! The AppWrite client is not receiving the project ID properly.`, 'error');
+                    log(`This suggests the client initialization is failing at runtime.`, 'error');
+                }
+            }
+        }
+
+        function checkEnvironmentVariables() {
+            const envResults = document.getElementById('envResults');
+            envResults.innerHTML = '';
+
+            const envDiv = document.createElement('div');
+            envDiv.innerHTML = '<h3>🔍 Environment Variables Analysis</h3>';
+
+            // Check for React environment variables
+            const reactEnvVars = [
+                'REACT_APP_APPWRITE_ENDPOINT',
+                'REACT_APP_APPWRITE_PROJECT_ID',
+                'REACT_APP_APPWRITE_DATABASE_ID'
+            ];
+
+            // Check for Vite environment variables
+            const viteEnvVars = [
+                'VITE_APPWRITE_ENDPOINT',
+                'VITE_APPWRITE_PROJECT_ID',
+                'VITE_APPWRITE_DATABASE_ID'
+            ];
+
+            let foundReact = 0, foundVite = 0;
+
+            reactEnvVars.forEach(varName => {
+                const value = process?.env?.[varName] || window?.[varName] || 'NOT_FOUND';
+                envDiv.innerHTML += `<p><strong>${varName}:</strong> ${value}</p>`;
+                if (value !== 'NOT_FOUND') foundReact++;
+            });
+
+            viteEnvVars.forEach(varName => {
+                const value = import?.meta?.env?.[varName] || 'NOT_FOUND';
+                envDiv.innerHTML += `<p><strong>${varName}:</strong> ${value}</p>`;
+                if (value !== 'NOT_FOUND') foundVite++;
+            });
+
+            envDiv.innerHTML += `<div class="status ${foundReact > 0 || foundVite > 0 ? 'success' : 'error'}">
+                Found ${foundReact} React env vars and ${foundVite} Vite env vars
+            </div>`;
+
+            if (foundReact === 0 && foundVite === 0) {
+                envDiv.innerHTML += `<div class="status error">
+                    ❌ NO ENVIRONMENT VARIABLES FOUND! This is likely the root cause.
+                </div>`;
+            }
+
+            envResults.appendChild(envDiv);
+        }
+
+        async function runBrowserTests() {
+            const browserResults = document.getElementById('browserResults');
+            browserResults.innerHTML = '';
+
+            const testsDiv = document.createElement('div');
+            testsDiv.innerHTML = '<h3>🖥️ Browser Environment Tests</h3>';
+
+            // Test 1: Check if running in browser
+            testsDiv.innerHTML += `<p><strong>Browser Environment:</strong> ${typeof window !== 'undefined' ? '✅ Yes' : '❌ No'}</p>`;
+
+            // Test 2: Check AppWrite SDK loading
+            testsDiv.innerHTML += `<p><strong>AppWrite SDK:</strong> ${typeof Appwrite !== 'undefined' ? '✅ Loaded' : '❌ Not Loaded'}</p>`;
+
+            // Test 3: Check process.env
+            testsDiv.innerHTML += `<p><strong>process.env:</strong> ${typeof process !== 'undefined' && process.env ? '✅ Available' : '❌ Not Available'}</p>`;
+
+            // Test 4: Check import.meta.env (for Vite)
+            const importMetaAvailable = typeof importMeta !== 'undefined' && importMeta.env;
+            testsDiv.innerHTML += `<p><strong>import.meta.env:</strong> ${importMetaAvailable ? '✅ Available' : '❌ Not Available'}</p>`;
+
+            // Test 5: Manual client test
+            try {
+                const testClient = new Client()
+                    .setEndpoint('https://nyc.cloud.appwrite.io/v1')
+                    .setProject('689bdee000098bd9d55c');
+                
+                testsDiv.innerHTML += `<p><strong>Manual Client Test:</strong> ✅ Success</p>`;
+                
+                // Try to get client details
+                const clientEndpoint = testClient.config?.endpoint || 'Unknown';
+                const clientProject = testClient.config?.project || 'Unknown';
+                
+                testsDiv.innerHTML += `<p><strong>Client Endpoint:</strong> ${clientEndpoint}</p>`;
+                testsDiv.innerHTML += `<p><strong>Client Project:</strong> ${clientProject}</p>`;
+                
+            } catch (error) {
+                testsDiv.innerHTML += `<p><strong>Manual Client Test:</strong> ❌ Failed - ${error.message}</p>`;
+            }
+
+            browserResults.appendChild(testsDiv);
+        }
+
+        // Auto-run initial diagnostics
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🔧 AppWrite Runtime Diagnostic Tool Initialized', 'info');
+            log('Click "Test Configuration" to start comprehensive diagnostics.', 'info');
+            
+            // Show current URL and environment
+            log(`Current URL: ${window.location.href}`, 'info');
+            log(`User Agent: ${navigator.userAgent}`, 'info');
+        });
+    </script>
+</body>
+</html>

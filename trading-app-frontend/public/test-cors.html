@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test - Trading Post</title>
+</head>
+<body>
+    <h1>Trading Post CORS Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const projectId = "689bdee000098bd9d55c";
+        const endpoint = "https://nyc.cloud.appwrite.io/v1";
+        const resultsDiv = document.getElementById('results');
+        
+        function log(message, isError = false) {
+            const p = document.createElement('p');
+            p.style.color = isError ? 'red' : 'green';
+            p.textContent = message;
+            resultsDiv.appendChild(p);
+            console.log(message);
+        }
+        
+        log(`Testing from origin: ${window.location.origin}`);
+        log(`Testing endpoint: ${endpoint}`);
+        log(`Testing project: ${projectId}`);
+        
+        // Test 1: Basic fetch to account endpoint
+        log("\n=== Test 1: Basic Account Endpoint ===");
+        fetch(`${endpoint}/account`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Appwrite-Project': projectId
+            }
+        })
+        .then(response => {
+            log(`Status: ${response.status}`);
+            log(`CORS Header: ${response.headers.get('access-control-allow-origin') || 'MISSING'}`);
+            return response.json();
+        })
+        .then(data => {
+            log(`Response: ${JSON.stringify(data)}`);
+        })
+        .catch(error => {
+            log(`❌ Fetch Error: ${error.message}`, true);
+            log(`❌ This indicates a CORS block`, true);
+        });
+        
+        // Test 2: OPTIONS preflight request
+        log("\n=== Test 2: OPTIONS Preflight ===");
+        fetch(`${endpoint}/account`, {
+            method: 'OPTIONS',
+            headers: {
+                'Origin': window.location.origin,
+                'Access-Control-Request-Method': 'POST',
+                'Access-Control-Request-Headers': 'content-type,x-appwrite-project'
+            }
+        })
+        .then(response => {
+            log(`OPTIONS Status: ${response.status}`);
+            log(`Allow-Origin: ${response.headers.get('access-control-allow-origin') || 'MISSING'}`);
+            log(`Allow-Methods: ${response.headers.get('access-control-allow-methods') || 'MISSING'}`);
+        })
+        .catch(error => {
+            log(`❌ OPTIONS Error: ${error.message}`, true);
+        });
+        
+        // Test 3: Manual registration attempt
+        log("\n=== Test 3: Registration Test ===");
+        const testUser = {
+            userId: `test_${Date.now()}`,
+            email: `test_${Date.now()}@example.com`,
+            password: 'testPassword123!',
+            name: 'Test User'
+        };
+        
+        fetch(`${endpoint}/account`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Appwrite-Project': projectId
+            },
+            body: JSON.stringify(testUser)
+        })
+        .then(response => {
+            log(`Registration Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            log(`Registration Response: ${JSON.stringify(data)}`);
+        })
+        .catch(error => {
+            log(`❌ Registration Error: ${error.message}`, true);
+            if (error.message.includes('CORS')) {
+                log(`❌ CONFIRMED: Platform ${window.location.hostname} not registered in Appwrite`, true);
+            }
+        });
+    </script>
+</body>
+</html>

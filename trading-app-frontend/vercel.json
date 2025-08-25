@@ -1,0 +1,66 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "build" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "REACT_APP_APPWRITE_ENDPOINT": "https://cloud.appwrite.io/v1",
+    "REACT_APP_APPWRITE_PROJECT_ID": "689bdee000098bd9d55c",
+    "REACT_APP_APPWRITE_DATABASE_ID": "trading_post_db",
+    "REACT_APP_APPWRITE_USERS_COLLECTION_ID": "users",
+    "REACT_APP_APPWRITE_ITEMS_COLLECTION_ID": "items",
+    "REACT_APP_APPWRITE_WANTS_COLLECTION_ID": "wants",
+    "REACT_APP_APPWRITE_TRADES_COLLECTION_ID": "trades",
+    "REACT_APP_APPWRITE_MESSAGES_COLLECTION_ID": "messages",
+    "REACT_APP_APPWRITE_REVIEWS_COLLECTION_ID": "reviews",
+    "REACT_APP_APPWRITE_NOTIFICATIONS_COLLECTION_ID": "notifications",
+    "REACT_APP_APPWRITE_ITEM_IMAGES_BUCKET_ID": "item_images",
+    "REACT_APP_APPWRITE_PROFILE_IMAGES_BUCKET_ID": "profile_images",
+    "REACT_APP_APPWRITE_CHAT_ATTACHMENTS_BUCKET_ID": "chat_attachments",
+    "REACT_APP_ENABLE_MICROSOFT_AUTH": "true",
+    "REACT_APP_ENABLE_DISCORD_AUTH": "true",
+    "REACT_APP_ENABLE_APPLE_AUTH": "true",
+    "REACT_APP_ENABLE_MAGIC_LINK": "true",
+    "REACT_APP_ENABLE_MFA": "true"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ]
+}

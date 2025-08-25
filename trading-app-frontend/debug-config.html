@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug AppWrite Configuration</title>
+</head>
+<body>
+    <h1>Trading Post - AppWrite Configuration Debug</h1>
+    <div id="config-output"></div>
+
+    <script type="module">
+        // Check environment variables
+        const viteProjId = import.meta.env.VITE_APPWRITE_PROJECT_ID;
+        const viteEndpoint = import.meta.env.VITE_APPWRITE_ENDPOINT;
+        
+        const config = {
+            'Environment Variables': {
+                'VITE_APPWRITE_PROJECT_ID': viteProjId || 'NOT SET',
+                'VITE_APPWRITE_ENDPOINT': viteEndpoint || 'NOT SET',
+                'VITE_APPWRITE_DATABASE_ID': import.meta.env.VITE_APPWRITE_DATABASE_ID || 'NOT SET'
+            },
+            'Expected Values': {
+                'Project ID': '689cb415001a367e69f8',
+                'Endpoint': 'https://cloud.appwrite.io/v1',
+                'Database ID': 'trading_post_db'
+            }
+        };
+
+        // Try to import the config file
+        try {
+            const appwriteConfig = await import('./src/config/appwriteRecursionConfig.js');
+            config['Config File'] = {
+                'Project ID': appwriteConfig.APPWRITE_CONFIG.projectId,
+                'Endpoint': appwriteConfig.APPWRITE_CONFIG.endpoint,
+                'Database ID': appwriteConfig.APPWRITE_CONFIG.databaseId
+            };
+        } catch (error) {
+            config['Config File'] = 'ERROR: ' + error.message;
+        }
+
+        // Try to import appwrite lib
+        try {
+            const appwriteLib = await import('./src/lib/appwrite.js');
+            // Access the client to see what's configured
+            config['Appwrite Client'] = {
+                'Client initialized': 'Yes',
+                'Note': 'Client config is internal, check network requests for actual project ID'
+            };
+        } catch (error) {
+            config['Appwrite Client'] = 'ERROR: ' + error.message;
+        }
+
+        document.getElementById('config-output').innerHTML = 
+            '<pre>' + JSON.stringify(config, null, 2) + '</pre>';
+
+        console.log('AppWrite Configuration Debug:', config);
+    </script>
+</body>
+</html>

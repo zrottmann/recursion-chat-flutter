@@ -1,0 +1,1 @@
+# Auto-deploy workflow updated and standardized - Fri, Aug 16, 2025

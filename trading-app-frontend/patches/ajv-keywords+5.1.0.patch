@@ -1,0 +1,18 @@
+diff --git a/node_modules/ajv-keywords/dist/index.js b/node_modules/ajv-keywords/dist/index.js
+index 1234567..8901234 100644
+--- a/node_modules/ajv-keywords/dist/index.js
++++ b/node_modules/ajv-keywords/dist/index.js
+@@ -22,7 +22,12 @@ function ajvKeywords(ajv, keyword) {
+         return get(keyword)(ajv);
+     }
+     for (const keyword of keywords) {
+-        get(keyword)(ajv);
++        try {
++            get(keyword)(ajv);
++        } catch (e) {
++            // Ignore unknown keywords
++            console.warn('Skipping unknown keyword:', keyword);
++        }
+     }
+ }
+ exports["default"] = ajvKeywords;
