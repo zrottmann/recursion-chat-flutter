@@ -28,10 +28,12 @@ class FeatureImplementationService {
     
     try {
       const user = await account.get();
-      const userField = fieldMapper.getFieldName('items', 'user');
+      // Use userId as the standard Appwrite field name
+      const userField = fieldMapper.getFieldName('items', 'user') || 'userId';
       
       const listing = {
         [userField]: user.$id,
+        userId: user.$id, // Also include userId explicitly to ensure compatibility
         title: listingData.title,
         description: listingData.description,
         category: listingData.category,

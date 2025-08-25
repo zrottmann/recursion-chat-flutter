@@ -21,8 +21,8 @@ class DatabaseFieldMapper {
     console.log('🔍 [FieldMapper] Initializing database field mappings...');
 
     try {
-      // Common field variations to check
-      const userFieldVariations = ['user_id', 'userId', 'owner_id', 'ownerId', 'created_by', 'createdBy'];
+      // Common field variations to check (userId first as it's most common in Appwrite)
+      const userFieldVariations = ['userId', 'user_id', 'owner_id', 'ownerId', 'created_by', 'createdBy', 'user'];
       
       for (const [collectionName, collectionId] of Object.entries(COLLECTIONS)) {
         await this.detectFieldsForCollection(collectionName, collectionId, userFieldVariations);
@@ -81,23 +81,23 @@ class DatabaseFieldMapper {
           this.fieldMappings.set(`${collectionName}.user`, userField);
           console.log(`✅ [FieldMapper] ${collectionName}: user field is '${userField}'`);
         } else {
-          // Default to user_id if no field found
-          this.fieldMappings.set(`${collectionName}.user`, 'user_id');
-          console.log(`📝 [FieldMapper] ${collectionName}: defaulting to 'user_id' field`);
+          // Default to userId (Appwrite standard) if no field found
+          this.fieldMappings.set(`${collectionName}.user`, 'userId');
+          console.log(`📝 [FieldMapper] ${collectionName}: defaulting to 'userId' field (Appwrite standard)`);
         }
 
         // Store all available fields for reference
         this.fieldMappings.set(`${collectionName}.fields`, availableFields);
       } else {
         console.log(`📭 [FieldMapper] ${collectionName}: collection is empty, cannot detect fields`);
-        // Set default for empty collections
-        this.fieldMappings.set(`${collectionName}.user`, 'user_id');
+        // Set default for empty collections (use Appwrite standard)
+        this.fieldMappings.set(`${collectionName}.user`, 'userId');
       }
     } catch (error) {
       if (error.code === 404) {
         console.warn(`⚠️ [FieldMapper] ${collectionName}: collection does not exist`);
-        // Set defaults for non-existent collections
-        this.fieldMappings.set(`${collectionName}.user`, 'user_id');
+        // Set defaults for non-existent collections (use Appwrite standard)
+        this.fieldMappings.set(`${collectionName}.user`, 'userId');
       } else {
         console.error(`❌ [FieldMapper] Error detecting fields for ${collectionName}:`, error);
       }
@@ -122,8 +122,8 @@ class DatabaseFieldMapper {
    */
   getFallbackFieldName(fieldType) {
     const fallbacks = {
-      user: 'user_id',
-      owner: 'owner_id',
+      user: 'userId',  // Use Appwrite standard field name
+      owner: 'ownerId',
       id: '$id'
     };
     return fallbacks[fieldType] || fieldType;
