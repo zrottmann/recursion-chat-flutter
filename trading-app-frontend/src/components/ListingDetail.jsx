@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Badge, Carousel } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge, Carousel, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import { useSelector } from 'react-redux';
@@ -16,6 +16,7 @@ const ListingDetail = () => {
   const [isSaved, setIsSaved] = useState(false);
   const [locationText, setLocationText] = useState('Location');
   const [ownerMembershipStatus, setOwnerMembershipStatus] = useState(null);
+  const [contacting, setContacting] = useState(false);
 
   const fetchListing = useCallback(async () => {
     try {
@@ -79,9 +80,35 @@ const ListingDetail = () => {
     }
   };
 
-  const handleContact = () => {
-    if (listing?.owner?.id) {
+  const handleContact = async () => {
+    setContacting(true);
+    console.log('🔧 Contact seller clicked', { 
+      listing: listing, 
+      ownerId: listing?.owner?.id,
+      ownerData: listing?.owner 
+    });
+    
+    try {
+      if (!listing?.owner?.id) {
+        console.error('❌ Cannot contact seller: missing owner ID');
+        toast.error('Cannot contact seller - missing contact information');
+        return;
+      }
+      
+      if (!currentUser) {
+        console.error('❌ Cannot contact seller: user not logged in');
+        toast.error('Please log in to contact seller');
+        navigate('/login');
+        return;
+      }
+      
+      console.log('✅ Navigating to messages with user ID:', listing.owner.id);
       navigate(`/messages/${listing.owner.id}`);
+    } catch (error) {
+      console.error('❌ Error navigating to messages:', error);
+      toast.error('Error opening messages - please try again');
+    } finally {
+      setContacting(false);
     }
   };
 
@@ -233,8 +260,18 @@ const ListingDetail = () => {
                     variant="primary" 
                     className="w-100 mb-2"
                     onClick={handleContact}
+                    disabled={contacting || !listing?.owner?.id}
                   >
-                    <i className="fas fa-comment"></i> Contact Seller
+                    {contacting ? (
+                      <>
+                        <Spinner animation="border" size="sm" className="me-2" />
+                        Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-comment"></i> Contact Seller
+                      </>
+                    )}
                   </Button>
                   <Button 
                     variant="outline-primary" 
