@@ -8,6 +8,7 @@ import featureService from '../services/featureImplementation';
 import { getCachedCityFromCoordinates, formatLocationDisplay } from '../utils/geocoding';
 import { getStockPhotoForListing, preloadStockPhotos } from '../services/stockPhotos';
 import { handleError } from '../utils/errorHandler';
+import AddFakeListingsButton from './AddFakeListingsButton';
 import './Marketplace.css';
 
 // Enhanced Location Display with more details
@@ -726,9 +727,15 @@ const EnhancedMarketplace = ({ saved = false }) => {
                       {saved ? "You haven't saved any items yet." : "Try adjusting your search criteria."}
                     </p>
                     {!saved && (
-                      <Button variant="primary" onClick={() => navigate('/listings/new')}>
-                        Create the first listing
-                      </Button>
+                      <div className="d-flex flex-column align-items-center gap-3">
+                        <Button variant="primary" onClick={() => navigate('/listings/new')}>
+                          Create the first listing
+                        </Button>
+                        <div className="mt-3">
+                          <p className="text-muted small mb-2">Or populate with sample data:</p>
+                          <AddFakeListingsButton />
+                        </div>
+                      </div>
                     )}
                   </div>
                 );
