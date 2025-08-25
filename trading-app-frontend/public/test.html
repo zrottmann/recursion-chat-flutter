@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trading Post Test</title>
+    <script>
+        console.log('Test page loaded');
+        
+        // Test if we can reach the main app
+        fetch('/src/main.jsx')
+            .then(response => {
+                console.log('Main.jsx status:', response.status);
+                return response.text();
+            })
+            .then(text => {
+                console.log('Main.jsx loaded, length:', text.length);
+            })
+            .catch(error => {
+                console.error('Error loading main.jsx:', error);
+            });
+        
+        // Test if React is available
+        fetch('/node_modules/.vite/deps/react.js')
+            .then(response => {
+                console.log('React status:', response.status);
+            })
+            .catch(error => {
+                console.error('Error loading React:', error);
+            });
+    </script>
+</head>
+<body>
+    <h1>Trading Post Test Page</h1>
+    <p>Check browser console (F12) for test results</p>
+    <a href="/">Go to Main App</a>
+</body>
+</html>

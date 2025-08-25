@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Listing Creation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container { margin-top: 50px; }
+        .test-result { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Listing Creation</h1>
+        <p>This page tests the userId fix for listing creation without the full app overhead.</p>
+        
+        <form id="testForm" class="mb-4">
+            <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input type="text" class="form-control" id="title" value="Test Listing Item" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" rows="3">This is a test listing to verify the userId fix</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select class="form-control" id="category">
+                    <option value="electronics">Electronics</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="books">Books</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="condition" class="form-label">Condition</label>
+                <select class="form-control" id="condition">
+                    <option value="new">New</option>
+                    <option value="excellent">Excellent</option>
+                    <option value="good">Good</option>
+                    <option value="fair">Fair</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="value" class="form-label">Estimated Value ($)</label>
+                <input type="number" class="form-control" id="value" value="50" min="0" step="0.01">
+            </div>
+            <button type="submit" class="btn btn-primary">Test Create Listing</button>
+        </form>
+
+        <div id="result" class="test-result" style="display: none;"></div>
+
+        <div class="mt-4">
+            <h3>Debug Info</h3>
+            <pre id="debugInfo"></pre>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Appwrite directly for testing
+        import { Client, Databases, Account, ID } from 'https://cdn.skypack.dev/appwrite';
+
+        const client = new Client()
+            .setEndpoint('https://cloud.appwrite.io/v1')
+            .setProject('trading-post-dev');
+
+        const databases = new Databases(client);
+        const account = new Account(client);
+
+        const DATABASE_ID = 'trading_post_db';
+        const COLLECTIONS = { items: 'items' };
+
+        const debugInfo = document.getElementById('debugInfo');
+        const resultDiv = document.getElementById('result');
+
+        function showResult(message, isError = false) {
+            resultDiv.style.display = 'block';
+            resultDiv.className = `test-result ${isError ? 'error' : 'success'}`;
+            resultDiv.innerHTML = message;
+        }
+
+        function updateDebug(info) {
+            debugInfo.textContent = JSON.stringify(info, null, 2);
+        }
+
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                showResult('Testing connection and authentication...', false);
+                
+                // Try to get current user
+                let user;
+                try {
+                    user = await account.get();
+                    updateDebug({ step: 'auth_success', user: { id: user.$id, email: user.email } });
+                } catch (authError) {
+                    updateDebug({ step: 'auth_failed', error: authError.message });
+                    showResult(`Authentication required. Error: ${authError.message}`, true);
+                    return;
+                }
+
+                // Collect form data
+                const formData = {
+                    title: document.getElementById('title').value,
+                    description: document.getElementById('description').value,
+                    category: document.getElementById('category').value,
+                    condition: document.getElementById('condition').value,
+                    estimated_value: parseFloat(document.getElementById('value').value) || 0
+                };
+
+                // Create listing with explicit userId
+                const listing = {
+                    userId: user.$id,  // Explicit userId field
+                    title: formData.title,
+                    description: formData.description,
+                    category: formData.category,
+                    condition: formData.condition,
+                    estimated_value: formData.estimated_value,
+                    images: [],
+                    tags: [],
+                    status: 'active',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+
+                updateDebug({ step: 'creating_listing', listing });
+
+                const response = await databases.createDocument(
+                    DATABASE_ID,
+                    COLLECTIONS.items,
+                    ID.unique(),
+                    listing
+                );
+
+                updateDebug({ step: 'success', response });
+                showResult(`✅ Listing created successfully! ID: ${response.$id}`, false);
+
+            } catch (error) {
+                console.error('Error creating listing:', error);
+                updateDebug({ step: 'error', error: error.message, code: error.code });
+                showResult(`❌ Error: ${error.message}`, true);
+            }
+        });
+
+        // Initial debug info
+        updateDebug({ step: 'initialized', timestamp: new Date().toISOString() });
+    </script>
+</body>
+</html>
