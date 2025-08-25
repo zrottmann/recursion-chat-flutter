@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Badge, Carousel, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import api from '../services/api';
+import itemsService from '../services/itemsService';
+import appwriteDatabase from '../services/appwriteDatabase';
 import { useSelector } from 'react-redux';
 import { getCachedCityFromCoordinates, formatLocationDisplay } from '../utils/geocoding';
 import VerifiedBadge from './VerifiedBadge';
@@ -20,20 +22,66 @@ const ListingDetail = () => {
 
   const fetchListing = useCallback(async () => {
     try {
-      const response = await api.get(`/items/${id}`);
-      setListing(response.data);
-      setIsSaved(response.data.is_saved || false);
+      console.log('🔍 Fetching listing with ID:', id);
       
-      // Load owner's membership status
-      if (response.data?.owner?.id) {
+      // Use itemsService directly instead of API
+      const result = await itemsService.getItem(id);
+      
+      if (result.success && result.item) {
+        console.log('✅ Item fetched successfully:', result.item);
+        
+        const item = result.item;
+        
+        // Try to get owner/user data
+        let owner = null;
         try {
-          const membershipResponse = await api.get(`/users/${response.data.owner.id}/membership-status`);
-          setOwnerMembershipStatus(membershipResponse.data);
-        } catch (membershipError) {
-          console.error('Error loading owner membership status:', membershipError);
+          const userId = item.user_id || item.userId || item.owner_id || item.ownerId;
+          console.log('🔍 Trying to get user data for userId:', userId);
+          
+          if (userId) {
+            const userResult = await appwriteDatabase.getUserById(userId);
+            if (userResult.success && userResult.user) {
+              owner = {
+                id: userResult.user.$id || userResult.user.id,
+                username: userResult.user.username || userResult.user.name || userResult.user.email?.split('@')[0] || 'Unknown User',
+                email: userResult.user.email,
+                created_at: userResult.user.$createdAt || userResult.user.created_at,
+                latitude: userResult.user.latitude,
+                longitude: userResult.user.longitude
+              };
+              console.log('✅ Found owner data:', owner);
+            }
+          }
+        } catch (userError) {
+          console.warn('⚠️ Could not fetch owner data:', userError);
         }
+        
+        // Create listing object with owner data
+        const listingWithOwner = {
+          ...item,
+          owner: owner
+        };
+        
+        console.log('🎯 Setting listing with owner:', listingWithOwner);
+        setListing(listingWithOwner);
+        setIsSaved(item.is_saved || false);
+        
+        // Load owner's membership status if we have the owner
+        if (owner?.id) {
+          try {
+            const membershipResponse = await api.get(`/users/${owner.id}/membership-status`);
+            setOwnerMembershipStatus(membershipResponse.data);
+          } catch (membershipError) {
+            console.warn('Could not load owner membership status:', membershipError);
+          }
+        }
+      } else {
+        console.error('❌ Failed to fetch item:', result.error);
+        toast.error('Failed to load listing');
+        navigate('/');
       }
     } catch (error) {
+      console.error('❌ Error in fetchListing:', error);
       toast.error('Failed to load listing');
       navigate('/');
     } finally {

@@ -330,6 +330,28 @@ const apiHandlers = {
   }
 };
 
+// Helper function to check if URL matches an endpoint pattern
+function matchesEndpoint(url, endpoint) {
+  try {
+    const urlObj = new URL(url, window.location.origin);
+    const pathname = urlObj.pathname;
+    
+    // Handle exact matches first
+    if (pathname === endpoint) return true;
+    
+    // Handle parameterized endpoints like /items/{id}
+    if (endpoint === '/items/' && pathname.startsWith('/items/') && pathname.split('/').length === 3) {
+      return true;
+    }
+    
+    // Handle other includes-based matches for backwards compatibility
+    return pathname.includes(endpoint);
+  } catch (error) {
+    // Fallback to simple includes if URL parsing fails
+    return url.includes(endpoint);
+  }
+}
+
 // Intercept fetch calls
 window.fetch = async function(...args) {
   const [url, options = {}] = args;
@@ -337,7 +359,7 @@ window.fetch = async function(...args) {
   
   // Check if this is an API call we should handle
   for (const [endpoint, handler] of Object.entries(apiHandlers)) {
-    if (urlString.includes(endpoint)) {
+    if (matchesEndpoint(urlString, endpoint)) {
       DEBUG.log(`📡 Intercepting API call: ${endpoint}`, options);
       
       try {
@@ -378,67 +400,19 @@ window.fetch = async function(...args) {
   return originalFetch.apply(this, args);
 };
 
+// TEMPORARILY DISABLED: XHR interception causing loading issues
 // Also intercept XMLHttpRequest for axios
 const originalXHROpen = XMLHttpRequest.prototype.open;
 const originalXHRSend = XMLHttpRequest.prototype.send;
 
-XMLHttpRequest.prototype.open = function(method, url, ...args) {
-  this._interceptUrl = url;
-  this._interceptMethod = method;
-  return originalXHROpen.apply(this, [method, url, ...args]);
-};
+// XMLHttpRequest.prototype.open = function(method, url, ...args) {
+//   this._interceptUrl = url;
+//   this._interceptMethod = method;
+//   return originalXHROpen.apply(this, [method, url, ...args]);
+// };
 
 XMLHttpRequest.prototype.send = function(data) {
-  const url = this._interceptUrl;
-  
-  // Check if this is an API call we should handle
-  for (const [endpoint, handler] of Object.entries(apiHandlers)) {
-    if (url && url.includes(endpoint)) {
-      DEBUG.log(`📡 Intercepting XHR API call: ${endpoint}`, { method: this._interceptMethod, data });
-      
-      // Handle the request asynchronously
-      handler({
-        url,
-        path: url,
-        method: this._interceptMethod,
-        body: data
-      }).then(result => {
-        // Simulate XHR response
-        Object.defineProperty(this, 'status', { value: result.status });
-        Object.defineProperty(this, 'statusText', { value: result.ok ? 'OK' : 'Error' });
-        Object.defineProperty(this, 'responseText', { value: JSON.stringify(result.data) });
-        Object.defineProperty(this, 'response', { value: result.data });
-        Object.defineProperty(this, 'readyState', { value: 4 });
-        
-        // Trigger events
-        if (this.onreadystatechange) {
-          this.onreadystatechange();
-        }
-        if (this.onload) {
-          this.onload();
-        }
-        
-        DEBUG.log(`✅ XHR API call handled: ${endpoint}`, result);
-      }).catch(error => {
-        DEBUG.error(`❌ XHR API handler error for ${endpoint}:`, error);
-        
-        Object.defineProperty(this, 'status', { value: 500 });
-        Object.defineProperty(this, 'statusText', { value: 'Internal Server Error' });
-        Object.defineProperty(this, 'responseText', { value: JSON.stringify({ error: error.message }) });
-        Object.defineProperty(this, 'response', { value: { error: error.message } });
-        Object.defineProperty(this, 'readyState', { value: 4 });
-        
-        if (this.onerror) {
-          this.onerror();
-        }
-      });
-      
-      // Don't actually send the request
-      return;
-    }
-  }
-  
-  // Not an API call we handle, use original send
+  // DISABLED: Skip XHR interception for now
   return originalXHRSend.apply(this, [data]);
 };
 
@@ -446,6 +420,9 @@ XMLHttpRequest.prototype.send = function(data) {
 export function initApiAdapter() {
   console.log('🔌 API Adapter initialized - redirecting old API calls to Appwrite services');
   DEBUG.log('API Adapter active - monitoring API calls');
+  
+  // Log current endpoints being intercepted for debugging
+  console.log('🔍 API Adapter endpoints:', Object.keys(apiHandlers));
 }
 
 // Export for testing
