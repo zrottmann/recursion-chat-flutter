@@ -360,7 +360,7 @@ window.fetch = async function(...args) {
   // Check if this is an API call we should handle
   for (const [endpoint, handler] of Object.entries(apiHandlers)) {
     if (matchesEndpoint(urlString, endpoint)) {
-      DEBUG.log(`📡 Intercepting API call: ${endpoint}`, options);
+      DEBUG.log('info', `📡 Intercepting API call: ${endpoint}`, options);
       
       try {
         const result = await handler({
@@ -378,11 +378,12 @@ window.fetch = async function(...args) {
           }
         });
         
-        DEBUG.log(`✅ API call handled: ${endpoint}`, result);
+        DEBUG.log('success', `✅ API call handled: ${endpoint}`, result);
         return response;
         
       } catch (error) {
-        DEBUG.error(`❌ API handler error for ${endpoint}:`, error);
+        DEBUG.log('error', `❌ API handler error for ${endpoint}:`, error);
+        console.error(`❌ API handler error for ${endpoint}:`, error);
         
         // Return error response
         return new Response(JSON.stringify({ error: error.message }), {
@@ -419,7 +420,7 @@ XMLHttpRequest.prototype.send = function(data) {
 // Initialize on load
 export function initApiAdapter() {
   console.log('🔌 API Adapter initialized - redirecting old API calls to Appwrite services');
-  DEBUG.log('API Adapter active - monitoring API calls');
+  DEBUG.log('info', 'API Adapter active - monitoring API calls');
   
   // Log current endpoints being intercepted for debugging
   console.log('🔍 API Adapter endpoints:', Object.keys(apiHandlers));

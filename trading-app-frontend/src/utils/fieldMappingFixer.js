@@ -36,6 +36,16 @@ const FIELD_MAPPINGS = {
     userField: 'userId',
     fallbacks: ['user_id', 'recipient_id'],
     requiredFields: ['userId', 'createdAt']
+  },
+  users: {
+    userField: 'username', // Users collection requires username as primary identifier
+    fallbacks: ['name', 'email'],
+    requiredFields: ['username', 'email'] // Required fields for users
+  },
+  wants: {
+    userField: 'userId',
+    fallbacks: ['user_id'],
+    requiredFields: ['userId', 'title', 'description']
   }
 };
 
@@ -93,13 +103,28 @@ export class FieldMappingFixer {
     const preparedData = { ...data };
     const userField = mapping.userField;
     
-    // Add user field if userId provided
-    if (userId) {
-      preparedData[userField] = userId;
-      // Also add fallback fields for compatibility
-      mapping.fallbacks.forEach(fallback => {
-        preparedData[fallback] = userId;
-      });
+    // Special handling for users collection
+    if (collectionName === 'users') {
+      // For users collection, ensure username is set
+      if (!preparedData.username && preparedData.name) {
+        preparedData.username = preparedData.name;
+      }
+      if (!preparedData.username && preparedData.email) {
+        preparedData.username = preparedData.email.split('@')[0];
+      }
+      // Ensure email is set
+      if (!preparedData.email && preparedData.username) {
+        preparedData.email = `${preparedData.username}@example.com`;
+      }
+    } else {
+      // Add user field if userId provided for other collections
+      if (userId) {
+        preparedData[userField] = userId;
+        // Also add fallback fields for compatibility
+        mapping.fallbacks.forEach(fallback => {
+          preparedData[fallback] = userId;
+        });
+      }
     }
     
     // Ensure timestamps are in correct format
