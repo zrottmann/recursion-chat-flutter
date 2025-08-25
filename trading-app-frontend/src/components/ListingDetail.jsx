@@ -24,7 +24,7 @@ const ListingDetail = () => {
       setIsSaved(response.data.is_saved || false);
       
       // Load owner's membership status
-      if (response.data.owner?.id) {
+      if (response.data?.owner?.id) {
         try {
           const membershipResponse = await api.get(`/users/${response.data.owner.id}/membership-status`);
           setOwnerMembershipStatus(membershipResponse.data);
@@ -46,7 +46,7 @@ const ListingDetail = () => {
 
   useEffect(() => {
     const updateLocationText = async () => {
-      if (!listing || !listing.owner?.latitude || !listing.owner?.longitude) {
+      if (!listing?.owner?.latitude || !listing?.owner?.longitude) {
         setLocationText(listing?.distance ? `${listing.distance.toFixed(1)} miles away` : 'Location');
         return;
       }
@@ -56,7 +56,7 @@ const ListingDetail = () => {
         setLocationText(formatLocationDisplay(listing.distance, city));
       } catch (error) {
         console.error('Error getting city:', error);
-        setLocationText(listing.distance ? `${listing.distance.toFixed(1)} miles away` : 'Location');
+        setLocationText(listing?.distance ? `${listing.distance.toFixed(1)} miles away` : 'Location');
       }
     };
     
@@ -80,7 +80,9 @@ const ListingDetail = () => {
   };
 
   const handleContact = () => {
-    navigate(`/messages/${listing.owner.id}`);
+    if (listing?.owner?.id) {
+      navigate(`/messages/${listing.owner.id}`);
+    }
   };
 
   const getConditionBadge = (condition) => {
@@ -109,7 +111,7 @@ const ListingDetail = () => {
     );
   }
 
-  const isOwner = currentUser && currentUser.id === listing.owner.id;
+  const isOwner = currentUser && listing?.owner?.id && currentUser.id === listing.owner.id;
 
   return (
     <Container className="py-4">
@@ -194,7 +196,7 @@ const ListingDetail = () => {
                 <div 
                   className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" 
                   style={{ width: '50px', height: '50px', cursor: 'pointer' }}
-                  onClick={() => navigate(`/users/${listing.owner.id}`)}
+                  onClick={() => listing?.owner?.id && navigate(`/users/${listing.owner.id}`)}
                 >
                   <i className="fas fa-user"></i>
                 </div>
@@ -202,10 +204,12 @@ const ListingDetail = () => {
                   <div className="d-flex align-items-center mb-1">
                     <h6 className="mb-0 me-2">
                       <a 
-                        href={`/users/${listing.owner.id}`}
+                        href={listing?.owner?.id ? `/users/${listing.owner.id}` : '#'}
                         onClick={(e) => {
                           e.preventDefault();
-                          navigate(`/users/${listing.owner.id}`);
+                          if (listing?.owner?.id) {
+                            navigate(`/users/${listing.owner.id}`);
+                          }
                         }}
                         className="text-decoration-none text-dark"
                       >
@@ -235,7 +239,7 @@ const ListingDetail = () => {
                   <Button 
                     variant="outline-primary" 
                     className="w-100 mb-2"
-                    onClick={() => navigate(`/users/${listing.owner.id}`)}
+                    onClick={() => listing?.owner?.id && navigate(`/users/${listing.owner.id}`)}
                   >
                     <i className="fas fa-user"></i> View Profile
                   </Button>
