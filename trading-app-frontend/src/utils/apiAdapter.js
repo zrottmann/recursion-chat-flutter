@@ -234,6 +234,72 @@ const apiHandlers = {
     }
   },
   
+  // Individual item endpoint  
+  '/items/': async (options) => {
+    try {
+      const url = new URL(options.url || options.path, window.location.origin);
+      const pathParts = url.pathname.split('/');
+      const itemId = pathParts[pathParts.length - 1];
+      
+      console.log('🔍 Fetching individual item:', itemId);
+      
+      const result = await itemsService.getItem(itemId);
+      
+      if (result.success && result.item) {
+        const item = result.item;
+        
+        // Try to get owner/user data
+        let owner = null;
+        try {
+          // Try to get user ID from item
+          const userId = item.user_id || item.userId || item.owner_id || item.ownerId;
+          console.log('🔍 Trying to get user data for userId:', userId);
+          
+          if (userId) {
+            // Use appwriteDatabase to get user info
+            const userResult = await appwriteDatabase.getUserById(userId);
+            if (userResult.success && userResult.user) {
+              owner = {
+                id: userResult.user.$id || userResult.user.id,
+                username: userResult.user.username || userResult.user.name || userResult.user.email?.split('@')[0] || 'Unknown User',
+                email: userResult.user.email,
+                created_at: userResult.user.$createdAt || userResult.user.created_at,
+                latitude: userResult.user.latitude,
+                longitude: userResult.user.longitude
+              };
+              console.log('✅ Found owner data:', owner);
+            }
+          }
+        } catch (userError) {
+          console.warn('⚠️ Could not fetch owner data:', userError);
+        }
+        
+        // Return item with owner data
+        const itemWithOwner = {
+          ...item,
+          owner: owner
+        };
+        
+        console.log('✅ Returning item with owner:', itemWithOwner);
+        
+        return {
+          ok: true,
+          status: 200,
+          data: itemWithOwner
+        };
+      } else {
+        return {
+          ok: false,
+          status: 404,
+          data: { error: 'Item not found' }
+        };
+      }
+    } catch (error) {
+      console.error('❌ Error fetching item:', error);
+      return { ok: false, status: 500, data: { error: error.message } };
+    }
+  },
+
   // Listings save/unsave endpoints
   '/api/listings/save': async (options) => {
     try {

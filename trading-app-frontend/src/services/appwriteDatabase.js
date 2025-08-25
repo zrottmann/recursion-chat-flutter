@@ -518,6 +518,33 @@ class AppwriteDatabaseService {
     }
   }
 
+  // User Management
+  async getUserById(userId) {
+    try {
+      console.log('🔍 Getting user by ID:', userId);
+      
+      const user = await this.db.getDocument(
+        DATABASE_ID,
+        COLLECTIONS.users,
+        userId
+      );
+      
+      console.log('✅ User found:', user);
+      
+      return {
+        user,
+        success: true
+      };
+      
+    } catch (error) {
+      console.error('❌ Get user by ID failed:', error);
+      return {
+        success: false,
+        error: handleAppwriteError(error)
+      };
+    }
+  }
+
   // Search and Discovery
   async searchUsers(query, location = null, limit = 20) {
     try {
