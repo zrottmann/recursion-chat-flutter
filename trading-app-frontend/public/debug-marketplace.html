@@ -20,12 +20,16 @@
         <h1>Marketplace Debug Tool</h1>
         <p>This tool checks why no items are appearing in the marketplace.</p>
 
-        <div class="btn-group">
+        <div class="btn-group mb-2">
             <button id="checkConnection" class="btn btn-primary">1. Check Connection</button>
             <button id="checkAuth" class="btn btn-secondary">2. Check Auth</button>
             <button id="listItems" class="btn btn-info">3. List All Items</button>
             <button id="createTestItem" class="btn btn-success">4. Create Test Item</button>
             <button id="checkCollections" class="btn btn-warning">5. Check Collections</button>
+        </div>
+        <div class="btn-group mb-3">
+            <button id="testMarketplaceQuery" class="btn btn-dark">6. Test Marketplace Query</button>
+            <button id="runFullDiagnosis" class="btn btn-danger">🚨 Run Full Diagnosis</button>
         </div>
 
         <div id="connectionResult" class="debug-section" style="display: none;">
@@ -51,6 +55,16 @@
         <div id="collectionsResult" class="debug-section" style="display: none;">
             <h3>Collections Check</h3>
             <div id="collectionsContent"></div>
+        </div>
+
+        <div id="marketplaceResult" class="debug-section" style="display: none;">
+            <h3>Marketplace Query Test</h3>
+            <div id="marketplaceContent"></div>
+        </div>
+
+        <div id="diagnosisResult" class="debug-section" style="display: none;">
+            <h3>Full Diagnosis</h3>
+            <div id="diagnosisContent"></div>
         </div>
 
         <div class="debug-section">
@@ -269,6 +283,158 @@
                     <div class="alert alert-danger">❌ Collection check failed: ${errorMsg}</div>
                     <p>Error code: ${error.code}</p>
                     <p>${suggestion}</p>
+                `, 'error');
+            }
+        });
+
+        // 6. Test Marketplace Query (exact same query as EnhancedMarketplace)
+        document.getElementById('testMarketplaceQuery').addEventListener('click', async () => {
+            log('Testing exact marketplace query...');
+            try {
+                // This is the exact query from EnhancedMarketplace.jsx
+                const searchParams = {
+                    query: '',
+                    category: undefined,
+                    status: 'active',
+                    limit: 50
+                };
+
+                const queries = [Query.limit(searchParams.limit || 50)];
+                
+                if (searchParams.query) {
+                    queries.push(Query.search('title', searchParams.query));
+                }
+                
+                if (searchParams.category) {
+                    queries.push(Query.equal('category', [searchParams.category]));
+                }
+                
+                if (searchParams.status) {
+                    queries.push(Query.equal('status', [searchParams.status]));
+                }
+
+                log('Marketplace query parameters', { searchParams, queries });
+
+                const response = await databases.listDocuments(
+                    CONFIG.database,
+                    CONFIG.collection,
+                    queries
+                );
+
+                log('Marketplace query successful', { 
+                    total: response.total, 
+                    count: response.documents.length,
+                    firstItem: response.documents[0]
+                });
+
+                const resultsHtml = response.documents.length === 0 ? 
+                    `<div class="alert alert-warning">⚠️ Marketplace query returned 0 items with status='active'</div>
+                     <p>This explains why the marketplace appears empty.</p>
+                     <p>Items might have a different status or the query filters are too restrictive.</p>` :
+                    `<div class="alert alert-success">✅ Marketplace query found ${response.documents.length} items</div>
+                     <p>Items should be visible in the marketplace.</p>
+                     <p>If they're not showing, check the frontend rendering logic.</p>`;
+
+                showSection('marketplaceResult', resultsHtml, response.documents.length > 0 ? 'success' : 'warning');
+
+            } catch (error) {
+                log('Marketplace query failed', error);
+                showSection('marketplaceResult', `
+                    <div class="alert alert-danger">❌ Marketplace query failed: ${error.message}</div>
+                    <p>Error code: ${error.code}</p>
+                `, 'error');
+            }
+        });
+
+        // 7. Run Full Diagnosis
+        document.getElementById('runFullDiagnosis').addEventListener('click', async () => {
+            log('Running full diagnosis...');
+            let diagnosisResults = [];
+            
+            try {
+                // Test 1: Connection
+                try {
+                    await fetch(`${CONFIG.endpoint}/health`);
+                    diagnosisResults.push({ test: 'Connection', status: 'pass', message: 'Appwrite is reachable' });
+                } catch {
+                    diagnosisResults.push({ test: 'Connection', status: 'fail', message: 'Cannot reach Appwrite' });
+                }
+
+                // Test 2: Authentication
+                try {
+                    const user = await account.get();
+                    diagnosisResults.push({ test: 'Authentication', status: 'pass', message: `Logged in as ${user.email}` });
+                } catch (error) {
+                    diagnosisResults.push({ test: 'Authentication', status: 'fail', message: 'Not authenticated' });
+                }
+
+                // Test 3: Collection Access
+                try {
+                    await databases.listDocuments(CONFIG.database, CONFIG.collection, [Query.limit(1)]);
+                    diagnosisResults.push({ test: 'Collection Access', status: 'pass', message: 'Can access items collection' });
+                } catch (error) {
+                    diagnosisResults.push({ test: 'Collection Access', status: 'fail', message: `Cannot access collection: ${error.message}` });
+                }
+
+                // Test 4: Item Count
+                try {
+                    const response = await databases.listDocuments(CONFIG.database, CONFIG.collection, [Query.limit(1)]);
+                    const count = response.total;
+                    if (count === 0) {
+                        diagnosisResults.push({ test: 'Item Count', status: 'warning', message: 'No items in database' });
+                    } else {
+                        diagnosisResults.push({ test: 'Item Count', status: 'pass', message: `${count} items in database` });
+                    }
+                } catch {
+                    diagnosisResults.push({ test: 'Item Count', status: 'fail', message: 'Cannot count items' });
+                }
+
+                // Test 5: Active Items
+                try {
+                    const response = await databases.listDocuments(CONFIG.database, CONFIG.collection, [
+                        Query.equal('status', ['active']),
+                        Query.limit(50)
+                    ]);
+                    const count = response.documents.length;
+                    if (count === 0) {
+                        diagnosisResults.push({ test: 'Active Items', status: 'warning', message: 'No active items found' });
+                    } else {
+                        diagnosisResults.push({ test: 'Active Items', status: 'pass', message: `${count} active items found` });
+                    }
+                } catch (error) {
+                    diagnosisResults.push({ test: 'Active Items', status: 'fail', message: `Cannot query active items: ${error.message}` });
+                }
+
+                // Generate diagnosis report
+                const passCount = diagnosisResults.filter(r => r.status === 'pass').length;
+                const failCount = diagnosisResults.filter(r => r.status === 'fail').length;
+                const warningCount = diagnosisResults.filter(r => r.status === 'warning').length;
+
+                const resultsList = diagnosisResults.map(result => {
+                    const icon = result.status === 'pass' ? '✅' : result.status === 'fail' ? '❌' : '⚠️';
+                    const colorClass = result.status === 'pass' ? 'text-success' : result.status === 'fail' ? 'text-danger' : 'text-warning';
+                    return `<div class="${colorClass}"><strong>${icon} ${result.test}:</strong> ${result.message}</div>`;
+                }).join('');
+
+                const overallStatus = failCount > 0 ? 'error' : warningCount > 0 ? 'warning' : 'success';
+                const overallMessage = failCount > 0 ? 'Critical issues found' : 
+                                     warningCount > 0 ? 'Issues found that may cause empty marketplace' : 
+                                     'All tests passed';
+
+                showSection('diagnosisResult', `
+                    <div class="alert alert-${overallStatus === 'error' ? 'danger' : overallStatus === 'warning' ? 'warning' : 'success'}">
+                        <strong>Diagnosis Complete:</strong> ${overallMessage}
+                    </div>
+                    <p><strong>Results:</strong> ${passCount} passed, ${warningCount} warnings, ${failCount} failed</p>
+                    <div class="mt-3">${resultsList}</div>
+                `, overallStatus);
+
+                log('Full diagnosis completed', diagnosisResults);
+
+            } catch (error) {
+                log('Diagnosis failed', error);
+                showSection('diagnosisResult', `
+                    <div class="alert alert-danger">❌ Diagnosis failed: ${error.message}</div>
                 `, 'error');
             }
         });
