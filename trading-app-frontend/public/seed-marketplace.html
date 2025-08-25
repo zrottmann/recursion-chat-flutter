@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace Seeder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container { margin-top: 20px; }
+        .seed-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; max-height: 300px; overflow-y: auto; }
+        .item-preview { border: 1px solid #dee2e6; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .btn-group { margin: 10px 0; }
+        .progress-container { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 Marketplace Seeder</h1>
+        <p>This tool creates test items to populate the marketplace.</p>
+
+        <div class="alert alert-info">
+            <strong>Note:</strong> You must be logged in to Appwrite for this tool to work.
+        </div>
+
+        <div class="btn-group mb-3">
+            <button id="checkAuth" class="btn btn-secondary">Check Authentication</button>
+            <button id="seedBasicItems" class="btn btn-success">Seed 5 Basic Items</button>
+            <button id="seedFullMarketplace" class="btn btn-primary">Seed Full Marketplace (20 items)</button>
+            <button id="clearItems" class="btn btn-danger">Clear All Items</button>
+        </div>
+
+        <div id="authStatus" class="seed-section" style="display: none;">
+            <h3>Authentication Status</h3>
+            <div id="authContent"></div>
+        </div>
+
+        <div id="seedProgress" class="seed-section" style="display: none;">
+            <h3>Seeding Progress</h3>
+            <div id="progressContent"></div>
+            <div class="progress-container">
+                <div class="progress">
+                    <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="seedResults" class="seed-section" style="display: none;">
+            <h3>Results</h3>
+            <div id="resultsContent"></div>
+        </div>
+
+        <div class="seed-section">
+            <h3>Console Log</h3>
+            <pre id="console"></pre>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Appwrite
+        import { Client, Databases, Account, ID } from 'https://cdn.skypack.dev/appwrite';
+
+        // Configuration
+        const CONFIG = {
+            endpoint: 'https://cloud.appwrite.io/v1',
+            project: 'trading-post-dev',
+            database: 'trading_post_db',
+            collection: 'items'
+        };
+
+        const client = new Client()
+            .setEndpoint(CONFIG.endpoint)
+            .setProject(CONFIG.project);
+
+        const databases = new Databases(client);
+        const account = new Account(client);
+
+        const consoleLog = document.getElementById('console');
+        let logCount = 0;
+
+        function log(message, data = null) {
+            logCount++;
+            const timestamp = new Date().toISOString().substr(11, 8);
+            let logMessage = `[${timestamp}] ${message}`;
+            if (data) {
+                logMessage += '\n' + JSON.stringify(data, null, 2);
+            }
+            consoleLog.textContent += logMessage + '\n\n';
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+            console.log(message, data);
+        }
+
+        function showSection(sectionId, content, className = '') {
+            const section = document.getElementById(sectionId);
+            const contentDiv = document.getElementById(sectionId.replace('Status', 'Content').replace('Progress', 'Content').replace('Results', 'Content'));
+            section.style.display = 'block';
+            section.className = `seed-section ${className}`;
+            contentDiv.innerHTML = content;
+        }
+
+        function updateProgress(current, total, message) {
+            const percent = Math.round((current / total) * 100);
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('progressBar').textContent = `${current}/${total}`;
+            showSection('seedProgress', `
+                <p><strong>Status:</strong> ${message}</p>
+                <p>Progress: ${current} of ${total} items processed</p>
+            `);
+        }
+
+        // Sample item templates
+        const ITEM_TEMPLATES = [
+            {
+                title: "Vintage iPhone 12",
+                description: "Excellent condition iPhone 12 with original box and charger. Battery health at 95%.",
+                category: "electronics",
+                condition: "excellent",
+                estimated_value: 450.00,
+                tags: ["apple", "smartphone", "vintage"]
+            },
+            {
+                title: "Nike Air Jordan Sneakers",
+                description: "Size 10 Air Jordan retro sneakers in good condition. Some wear on soles but still comfortable.",
+                category: "clothing",
+                condition: "good",
+                estimated_value: 180.00,
+                tags: ["nike", "sneakers", "basketball"]
+            },
+            {
+                title: "MacBook Pro 2019",
+                description: "13-inch MacBook Pro with Touch Bar. 256GB SSD, 8GB RAM. Perfect for students or professionals.",
+                category: "electronics",
+                condition: "good",
+                estimated_value: 800.00,
+                tags: ["apple", "laptop", "macbook"]
+            },
+            {
+                title: "Harry Potter Book Collection",
+                description: "Complete set of Harry Potter books in hardcover. Some shelf wear but pages are in excellent condition.",
+                category: "books",
+                condition: "good",
+                estimated_value: 120.00,
+                tags: ["books", "harry potter", "collection"]
+            },
+            {
+                title: "Wooden Dining Table",
+                description: "Solid oak dining table that seats 6 people. Minor scratches but very sturdy.",
+                category: "furniture",
+                condition: "fair",
+                estimated_value: 300.00,
+                tags: ["furniture", "dining", "oak"]
+            },
+            {
+                title: "PlayStation 5 Console",
+                description: "Brand new PS5 console with controller. Still in original packaging.",
+                category: "electronics",
+                condition: "new",
+                estimated_value: 500.00,
+                tags: ["gaming", "playstation", "console"]
+            },
+            {
+                title: "Road Bike - Trek FX3",
+                description: "Hybrid road bike in excellent condition. Recently serviced with new tires.",
+                category: "sports",
+                condition: "excellent",
+                estimated_value: 650.00,
+                tags: ["bike", "cycling", "trek"]
+            },
+            {
+                title: "Instant Pot Pressure Cooker",
+                description: "6-quart Instant Pot, barely used. Comes with all accessories and recipe book.",
+                category: "home",
+                condition: "like_new",
+                estimated_value: 80.00,
+                tags: ["cooking", "kitchen", "instant pot"]
+            },
+            {
+                title: "Canon DSLR Camera",
+                description: "Canon EOS Rebel T7 with 18-55mm lens. Great for photography beginners.",
+                category: "electronics",
+                condition: "excellent",
+                estimated_value: 400.00,
+                tags: ["camera", "canon", "photography"]
+            },
+            {
+                title: "Winter Jacket - North Face",
+                description: "Men's large North Face winter jacket. Warm and waterproof, perfect for cold weather.",
+                category: "clothing",
+                condition: "good",
+                estimated_value: 150.00,
+                tags: ["jacket", "winter", "north face"]
+            },
+            {
+                title: "Electric Guitar - Fender",
+                description: "Fender Stratocaster electric guitar with amplifier. Great for beginners or practice.",
+                category: "music",
+                condition: "good",
+                estimated_value: 350.00,
+                tags: ["guitar", "fender", "music"]
+            },
+            {
+                title: "Coffee Table Books Set",
+                description: "Collection of beautiful coffee table books on art, photography, and travel.",
+                category: "books",
+                condition: "excellent",
+                estimated_value: 60.00,
+                tags: ["books", "art", "coffee table"]
+            },
+            {
+                title: "Yoga Mat and Blocks",
+                description: "High-quality yoga mat with foam blocks. Perfect for home workouts.",
+                category: "sports",
+                condition: "like_new",
+                estimated_value: 45.00,
+                tags: ["yoga", "fitness", "exercise"]
+            },
+            {
+                title: "Smart TV - Samsung 55\"",
+                description: "55-inch Samsung Smart TV with 4K resolution. Excellent picture quality.",
+                category: "electronics",
+                condition: "excellent",
+                estimated_value: 550.00,
+                tags: ["tv", "samsung", "smart tv"]
+            },
+            {
+                title: "Designer Handbag",
+                description: "Authentic Coach handbag in tan leather. Some signs of use but still beautiful.",
+                category: "clothing",
+                condition: "good",
+                estimated_value: 200.00,
+                tags: ["handbag", "coach", "designer"]
+            },
+            {
+                title: "Board Game Collection",
+                description: "10+ popular board games including Catan, Monopoly, and Scrabble. All complete.",
+                category: "games",
+                condition: "good",
+                estimated_value: 150.00,
+                tags: ["board games", "family", "entertainment"]
+            },
+            {
+                title: "Kitchen Stand Mixer",
+                description: "KitchenAid stand mixer in red. Comes with dough hook, whisk, and paddle attachments.",
+                category: "home",
+                condition: "good",
+                estimated_value: 220.00,
+                tags: ["mixer", "kitchenaid", "baking"]
+            },
+            {
+                title: "Camping Tent - 4 Person",
+                description: "Coleman 4-person tent with rainfly. Used only a few times, excellent for camping.",
+                category: "sports",
+                condition: "like_new",
+                estimated_value: 120.00,
+                tags: ["camping", "tent", "coleman"]
+            },
+            {
+                title: "Art Supplies Set",
+                description: "Complete acrylic painting set with canvases, brushes, and paints. Perfect for artists.",
+                category: "art",
+                condition: "new",
+                estimated_value: 90.00,
+                tags: ["art", "painting", "supplies"]
+            },
+            {
+                title: "Bluetooth Speaker - JBL",
+                description: "Portable JBL Bluetooth speaker with excellent sound quality. Waterproof design.",
+                category: "electronics",
+                condition: "excellent",
+                estimated_value: 100.00,
+                tags: ["speaker", "bluetooth", "jbl"]
+            }
+        ];
+
+        // Check Authentication
+        document.getElementById('checkAuth').addEventListener('click', async () => {
+            log('Checking authentication...');
+            try {
+                const user = await account.get();
+                log('Authentication successful', { id: user.$id, email: user.email });
+                showSection('authStatus', `
+                    <div class="alert alert-success">✅ Authenticated as ${user.email}</div>
+                    <p><strong>User ID:</strong> ${user.$id}</p>
+                    <p><strong>Name:</strong> ${user.name || 'Not set'}</p>
+                    <p>Ready to seed items!</p>
+                `, 'success');
+            } catch (error) {
+                log('Authentication failed', error);
+                showSection('authStatus', `
+                    <div class="alert alert-danger">❌ Not authenticated: ${error.message}</div>
+                    <p>Please log in to the Trading Post app first, then return here.</p>
+                `, 'error');
+            }
+        });
+
+        // Seed Basic Items (5 items)
+        document.getElementById('seedBasicItems').addEventListener('click', async () => {
+            await seedItems(ITEM_TEMPLATES.slice(0, 5));
+        });
+
+        // Seed Full Marketplace (20 items)
+        document.getElementById('seedFullMarketplace').addEventListener('click', async () => {
+            await seedItems(ITEM_TEMPLATES);
+        });
+
+        // Clear All Items
+        document.getElementById('clearItems').addEventListener('click', async () => {
+            if (!confirm('Are you sure you want to clear ALL items from the marketplace?')) {
+                return;
+            }
+
+            log('Clearing all items...');
+            try {
+                const user = await account.get();
+                
+                // Get all items
+                const response = await databases.listDocuments(CONFIG.database, CONFIG.collection);
+                const items = response.documents;
+                
+                updateProgress(0, items.length, 'Deleting items...');
+                
+                let deleted = 0;
+                for (const item of items) {
+                    try {
+                        await databases.deleteDocument(CONFIG.database, CONFIG.collection, item.$id);
+                        deleted++;
+                        updateProgress(deleted, items.length, `Deleted ${deleted}/${items.length} items`);
+                    } catch (error) {
+                        log(`Failed to delete item ${item.$id}:`, error);
+                    }
+                }
+
+                showSection('seedResults', `
+                    <div class="alert alert-success">✅ Cleared ${deleted} items from marketplace</div>
+                    <p>The marketplace should now be empty.</p>
+                `, 'success');
+
+            } catch (error) {
+                log('Clear failed', error);
+                showSection('seedResults', `
+                    <div class="alert alert-danger">❌ Failed to clear items: ${error.message}</div>
+                `, 'error');
+            }
+        });
+
+        // Main seeding function
+        async function seedItems(templates) {
+            log(`Starting to seed ${templates.length} items...`);
+            
+            try {
+                const user = await account.get();
+                log('User authenticated, proceeding with seeding', { userEmail: user.email });
+                
+                updateProgress(0, templates.length, 'Starting to create items...');
+                
+                const results = [];
+                let created = 0;
+                
+                for (let i = 0; i < templates.length; i++) {
+                    const template = templates[i];
+                    
+                    try {
+                        const item = {
+                            userId: user.$id,
+                            title: template.title,
+                            description: template.description,
+                            category: template.category,
+                            condition: template.condition,
+                            estimated_value: template.estimated_value,
+                            images: [],
+                            tags: template.tags || [],
+                            status: 'active',
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        };
+
+                        const response = await databases.createDocument(
+                            CONFIG.database,
+                            CONFIG.collection,
+                            ID.unique(),
+                            item
+                        );
+
+                        results.push({ success: true, item: response });
+                        created++;
+                        
+                        updateProgress(i + 1, templates.length, `Created "${template.title}"`);
+                        log(`Created item: ${template.title}`, { id: response.$id });
+                        
+                        // Small delay to avoid rate limiting
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
+                    } catch (error) {
+                        log(`Failed to create item "${template.title}":`, error);
+                        results.push({ success: false, template, error: error.message });
+                    }
+                }
+
+                const failed = results.filter(r => !r.success).length;
+                
+                showSection('seedResults', `
+                    <div class="alert alert-${failed === 0 ? 'success' : 'warning'}">
+                        ${failed === 0 ? '✅' : '⚠️'} Seeding complete: ${created} items created, ${failed} failed
+                    </div>
+                    <p>Check the marketplace to see the new items!</p>
+                    <p><strong>Tip:</strong> Refresh the marketplace page if items don't appear immediately.</p>
+                    ${failed > 0 ? '<p class="text-danger">Check console log for failure details.</p>' : ''}
+                `, failed === 0 ? 'success' : 'warning');
+
+                log('Seeding completed', { created, failed, results });
+
+            } catch (error) {
+                log('Seeding failed', error);
+                showSection('seedResults', `
+                    <div class="alert alert-danger">❌ Seeding failed: ${error.message}</div>
+                    <p>Make sure you're authenticated and try again.</p>
+                `, 'error');
+            }
+        }
+
+        // Initial log
+        log('Marketplace seeder initialized');
+        log('Configuration', CONFIG);
+        log(`Available templates: ${ITEM_TEMPLATES.length} items`);
+    </script>
+</body>
+</html>

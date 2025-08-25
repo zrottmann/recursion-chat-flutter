@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Marketplace Seeder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0/dist/iife/sdk.js"></script>
+    <style>
+        .container { margin-top: 20px; }
+        .result { margin: 15px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #cce7ff; color: #004085; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 Simple Marketplace Seeder</h1>
+        <p>This tool adds test items to your marketplace.</p>
+        
+        <div class="alert alert-info">
+            <strong>Instructions:</strong>
+            <ol>
+                <li>First check if you're authenticated</li>
+                <li>Then click "Add Test Items" to seed the marketplace</li>
+                <li>Go back to the main marketplace to see the items</li>
+            </ol>
+        </div>
+
+        <div class="mb-3">
+            <button id="checkAuth" class="btn btn-secondary me-2">Check Authentication</button>
+            <button id="addItems" class="btn btn-success me-2">Add 5 Test Items</button>
+            <button id="viewItems" class="btn btn-info">View All Items</button>
+        </div>
+
+        <div id="results"></div>
+        
+        <div class="mt-4">
+            <h5>Console Output:</h5>
+            <div id="console" style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-family: monospace; min-height: 100px; white-space: pre-wrap;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Appwrite
+        const { Client, Databases, Account, ID, Query } = Appwrite;
+        
+        const client = new Client()
+            .setEndpoint('https://cloud.appwrite.io/v1')
+            .setProject('trading-post-dev');
+
+        const databases = new Databases(client);
+        const account = new Account(client);
+
+        const DATABASE_ID = 'trading_post_db';
+        const COLLECTION_ID = 'items';
+
+        // Logging function
+        function log(message) {
+            console.log(message);
+            const consoleDiv = document.getElementById('console');
+            consoleDiv.textContent += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+
+        // Show result function
+        function showResult(message, type = 'success') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        // Test items data
+        const TEST_ITEMS = [
+            {
+                title: "iPhone 12 - Excellent Condition",
+                description: "Barely used iPhone 12 with original box and accessories. Battery health at 95%.",
+                category: "electronics",
+                condition: "excellent",
+                estimated_value: 450.00
+            },
+            {
+                title: "Nike Air Jordan Sneakers",
+                description: "Size 10 Air Jordan sneakers in good condition. Perfect for casual wear or sports.",
+                category: "clothing", 
+                condition: "good",
+                estimated_value: 180.00
+            },
+            {
+                title: "MacBook Pro 2019",
+                description: "13-inch MacBook Pro with Touch Bar. Great for work or school projects.",
+                category: "electronics",
+                condition: "good", 
+                estimated_value: 800.00
+            },
+            {
+                title: "Complete Harry Potter Book Set",
+                description: "All 7 Harry Potter books in hardcover. Some shelf wear but pages are perfect.",
+                category: "books",
+                condition: "good",
+                estimated_value: 120.00
+            },
+            {
+                title: "Oak Dining Table",
+                description: "Solid oak dining table that seats 6 people. Minor scratches but very sturdy.",
+                category: "furniture",
+                condition: "fair",
+                estimated_value: 300.00
+            }
+        ];
+
+        // Check Authentication
+        document.getElementById('checkAuth').addEventListener('click', async () => {
+            log('Checking authentication...');
+            showResult('Checking authentication...', 'loading');
+            
+            try {
+                const user = await account.get();
+                log('✅ Authenticated as: ' + user.email);
+                showResult(`✅ <strong>Authenticated!</strong><br>Email: ${user.email}<br>User ID: ${user.$id}`, 'success');
+            } catch (error) {
+                log('❌ Not authenticated: ' + error.message);
+                showResult(`❌ <strong>Not Authenticated</strong><br>${error.message}<br><em>Please log in to the main Trading Post app first, then come back here.</em>`, 'error');
+            }
+        });
+
+        // Add Test Items
+        document.getElementById('addItems').addEventListener('click', async () => {
+            log('Starting to add test items...');
+            showResult('Adding test items...', 'loading');
+            
+            try {
+                // Check auth first
+                const user = await account.get();
+                log('User authenticated, proceeding with item creation');
+                
+                let created = 0;
+                let failed = 0;
+                
+                for (let i = 0; i < TEST_ITEMS.length; i++) {
+                    const template = TEST_ITEMS[i];
+                    
+                    try {
+                        const itemData = {
+                            userId: user.$id,
+                            title: template.title,
+                            description: template.description,
+                            category: template.category,
+                            condition: template.condition,
+                            estimated_value: template.estimated_value,
+                            images: [],
+                            tags: [],
+                            status: 'active',
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        };
+
+                        const response = await databases.createDocument(
+                            DATABASE_ID,
+                            COLLECTION_ID,
+                            ID.unique(),
+                            itemData
+                        );
+
+                        created++;
+                        log(`✅ Created: ${template.title} (ID: ${response.$id})`);
+                        
+                        // Small delay to avoid rate limiting
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                        
+                    } catch (itemError) {
+                        failed++;
+                        log(`❌ Failed to create "${template.title}": ${itemError.message}`);
+                    }
+                }
+
+                showResult(`✅ <strong>Seeding Complete!</strong><br>Created: ${created} items<br>Failed: ${failed} items<br><em>Go back to the marketplace to see your new items!</em>`, 'success');
+                log(`Seeding complete: ${created} created, ${failed} failed`);
+                
+            } catch (error) {
+                log('❌ Seeding failed: ' + error.message);
+                showResult(`❌ <strong>Seeding Failed</strong><br>${error.message}<br><em>Make sure you're authenticated first.</em>`, 'error');
+            }
+        });
+
+        // View All Items
+        document.getElementById('viewItems').addEventListener('click', async () => {
+            log('Fetching all items...');
+            showResult('Fetching items from database...', 'loading');
+            
+            try {
+                const response = await databases.listDocuments(
+                    DATABASE_ID,
+                    COLLECTION_ID,
+                    [Query.orderDesc('$createdAt'), Query.limit(20)]
+                );
+
+                log(`Found ${response.documents.length} items in database`);
+                
+                if (response.documents.length === 0) {
+                    showResult('⚠️ <strong>No Items Found</strong><br>The database is empty. Try adding some test items first.', 'error');
+                } else {
+                    const itemsList = response.documents.map(item => 
+                        `<div style="border: 1px solid #ddd; padding: 8px; margin: 5px 0; border-radius: 3px;">
+                            <strong>${item.title}</strong> - $${item.estimated_value}<br>
+                            <small>Status: ${item.status} | Category: ${item.category} | ID: ${item.$id}</small>
+                        </div>`
+                    ).join('');
+
+                    showResult(`✅ <strong>Found ${response.documents.length} Items</strong><br><div style="max-height: 300px; overflow-y: auto;">${itemsList}</div>`, 'success');
+                }
+                
+            } catch (error) {
+                log('❌ Failed to fetch items: ' + error.message);
+                showResult(`❌ <strong>Failed to Fetch Items</strong><br>${error.message}`, 'error');
+            }
+        });
+
+        // Initialize
+        log('Simple seeder initialized');
+        log('Ready to seed marketplace items');
+    </script>
+</body>
+</html>
