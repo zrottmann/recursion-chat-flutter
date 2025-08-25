@@ -169,9 +169,13 @@ const ListingCard = ({ listing, savedItems, onSaveToggle, onViewDetails, cityCac
             variant="primary" 
             size="sm"
             onClick={() => onViewDetails(listing.$id || listing.id)}
-            className="btn-animated"
+            className="btn-animated d-flex align-items-center justify-content-center gap-2"
           >
-            View Details
+            <span className="fw-bold text-truncate" style={{maxWidth: '120px'}} title={listing.title}>
+              {listing.title}
+            </span>
+            <span>•</span>
+            <span>View Details</span>
           </Button>
         </div>
       </Card.Body>
