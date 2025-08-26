@@ -17,6 +17,8 @@ import { initDebugConsole, autoFixIssues, DEBUG } from './utils/fixDatabaseSchem
 import './utils/checkListings';
 // Import AI matching tester
 import './utils/testAIMatching';
+// Import platform activator to fix OAuth errors
+import { activatePlatform } from './utils/platformActivator';
 // Import API adapter to fix 405 errors
 import { initApiAdapter } from './utils/apiAdapter';
 // Import system initializer for comprehensive startup
@@ -279,6 +281,18 @@ function App() {
       console.log('🔌 Initializing API adapter to handle legacy API calls...');
       initApiAdapter();
       console.log('✅ API adapter initialized - old API calls will be redirected to Appwrite');
+      
+      // CRITICAL: Activate platform for OAuth to work
+      console.log('🔐 Activating platform for OAuth authentication...');
+      activatePlatform().then(result => {
+        if (result.success) {
+          console.log('✅ Platform activated successfully:', result);
+        } else {
+          console.error('⚠️ Platform activation issue:', result);
+        }
+      }).catch(error => {
+        console.error('❌ Platform activation error:', error);
+      });
       
       // Run auto-fixes after a short delay
       setTimeout(() => {
