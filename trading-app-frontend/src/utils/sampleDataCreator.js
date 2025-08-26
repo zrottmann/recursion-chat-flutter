@@ -331,23 +331,32 @@ class SampleDataCreator {
     for (const userData of sampleUsersData) {
       try {
         const userId = ID.unique();
+        // Prepare user data with required fields
+        const userDocument = {
+          ...userData,
+          username: userData.name.toLowerCase().replace(/\s+/g, '_'), // Generate username from name
+          user_id: userId, // Add user_id field
+          userId: userId, // Add userId field for consistency
+          member_since: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
+          is_active: true,
+          last_active: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          verification_status: 'verified',
+          preferences: {
+            categories: ['Electronics', 'Art', 'Furniture', 'Books'],
+            max_distance: 30,
+              preferred_meeting_type: 'public_place'
+          }
+        };
+        
+        console.log('🔍 [SampleData] Creating user:', userDocument.name, 'with username:', userDocument.username);
+        
         const user = await db.createDocument(
           DATABASE_ID,
           COLLECTIONS.users,
           userId,
-          {
-            ...userData,
-            user_id: userId,
-            member_since: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString(),
-            is_active: true,
-            last_active: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-            verification_status: 'verified',
-            preferences: {
-              categories: ['Electronics', 'Art', 'Furniture', 'Books'],
-              max_distance: 30,
-              preferred_meeting_type: 'public_place'
-            }
-          }
+          userDocument
         );
         
         this.createdData.users.push(user);
@@ -566,20 +575,26 @@ class SampleDataCreator {
     
     for (const notifData of notificationTypes) {
       try {
+        const notificationDoc = {
+          ...notifData,
+          userId: this.currentUser.$id, // Primary field required by field mapping
+          user_id: this.currentUser.$id, // Fallback field
+          recipient_id: this.currentUser.$id, // Another fallback field
+          created_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          is_read: Math.random() > 0.6,
+          action_url: '/trades',
+          metadata: {
+            source: 'ai_matching_system'
+          }
+        };
+        
+        console.log('🔍 [SampleData] Creating notification with userId:', notificationDoc.userId);
+        
         const notification = await db.createDocument(
           DATABASE_ID,
           COLLECTIONS.notifications,
           ID.unique(),
-          {
-            ...notifData,
-            user_id: this.currentUser.$id,
-            created_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-            is_read: Math.random() > 0.6,
-            action_url: '/trades',
-            metadata: {
-              source: 'ai_matching_system'
-            }
-          }
+          notificationDoc
         );
         
         this.createdData.notifications.push(notification);

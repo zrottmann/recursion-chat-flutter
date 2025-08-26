@@ -41,10 +41,20 @@ class ItemsService {
    */
   async createItem(itemData) {
     try {
+      console.log('🔍 [ItemsService] Getting current user...');
       const userId = await this.getCurrentUserId();
-      if (!userId) throw new Error('User not authenticated');
+      console.log('🔍 [ItemsService] Current user ID:', userId);
+      
+      if (!userId) {
+        console.error('❌ [ItemsService] User not authenticated');
+        throw new Error('User not authenticated');
+      }
 
-      debug.info('Creating new item', { title: itemData.title, category: itemData.category });
+      console.log('✅ [ItemsService] Creating new item:', { 
+        title: itemData.title, 
+        category: itemData.category,
+        userId: userId 
+      });
 
       // Upload images first if provided
       let imageUrls = [];
@@ -57,8 +67,8 @@ class ItemsService {
         debug.success('Images uploaded', { count: imageUrls.length });
       }
 
-      // Prepare item document with correct field mapping
-      const itemDocument = FieldMappingFixer.prepareDocumentData('items', {
+      // Prepare base item data first
+      const baseItemData = {
         title: itemData.title,
         description: itemData.description || '',
         category: itemData.category,
@@ -80,8 +90,31 @@ class ItemsService {
         likes: 0,
         ai_tags: JSON.stringify(itemData.ai_tags || []),
         ai_analysis: JSON.stringify(itemData.ai_analysis || {}),
-      }, userId); // Pass userId to be added with correct field names
+        // Explicitly add userId and all fallback fields
+        userId: userId,
+        user_id: userId,
+        owner_id: userId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('🔍 [ItemsService] Base item data prepared:', {
+        title: baseItemData.title,
+        userId: baseItemData.userId,
+        user_id: baseItemData.user_id
+      });
 
+      // Apply field mapping (this should be redundant now but keeping for safety)
+      const itemDocument = FieldMappingFixer.prepareDocumentData('items', baseItemData, userId);
+      
+      console.log('🔍 [ItemsService] Final item document:', {
+        title: itemDocument.title,
+        userId: itemDocument.userId,
+        user_id: itemDocument.user_id,
+        hasAllFields: !!(itemDocument.userId || itemDocument.user_id)
+      });
+
+      console.log('📡 [ItemsService] Attempting to create document in database...');
       const item = await this.db.createDocument(
         DATABASE_ID,
         COLLECTIONS.items,
@@ -89,10 +122,23 @@ class ItemsService {
         itemDocument
       );
 
+      console.log('✅ [ItemsService] Item created successfully:', { 
+        itemId: item.$id, 
+        title: item.title,
+        userId: item.userId || item.user_id
+      });
+      
       debug.success('Item created', { itemId: item.$id, title: item.title });
       return { success: true, item };
 
     } catch (error) {
+      console.error('❌ [ItemsService] Failed to create item:', {
+        error: error.message,
+        code: error.code,
+        type: error.type,
+        stack: error.stack
+      });
+      
       debug.error('Failed to create item', { error: error.message, code: error.code });
       return { 
         success: false, 
