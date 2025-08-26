@@ -15,6 +15,8 @@ import './utils/mutationObserverSafe';
 import { initDebugConsole, autoFixIssues, DEBUG } from './utils/fixDatabaseSchema';
 // Import listings checker for debugging
 import './utils/checkListings';
+// Import AI matching tester
+import './utils/testAIMatching';
 // Import API adapter to fix 405 errors
 import { initApiAdapter } from './utils/apiAdapter';
 // Import system initializer for comprehensive startup
