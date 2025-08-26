@@ -13,6 +13,8 @@ import './utils/mutationObserverSafe';
 
 // Import database schema fix and debug console
 import { initDebugConsole, autoFixIssues, DEBUG } from './utils/fixDatabaseSchema';
+// Import listings checker for debugging
+import './utils/checkListings';
 // Import API adapter to fix 405 errors
 import { initApiAdapter } from './utils/apiAdapter';
 // Import system initializer for comprehensive startup

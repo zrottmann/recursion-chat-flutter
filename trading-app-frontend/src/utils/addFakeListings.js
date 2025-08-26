@@ -456,5 +456,11 @@ function generateTags(listing) {
   return [...baseTags, ...potentialTags].filter(Boolean);
 }
 
+// Make it available globally for console testing
+if (typeof window !== 'undefined') {
+  window.addFakeListings = addFakeListings;
+  console.log('💡 Fake listings function available: window.addFakeListings()');
+}
+
 // Export for use in console or components
 export default addFakeListings;
