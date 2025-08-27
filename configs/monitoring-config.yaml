@@ -1,0 +1,367 @@
+# Comprehensive Monitoring & Analytics Configuration
+# Based on Agent Swarm Monitoring Analysis
+
+monitoring:
+  # Application Performance Monitoring (APM)
+  application_performance:
+    enabled: true
+    
+    metrics:
+      response_time:
+        enabled: true
+        percentiles: [50, 95, 99]
+        alert_threshold_p95: 2000  # 2 seconds
+        alert_threshold_p99: 5000  # 5 seconds
+        
+      throughput:
+        enabled: true
+        requests_per_minute: true
+        alert_threshold: 10000  # requests/minute
+        
+      error_rate:
+        enabled: true
+        alert_threshold: 0.05  # 5%
+        window_minutes: 5
+        
+      database_performance:
+        enabled: true
+        slow_query_threshold: 1000  # 1 second
+        connection_pool_monitoring: true
+        
+    endpoints:
+      - path: "/api/auth/*"
+        name: "Authentication"
+        critical: true
+      - path: "/api/chat/*"
+        name: "Chat System"
+        critical: true
+      - path: "/api/trades/*"
+        name: "Trading System"
+        critical: true
+      - path: "/api/game/*"
+        name: "Game System"
+        critical: false
+
+  # Infrastructure Monitoring
+  infrastructure:
+    enabled: true
+    
+    server_metrics:
+      cpu_usage:
+        enabled: true
+        alert_threshold: 80  # 80%
+        window_minutes: 5
+        
+      memory_usage:
+        enabled: true
+        alert_threshold: 85  # 85%
+        window_minutes: 5
+        
+      disk_usage:
+        enabled: true
+        alert_threshold: 90  # 90%
+        
+      network_io:
+        enabled: true
+        
+    cloud_services:
+      appwrite:
+        enabled: true
+        api_response_time: true
+        function_execution_time: true
+        database_queries: true
+        storage_usage: true
+        
+      cloudflare:
+        enabled: true
+        worker_execution_time: true
+        cache_hit_ratio: true
+        bandwidth_usage: true
+
+  # Business Metrics
+  business_analytics:
+    enabled: true
+    
+    user_engagement:
+      daily_active_users: true
+      monthly_active_users: true
+      session_duration: true
+      user_retention_cohorts: true
+      
+    feature_usage:
+      chat_messages_per_day: true
+      trades_completed_per_day: true
+      game_sessions_per_day: true
+      file_uploads_per_day: true
+      
+    conversion_metrics:
+      user_registration_rate: true
+      email_verification_rate: true
+      feature_adoption_rate: true
+
+  # Security Monitoring
+  security:
+    enabled: true
+    
+    authentication_events:
+      failed_logins:
+        enabled: true
+        alert_threshold: 10  # per minute
+        window_minutes: 5
+        
+      suspicious_login_patterns:
+        enabled: true
+        multiple_locations: true
+        unusual_times: true
+        
+      brute_force_detection:
+        enabled: true
+        attempts_threshold: 20
+        time_window: 300  # 5 minutes
+        
+    api_security:
+      rate_limit_exceeded:
+        enabled: true
+        alert_threshold: 100  # per minute
+        
+      unusual_request_patterns:
+        enabled: true
+        payload_size_anomalies: true
+        request_frequency_anomalies: true
+        
+    data_access:
+      sensitive_data_access: true
+      bulk_data_exports: true
+      unauthorized_access_attempts: true
+
+  # Error Tracking
+  error_tracking:
+    enabled: true
+    
+    error_types:
+      javascript_errors:
+        enabled: true
+        source_maps: true
+        
+      server_errors:
+        enabled: true
+        stack_traces: true
+        context_capture: true
+        
+      database_errors:
+        enabled: true
+        query_logging: true
+        
+    notifications:
+      immediate: ["critical", "high"]
+      daily_digest: ["medium", "low"]
+      
+    retention_days: 90
+
+  # Alerting Configuration
+  alerting:
+    channels:
+      email:
+        enabled: true
+        recipients:
+          - "admin@recursionsystems.com"
+          - "alerts@recursionsystems.com"
+        
+      slack:
+        enabled: true
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+        channel: "#alerts"
+        
+      sms:
+        enabled: false  # Enable for critical production alerts
+        
+    escalation:
+      level_1:
+        timeout_minutes: 15
+        channels: ["slack"]
+        
+      level_2:
+        timeout_minutes: 30
+        channels: ["slack", "email"]
+        
+      level_3:
+        timeout_minutes: 60
+        channels: ["slack", "email", "sms"]
+        
+    maintenance_window:
+      enabled: true
+      schedule: "0 2 * * *"  # 2 AM daily
+      duration_minutes: 60
+      suppress_alerts: ["low", "medium"]
+
+  # Log Management
+  logging:
+    enabled: true
+    
+    levels:
+      production: "info"
+      staging: "debug"
+      development: "debug"
+      
+    structured_logging:
+      enabled: true
+      format: "json"
+      
+    log_aggregation:
+      enabled: true
+      batch_size: 1000
+      flush_interval_seconds: 30
+      
+    retention:
+      error_logs: 365  # days
+      access_logs: 90   # days
+      debug_logs: 30    # days
+      
+    sensitive_data_masking:
+      enabled: true
+      fields:
+        - "password"
+        - "token"
+        - "api_key"
+        - "credit_card"
+        - "ssn"
+
+  # Performance Profiling
+  profiling:
+    enabled: true
+    
+    application_profiling:
+      cpu_profiling: true
+      memory_profiling: true
+      sampling_rate: 0.01  # 1%
+      
+    database_profiling:
+      query_profiling: true
+      slow_query_logging: true
+      
+    custom_metrics:
+      chat_message_latency: true
+      trade_processing_time: true
+      game_state_updates: true
+      email_delivery_time: true
+
+  # Health Checks
+  health_checks:
+    enabled: true
+    
+    endpoints:
+      - url: "https://chat.recursionsystems.com/health"
+        name: "Recursion Chat"
+        interval_seconds: 60
+        timeout_seconds: 10
+        expected_status: 200
+        
+      - url: "https://tradingpost.appwrite.network/health"
+        name: "Trading Post"
+        interval_seconds: 60
+        timeout_seconds: 10
+        expected_status: 200
+        
+      - url: "https://slumlord.appwrite.network/health"
+        name: "Slumlord Game"
+        interval_seconds: 300  # 5 minutes
+        timeout_seconds: 15
+        expected_status: 200
+        
+    database_checks:
+      - name: "Appwrite Connection"
+        type: "appwrite"
+        interval_seconds: 300
+        
+    external_service_checks:
+      - name: "Email Service"
+        type: "cloudflare_worker"
+        url: "${EMAIL_WORKER_URL}/health"
+        interval_seconds: 300
+
+  # Dashboards
+  dashboards:
+    enabled: true
+    
+    system_overview:
+      enabled: true
+      refresh_interval: 30  # seconds
+      widgets:
+        - "response_time_p95"
+        - "error_rate"
+        - "active_users"
+        - "system_health"
+        
+    application_specific:
+      recursion_chat:
+        enabled: true
+        widgets:
+          - "active_chat_rooms"
+          - "messages_per_minute"
+          - "user_connections"
+          
+      trading_post:
+        enabled: true
+        widgets:
+          - "active_listings"
+          - "completed_trades"
+          - "user_searches"
+          
+      slumlord:
+        enabled: true
+        widgets:
+          - "active_players"
+          - "game_sessions"
+          - "server_performance"
+
+  # Data Export & Backup
+  data_management:
+    metrics_retention: 365  # days
+    raw_data_retention: 90  # days
+    
+    backup:
+      enabled: true
+      frequency: "daily"
+      retention_days: 30
+      
+    export:
+      enabled: true
+      formats: ["json", "csv"]
+      scheduled_reports:
+        - name: "weekly_summary"
+          schedule: "0 9 * * 1"  # Monday 9 AM
+          recipients: ["admin@recursionsystems.com"]
+
+# Environment-Specific Overrides
+environments:
+  development:
+    monitoring:
+      alerting:
+        enabled: false
+      logging:
+        level: "debug"
+      profiling:
+        sampling_rate: 0.1  # 10% for development
+        
+  staging:
+    monitoring:
+      alerting:
+        channels:
+          email:
+            enabled: false
+          slack:
+            enabled: true
+      health_checks:
+        interval_seconds: 300  # Less frequent
+        
+  production:
+    monitoring:
+      alerting:
+        enabled: true
+        escalation:
+          level_3:
+            channels: ["slack", "email", "sms"]
+      logging:
+        level: "info"
+      profiling:
+        sampling_rate: 0.001  # 0.1% for production

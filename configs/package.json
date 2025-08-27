@@ -1,0 +1,29 @@
+{
+  "name": "claude-auto-approve",
+  "version": "1.0.0",
+  "description": "Auto-approval system for Claude Code bash commands",
+  "main": "auto-approve.js",
+  "scripts": {
+    "test": "node auto-approve.js \"ls -la\"",
+    "test-safe": "node auto-approve.js \"npm run build\"",
+    "test-dangerous": "node auto-approve.js \"rm -rf /\"",
+    "install-global": "npm link",
+    "setup": "node setup.js"
+  },
+  "bin": {
+    "claude-auto-approve": "auto-approve.js"
+  },
+  "keywords": [
+    "claude",
+    "auto-approve",
+    "bash",
+    "development",
+    "automation"
+  ],
+  "author": "Claude Code Auto-Approval System",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "type": "commonjs"
+}

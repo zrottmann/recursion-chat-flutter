@@ -1,0 +1,178 @@
+[
+  {
+    "site": "Trading Post",
+    "url": "https://tradingpost.appwrite.network",
+    "projectId": "689bdee000098bd9d55c",
+    "timestamp": "2025-08-24T10:56:03.597Z",
+    "tests": {
+      "availability": {
+        "available": true,
+        "statusCode": 200,
+        "contentLength": 18121,
+        "hasAuthFeatures": {
+          "hasGoogleOAuth": true,
+          "hasGitHubOAuth": false,
+          "hasMicrosoftOAuth": false,
+          "hasMobileAuth": false,
+          "hasUnifiedSSO": false,
+          "hasSessionManagement": true,
+          "hasErrorBoundary": false,
+          "hasTouchOptimization": true
+        }
+      },
+      "authFeatures": {
+        "hasGoogleOAuth": true,
+        "hasGitHubOAuth": false,
+        "hasMicrosoftOAuth": false,
+        "hasMobileAuth": false,
+        "hasUnifiedSSO": false,
+        "hasSessionManagement": true,
+        "hasErrorBoundary": false,
+        "hasTouchOptimization": true
+      },
+      "oauthProviders": {
+        "google": {
+          "tested": true,
+          "passed": false,
+          "details": "Status: 404"
+        },
+        "github": {
+          "tested": true,
+          "passed": false,
+          "details": "Status: 404"
+        },
+        "microsoft": {
+          "tested": true,
+          "passed": false,
+          "details": "Status: 404"
+        }
+      },
+      "mobileResponsiveness": {
+        "viewport": true,
+        "touchTargets": true,
+        "mobileAuth": false,
+        "responsiveDesign": false
+      }
+    },
+    "passed": 6,
+    "failed": 0,
+    "score": 100
+  },
+  {
+    "site": "Slumlord RPG",
+    "url": "https://slumlord.appwrite.network",
+    "projectId": "68a0db634634a6d0392f",
+    "timestamp": "2025-08-24T10:56:04.266Z",
+    "tests": {
+      "availability": {
+        "available": true,
+        "statusCode": 200,
+        "contentLength": 31357,
+        "hasAuthFeatures": {
+          "hasGoogleOAuth": false,
+          "hasGitHubOAuth": false,
+          "hasMicrosoftOAuth": false,
+          "hasMobileAuth": false,
+          "hasUnifiedSSO": false,
+          "hasSessionManagement": false,
+          "hasErrorBoundary": false,
+          "hasTouchOptimization": true
+        }
+      },
+      "authFeatures": {
+        "hasGoogleOAuth": false,
+        "hasGitHubOAuth": false,
+        "hasMicrosoftOAuth": false,
+        "hasMobileAuth": false,
+        "hasUnifiedSSO": false,
+        "hasSessionManagement": false,
+        "hasErrorBoundary": false,
+        "hasTouchOptimization": true
+      },
+      "oauthProviders": {
+        "google": {
+          "tested": true,
+          "passed": false,
+          "details": "Status: 404"
+        },
+        "github": {
+          "tested": true,
+          "passed": false,
+          "details": "Status: 404"
+        },
+        "microsoft": {
+          "tested": true,
+          "passed": false,
+          "details": "Status: 404"
+        }
+      },
+      "mobileResponsiveness": {
+        "viewport": true,
+        "touchTargets": true,
+        "mobileAuth": false,
+        "responsiveDesign": true
+      }
+    },
+    "passed": 5,
+    "failed": 0,
+    "score": 100
+  },
+  {
+    "site": "Recursion Chat",
+    "url": "https://chat.recursionsystems.com",
+    "projectId": "689bdaf500072795b0f6",
+    "timestamp": "2025-08-24T10:56:04.838Z",
+    "tests": {
+      "availability": {
+        "available": false,
+        "statusCode": 404,
+        "contentLength": 18337,
+        "hasAuthFeatures": {
+          "hasGoogleOAuth": false,
+          "hasGitHubOAuth": false,
+          "hasMicrosoftOAuth": false,
+          "hasMobileAuth": false,
+          "hasUnifiedSSO": false,
+          "hasSessionManagement": false,
+          "hasErrorBoundary": false,
+          "hasTouchOptimization": false
+        }
+      },
+      "authFeatures": null,
+      "oauthProviders": null,
+      "mobileResponsiveness": null
+    },
+    "passed": 0,
+    "failed": 1,
+    "score": 0
+  },
+  {
+    "site": "GX Multi-Agent Platform",
+    "url": "https://gx.appwrite.network",
+    "projectId": "68a4e3da0022f3e129d0",
+    "timestamp": "2025-08-24T10:56:05.053Z",
+    "tests": {
+      "availability": {
+        "available": false,
+        "statusCode": 404,
+        "contentLength": 18315,
+        "hasAuthFeatures": {
+          "hasGoogleOAuth": false,
+          "hasGitHubOAuth": false,
+          "hasMicrosoftOAuth": false,
+          "hasMobileAuth": false,
+          "hasUnifiedSSO": false,
+          "hasSessionManagement": false,
+          "hasErrorBoundary": false,
+          "hasTouchOptimization": false
+        }
+      },
+      "authFeatures": null,
+      "oauthProviders": null,
+      "mobileResponsiveness": null
+    },
+    "passed": 0,
+    "failed": 1,
+    "score": 0
+  }
+]

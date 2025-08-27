@@ -1,0 +1,46 @@
+{
+  "name": "easy-appwrite-sso",
+  "version": "1.0.0",
+  "description": "Zero-configuration OAuth authentication for Appwrite",
+  "main": "easy-appwrite-sso.js",
+  "scripts": {
+    "install": "node install-easy-appwrite-sso.js",
+    "test": "echo \"Easy Appwrite SSO - Run examples to test\"",
+    "docs": "echo \"See EASY_APPWRITE_SSO_GUIDE.md for documentation\""
+  },
+  "bin": {
+    "install-easy-sso": "./install-easy-appwrite-sso.js"
+  },
+  "keywords": [
+    "appwrite",
+    "sso",
+    "oauth",
+    "authentication",
+    "react",
+    "javascript",
+    "typescript",
+    "google-auth",
+    "github-auth",
+    "facebook-auth"
+  ],
+  "author": "Claude Code",
+  "license": "MIT",
+  "peerDependencies": {
+    "appwrite": "^13.0.0 || ^14.0.0 || ^15.0.0"
+  },
+  "files": [
+    "easy-appwrite-sso.js",
+    "EasySSOButton.jsx", 
+    "appwrite-sso-config.js",
+    "install-easy-appwrite-sso.js",
+    "EASY_APPWRITE_SSO_GUIDE.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/easy-appwrite-sso.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/easy-appwrite-sso/issues"
+  },
+  "homepage": "https://github.com/your-username/easy-appwrite-sso#readme"
+}

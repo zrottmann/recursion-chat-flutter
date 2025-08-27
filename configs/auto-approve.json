@@ -1,0 +1,42 @@
+{
+  "autoApprovePatterns": [
+    "git status*",
+    "git branch*",
+    "git log*",
+    "git diff*",
+    "npm run lint*",
+    "npm run test*",
+    "npm run build*",
+    "ls*",
+    "cd*",
+    "pwd",
+    "echo*",
+    "cat*",
+    "grep*",
+    "find*",
+    "npm list*",
+    "node --version",
+    "npm --version",
+    "git --version"
+  ],
+  "autoApproveTools": [
+    "Read",
+    "Grep",
+    "Glob",
+    "LS",
+    "TodoWrite",
+    "TodoRead"
+  ],
+  "requireApproval": [
+    "git push*",
+    "git commit*",
+    "git merge*",
+    "git rebase*",
+    "rm -rf*",
+    "del /f*",
+    "npm install*",
+    "npm uninstall*",
+    "git checkout main",
+    "git checkout master"
+  ]
+}

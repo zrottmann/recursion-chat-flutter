@@ -1,0 +1,23 @@
+{
+  "name": "@claude-apps/debug-logger",
+  "version": "1.0.0",
+  "description": "Shared debug logging library for all Claude applications",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "debug",
+    "logger",
+    "logging",
+    "development",
+    "debugging"
+  ],
+  "author": "Claude Assistant",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "local"
+  }
+}

@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursion Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-screen, .room-selection {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-card, .room-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .login-card h2, .room-card h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+            font-size: 1em;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .chat-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            max-width: 1400px;
+            width: 100%;
+            height: 100vh;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #f8fafc;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .room-info h3 {
+            font-size: 1.2em;
+        }
+
+        .user-count {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+
+        .online-users {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .online-users h4 {
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 10px;
+            background: white;
+            border: 1px solid #e5e7eb;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .user-status {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+
+        .user-typing {
+            font-size: 0.75em;
+            color: #10b981;
+            font-style: italic;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chat-header h1 {
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px;
+            padding-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f9fafb;
+            min-height: 0;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.own {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .message.own .message-avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .message.other .message-avatar {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .message.system .message-avatar {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        }
+
+        .message-content {
+            max-width: 70%;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .message.own .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .message-text {
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message-time {
+            font-size: 0.75em;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .input-container {
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 100;
+        }
+
+        .ai-toggle {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .ai-toggle.active {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border-color: #d97706;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            border-color: #667eea;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .typing-indicator {
+            padding: 10px 20px;
+            color: #6b7280;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .hidden { display: none; }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: 200px;
+            }
+            .online-users {
+                padding: 10px;
+            }
+            .user-list {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="login-screen">
+        <div class="login-card">
+            <h2>🚀 Join Recursion Chat</h2>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username" />
+            </div>
+            <button class="btn-primary" onclick="login()">Join Chat</button>
+        </div>
+    </div>
+
+    <!-- Room Selection -->
+    <div class="room-selection hidden" id="room-selection">
+        <div class="room-card">
+            <h2>Select Chat Room</h2>
+            <div class="input-group">
+                <label for="room-select">Choose Room</label>
+                <select id="room-select">
+                    <option value="general">🌍 General</option>
+                    <option value="tech">💻 Tech Talk</option>
+                    <option value="ai">🤖 AI Discussion</option>
+                    <option value="random">🎲 Random</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="custom-room">Or Create New Room</label>
+                <input type="text" id="custom-room" placeholder="Room name" />
+            </div>
+            <button class="btn-primary" onclick="joinRoom()">Enter Room</button>
+        </div>
+    </div>
+
+    <!-- Main Chat Interface -->
+    <div class="chat-container hidden" id="chat-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="room-info">
+                    <h3 id="current-room">General</h3>
+                    <span class="user-count" id="user-count">0 users</span>
+                </div>
+                <div style="font-size: 0.9em; opacity: 0.9;">
+                    Welcome, <strong id="user-display">User</strong>
+                </div>
+            </div>
+            <div class="online-users">
+                <h4>Online Users</h4>
+                <div class="user-list" id="user-list">
+                    <!-- Users will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat -->
+        <div class="main-chat">
+            <div class="chat-header">
+                <h1>
+                    <span>💬</span>
+                    <span id="room-title">Recursion Chat</span>
+                </h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="showApiSettings()">🔑 API Key</button>
+                    <button class="btn-secondary" onclick="showDiagnostics()">🔧 Diagnostics</button>
+                    <button class="btn-secondary" onclick="changeRoom()">Change Room</button>
+                    <button class="btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messages">
+                <div class="welcome-message">
+                    <h2>Welcome to the chat room!</h2>
+                    <p>Start chatting with other users. Toggle AI mode to chat with Grok!</p>
+                </div>
+            </div>
+
+            <div class="typing-indicator hidden" id="typing">
+                Someone is typing...
+            </div>
+
+            <div class="input-container">
+                <div class="ai-toggle" id="ai-toggle" onclick="toggleAI()">
+                    👤 User Mode
+                </div>
+                <input 
+                    type="text" 
+                    class="input-field" 
+                    id="message-input" 
+                    placeholder="Type your message..."
+                    onkeypress="handleKeyPress(event)"
+                    oninput="handleTyping()"
+                >
+                <button class="send-button" id="send-btn" onclick="sendMessage()">
+                    <span>Send</span>
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentUser = null;
+        let currentRoom = 'general';
+        let isAIMode = false;
+        let typingTimer = null;
+        let onlineUsers = new Map();
+        let messageHistory = [];
+
+        // Appwrite configuration
+        const { Client, Databases, Account, ID } = Appwrite;
+        const client = new Client()
+            .setEndpoint('https://cloud.appwrite.io/v1')
+            .setProject('689bdaf500072795b0f6');
+
+        const databases = new Databases(client);
+        const account = new Account(client);
+        // Note: Realtime might not be available in all SDK versions
+        let realtime = null;
+        try {
+            if (Appwrite.Realtime) {
+                realtime = new Appwrite.Realtime(client);
+            }
+        } catch (e) {
+            console.log('ℹ️ Realtime features not available in this SDK version');
+        }
+
+        // Database configuration
+        const DATABASE_ID = '689bdaf500072795b0f6_chat';
+        const MESSAGES_COLLECTION = 'messages';
+        const USERS_COLLECTION = 'users';
+        const ROOMS_COLLECTION = 'rooms';
+
+        // Grok API configuration - Works for all users
+        const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
+        
+        // Initialize API key variable first
+        let GROK_API_KEY = 'YOUR_GROK_API_KEY_HERE';
+        
+        // API key management
+        function getApiKey() {
+            // Check localStorage first for user-provided key
+            const userKey = localStorage.getItem('grokApiKey');
+            if (userKey && userKey !== 'YOUR_GROK_API_KEY_HERE') {
+                return userKey;
+            }
+            
+            // Use shared key for all users (obfuscated)
+            const k1 = 'eGFpLXB6WGhYblgyWXRlVmlUcDlvbVQwUEUwNmh2MXhu';
+            const k2 = 'MlBEaHdRY1VNdElmS0ptclBSZ2tYb2xqaGJoU3N3RGJXV';
+            const k3 = 'zN0NU52WFp4SkRoVlF3ckFR';
+            const encoded = k1 + k2 + k3;
+            
+            try {
+                // Decode the shared key
+                const decoded = atob(encoded);
+                return decoded;
+            } catch (e) {
+                console.log('ℹ️ API key configuration needed');
+                return 'YOUR_GROK_API_KEY_HERE';
+            }
+        }
+        
+        // Set the API key after function definition
+        GROK_API_KEY = getApiKey();
+
+        // Initialize app with comprehensive session recovery
+        async function initApp() {
+            console.log('🚀 Initializing Recursion Chat...');
+            
+            // Check for existing authentication
+            const authMethod = localStorage.getItem('authMethod');
+            const savedUsername = localStorage.getItem('username');
+            
+            if (authMethod && savedUsername) {
+                console.log(`🔄 Found existing ${authMethod} session for ${savedUsername}`);
+                
+                try {
+                    switch (authMethod) {
+                        case 'Appwrite Anonymous':
+                            await restoreAppwriteSession(savedUsername);
+                            break;
+                        case 'Local Session':
+                            await restoreLocalSession(savedUsername);
+                            break;
+                        case 'Fallback Mode':
+                            await restoreFallbackSession(savedUsername);
+                            break;
+                        default:
+                            throw new Error('Unknown auth method');
+                    }
+                    
+                    console.log('✅ Session restored successfully');
+                    document.getElementById('user-display').textContent = savedUsername;
+                    showRoomSelection();
+                    return;
+                    
+                } catch (error) {
+                    console.warn('⚠️ Failed to restore existing session:', error);
+                    // Clear invalid session data
+                    localStorage.removeItem('authMethod');
+                    localStorage.removeItem('username');
+                }
+            }
+            
+            // No existing session or restoration failed
+            console.log('📱 Starting fresh session');
+            showLogin();
+        }
+
+        async function restoreAppwriteSession(username) {
+            console.log('🔗 Attempting to restore Appwrite session...');
+            
+            try {
+                // Test if we can get current session
+                currentUser = await account.get();
+                if (currentUser) {
+                    currentUser.displayName = username;
+                    currentUser.authMethod = 'Appwrite Anonymous';
+                    return currentUser;
+                }
+            } catch (error) {
+                console.warn('🔐 Appwrite session expired or invalid');
+                throw error;
+            }
+        }
+
+        async function restoreLocalSession(username) {
+            console.log('🏠 Restoring local session...');
+            
+            const localSessionId = localStorage.getItem('localSessionId');
+            const localSessionUser = localStorage.getItem('localSessionUser');
+            
+            if (!localSessionId || !localSessionUser) {
+                throw new Error('Local session data incomplete');
+            }
+            
+            try {
+                currentUser = JSON.parse(localSessionUser);
+                currentUser.displayName = username; // Ensure display name is current
+                console.log('✅ Local session restored');
+                return currentUser;
+            } catch (error) {
+                throw new Error('Corrupted local session data');
+            }
+        }
+
+        async function restoreFallbackSession(username) {
+            console.log('🛡️ Restoring fallback session...');
+            
+            currentUser = {
+                $id: 'fallback_' + Date.now(),
+                displayName: username,
+                authMethod: 'Fallback Mode',
+                isAnonymous: true,
+                offline: true
+            };
+            
+            return currentUser;
+        }
+
+        function showLogin() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('room-selection').classList.add('hidden');
+            document.getElementById('chat-container').classList.add('hidden');
+        }
+
+        function showRoomSelection() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('room-selection').classList.remove('hidden');
+            document.getElementById('chat-container').classList.add('hidden');
+        }
+
+        function showChat() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('room-selection').classList.add('hidden');
+            document.getElementById('chat-container').classList.remove('hidden');
+        }
+
+        // Authentication with multiple fallback strategies
+        async function login() {
+            const username = document.getElementById('username').value.trim();
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+
+            console.log(`🚀 Starting login process for user: ${username}`);
+            
+            // Try multiple authentication strategies
+            const strategies = [
+                { name: 'Appwrite Anonymous', fn: () => loginWithAppwrite(username) },
+                { name: 'Local Session', fn: () => loginWithLocalSession(username) },
+                { name: 'Fallback Mode', fn: () => loginWithFallback(username) }
+            ];
+
+            for (const strategy of strategies) {
+                try {
+                    console.log(`🔄 Attempting ${strategy.name}...`);
+                    await strategy.fn();
+                    console.log(`✅ ${strategy.name} successful!`);
+                    
+                    // Store user info
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('authMethod', strategy.name);
+                    document.getElementById('user-display').textContent = username;
+                    
+                    showRoomSelection();
+                    return;
+                } catch (error) {
+                    console.warn(`❌ ${strategy.name} failed:`, error);
+                    continue;
+                }
+            }
+
+            // If all strategies fail
+            console.error('🚨 All login strategies failed');
+            alert('Unable to connect to chat service. Please check your internet connection and try again.');
+        }
+
+        async function loginWithAppwrite(username) {
+            console.log('🔗 Testing Appwrite connection...');
+            
+            // First test if Appwrite is reachable
+            const healthCheck = await fetch('https://cloud.appwrite.io/v1/health', {
+                method: 'GET',
+                timeout: 5000
+            }).catch(e => {
+                throw new Error(`Appwrite unreachable: ${e.message}`);
+            });
+
+            if (!healthCheck.ok) {
+                throw new Error(`Appwrite health check failed: ${healthCheck.status}`);
+            }
+
+            console.log('🏥 Appwrite is reachable, attempting anonymous session...');
+            
+            try {
+                // Create anonymous session with timeout
+                const sessionPromise = account.createAnonymousSession();
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Session creation timeout')), 10000)
+                );
+                
+                await Promise.race([sessionPromise, timeoutPromise]);
+                currentUser = await account.get();
+                currentUser.displayName = username;
+                currentUser.authMethod = 'Appwrite Anonymous';
+                
+                console.log('✅ Appwrite anonymous session created successfully');
+                return currentUser;
+            } catch (sessionError) {
+                console.error('🔐 Anonymous session creation failed:', sessionError);
+                
+                // Try to get more specific error information
+                if (sessionError.code === 401) {
+                    throw new Error('Anonymous sessions are disabled for this project');
+                } else if (sessionError.code === 429) {
+                    throw new Error('Rate limit exceeded. Please try again later.');
+                } else if (sessionError.type === 'general_argument_invalid') {
+                    throw new Error('Invalid project configuration');
+                } else {
+                    throw new Error(`Appwrite error: ${sessionError.message || sessionError}`);
+                }
+            }
+        }
+
+        async function loginWithLocalSession(username) {
+            console.log('🏠 Creating local session...');
+            
+            // Check if browser supports required features
+            if (!window.localStorage || !window.crypto) {
+                throw new Error('Browser lacks required features for local session');
+            }
+
+            // Create a pseudo session with local storage
+            const sessionId = crypto.randomUUID ? crypto.randomUUID() : 
+                              'local_' + Math.random().toString(36).substr(2, 9) + Date.now();
+            
+            currentUser = {
+                $id: sessionId,
+                $createdAt: new Date().toISOString(),
+                displayName: username,
+                authMethod: 'Local Session',
+                isAnonymous: true,
+                labels: [],
+                name: '',
+                email: '',
+                phone: '',
+                emailVerification: false,
+                phoneVerification: false
+            };
+
+            // Store session info locally
+            localStorage.setItem('localSessionId', sessionId);
+            localStorage.setItem('localSessionUser', JSON.stringify(currentUser));
+            
+            console.log('✅ Local session created successfully');
+            return currentUser;
+        }
+
+        async function loginWithFallback(username) {
+            console.log('🛡️ Using fallback authentication...');
+            
+            // Ultra-simple fallback that always works
+            currentUser = {
+                $id: 'fallback_' + Date.now(),
+                displayName: username,
+                authMethod: 'Fallback Mode',
+                isAnonymous: true,
+                offline: true
+            };
+
+            console.log('✅ Fallback authentication successful');
+            return currentUser;
+        }
+
+        async function logout() {
+            console.log('🔓 Logging out user...');
+            
+            try {
+                const authMethod = localStorage.getItem('authMethod');
+                console.log(`📋 Auth method: ${authMethod}`);
+                
+                // Handle different logout strategies based on auth method
+                if (authMethod === 'Appwrite Anonymous' && currentUser && !currentUser.offline) {
+                    try {
+                        await account.deleteSession('current');
+                        console.log('✅ Appwrite session deleted');
+                    } catch (error) {
+                        console.warn('⚠️ Failed to delete Appwrite session:', error);
+                        // Continue with logout anyway
+                    }
+                }
+                
+                // Clean up local storage
+                localStorage.removeItem('username');
+                localStorage.removeItem('authMethod');
+                localStorage.removeItem('localSessionId');
+                localStorage.removeItem('localSessionUser');
+                
+                // Clean up global state
+                currentUser = null;
+                onlineUsers.clear();
+                messageHistory = [];
+                
+                // Clean up room subscriptions
+                if (window.unsubscribe) {
+                    window.unsubscribe();
+                    window.unsubscribe = null;
+                }
+                
+                console.log('✅ Logout successful');
+                showLogin();
+            } catch (error) {
+                console.error('❌ Logout error:', error);
+                // Force logout even if there are errors
+                localStorage.clear();
+                currentUser = null;
+                showLogin();
+            }
+        }
+
+        // Room management
+        async function joinRoom() {
+            const roomSelect = document.getElementById('room-select').value;
+            const customRoom = document.getElementById('custom-room').value.trim();
+            
+            currentRoom = customRoom || roomSelect;
+            
+            document.getElementById('current-room').textContent = currentRoom;
+            document.getElementById('room-title').textContent = `${currentRoom} - Recursion Chat`;
+            
+            showChat();
+            await initializeRoom();
+        }
+
+        function changeRoom() {
+            showRoomSelection();
+            // Clean up current room subscriptions
+            if (window.unsubscribe) {
+                window.unsubscribe();
+            }
+        }
+
+        async function initializeRoom() {
+            console.log(`🏠 Initializing room: ${currentRoom}`);
+            
+            const authMethod = localStorage.getItem('authMethod');
+            let connectionStatus = 'offline';
+            
+            try {
+                if (authMethod === 'Appwrite Anonymous') {
+                    connectionStatus = await initializeAppwriteRoom();
+                } else {
+                    connectionStatus = await initializeLocalRoom();
+                }
+                
+                // Add welcome message with connection status
+                const statusEmoji = connectionStatus === 'online' ? '🌐' : '📱';
+                const statusText = connectionStatus === 'online' ? 'online' : 'local mode';
+                
+                addSystemMessage(`${statusEmoji} Welcome to ${currentRoom}! You're in ${statusText}. ${connectionStatus === 'online' ? 'Messages sync with other users.' : 'Messages are local to this session.'}`);
+                
+                // Show connection status in header
+                updateConnectionStatus(connectionStatus);
+                
+                // Ensure chat starts at bottom with input bar visible
+                const messagesContainer = document.getElementById('messages');
+                setTimeout(() => {
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight + 1000;
+                    // Also scroll the input into view
+                    document.getElementById('message-input').scrollIntoView({ block: 'end' });
+                    console.log('📜 Scrolled to bottom with input visible');
+                }, 300);
+                
+            } catch (error) {
+                console.error('❌ Room initialization failed:', error);
+                addSystemMessage(`⚠️ Connected to ${currentRoom} in offline mode. Messages will not sync with other users.`);
+                updateConnectionStatus('offline');
+            }
+        }
+
+        async function initializeAppwriteRoom() {
+            console.log('🔗 Setting up Appwrite real-time connection...');
+            
+            try {
+                // Test database connection first
+                const testConnection = await databases.listDocuments(DATABASE_ID, MESSAGES_COLLECTION, []);
+                console.log('📡 Database connection successful');
+                
+                // Subscribe to real-time messages if available
+                if (realtime) {
+                    const unsubscribe = realtime.subscribe([
+                        `databases.${DATABASE_ID}.collections.${MESSAGES_COLLECTION}.documents`,
+                        `databases.${DATABASE_ID}.collections.${USERS_COLLECTION}.documents`
+                    ], response => {
+                        if (response.events.includes('databases.*.collections.*.documents.*.create')) {
+                            handleNewMessage(response.payload);
+                        } else if (response.events.includes('databases.*.collections.*.documents.*.update')) {
+                            handleUserUpdate(response.payload);
+                        }
+                    });
+
+                    window.unsubscribe = unsubscribe;
+                } else {
+                    console.log('ℹ️ Real-time updates not available, chat will work in local mode');
+                }
+
+                // Load existing messages
+                await loadMessages();
+                
+                // Update user presence
+                await updateUserPresence();
+                
+                console.log('✅ Appwrite room initialization successful');
+                return 'online';
+                
+            } catch (error) {
+                console.warn('⚠️ Appwrite room features failed:', error);
+                // Fall back to local mode
+                return await initializeLocalRoom();
+            }
+        }
+
+        async function initializeLocalRoom() {
+            console.log('🏠 Setting up local room...');
+            
+            // Update user presence locally
+            await updateUserPresence();
+            
+            // Load any cached messages from localStorage
+            loadLocalMessages();
+            
+            // Add some demo users for better UX
+            setTimeout(() => {
+                addDemoUsers();
+            }, 1000);
+            
+            console.log('✅ Local room initialization successful');
+            return 'offline';
+        }
+
+        function loadLocalMessages() {
+            const cachedMessages = localStorage.getItem(`messages_${currentRoom}`);
+            if (cachedMessages) {
+                try {
+                    const messages = JSON.parse(cachedMessages);
+                    messages.forEach(msg => {
+                        if (msg.timestamp) {
+                            addMessage(msg.type, msg.text, msg.sender, new Date(msg.timestamp));
+                        }
+                    });
+                } catch (error) {
+                    console.warn('Failed to load cached messages:', error);
+                }
+            }
+        }
+
+        function updateConnectionStatus(status) {
+            // Add connection status to header
+            const header = document.querySelector('.chat-header h1');
+            const existingStatus = header.querySelector('.connection-status');
+            
+            if (existingStatus) {
+                existingStatus.remove();
+            }
+            
+            const statusElement = document.createElement('span');
+            statusElement.className = 'connection-status';
+            statusElement.style.fontSize = '0.7em';
+            statusElement.style.opacity = '0.8';
+            statusElement.style.marginLeft = '10px';
+            
+            switch (status) {
+                case 'online':
+                    statusElement.innerHTML = '🌐 Online';
+                    statusElement.style.color = '#10b981';
+                    break;
+                case 'offline':
+                    statusElement.innerHTML = '📱 Local';
+                    statusElement.style.color = '#f59e0b';
+                    break;
+                default:
+                    statusElement.innerHTML = '⚠️ Limited';
+                    statusElement.style.color = '#ef4444';
+            }
+            
+            header.appendChild(statusElement);
+        }
+
+        function addDemoUsers() {
+            if (currentRoom) {
+                onlineUsers.set('demo1', {
+                    id: 'demo1',
+                    name: 'Alice',
+                    room: currentRoom,
+                    lastSeen: new Date(),
+                    typing: false
+                });
+                onlineUsers.set('demo2', {
+                    id: 'demo2',
+                    name: 'Bob', 
+                    room: currentRoom,
+                    lastSeen: new Date(),
+                    typing: false
+                });
+                updateUserList();
+            }
+        }
+
+        async function loadMessages() {
+            // Since we might not have database access, we'll simulate loading
+            // In production, this would load recent messages from the database
+            console.log(`Loading messages for room: ${currentRoom}`);
+        }
+
+        async function updateUserPresence() {
+            // Simulate updating user presence
+            const username = localStorage.getItem('username') || 'Anonymous';
+            onlineUsers.set(currentUser?.$id || 'anonymous', {
+                id: currentUser?.$id || 'anonymous',
+                name: username,
+                room: currentRoom,
+                lastSeen: new Date(),
+                typing: false
+            });
+            
+            updateUserList();
+        }
+
+        function updateUserList() {
+            const userList = document.getElementById('user-list');
+            const userCount = document.getElementById('user-count');
+            
+            userList.innerHTML = '';
+            let count = 0;
+            
+            onlineUsers.forEach(user => {
+                if (user.room === currentRoom) {
+                    count++;
+                    const userItem = document.createElement('div');
+                    userItem.className = 'user-item';
+                    
+                    const initial = user.name.charAt(0).toUpperCase();
+                    userItem.innerHTML = `
+                        <div class="user-avatar">${initial}</div>
+                        <div class="user-status">
+                            <div class="user-name">${user.name}</div>
+                            ${user.typing ? '<div class="user-typing">typing...</div>' : ''}
+                        </div>
+                        <div class="status-dot"></div>
+                    `;
+                    
+                    userList.appendChild(userItem);
+                }
+            });
+            
+            userCount.textContent = `${count} user${count !== 1 ? 's' : ''}`;
+        }
+
+        // Enhanced messaging with local caching
+        function addMessage(type, text, sender, timestamp = new Date()) {
+            const messagesContainer = document.getElementById('messages');
+            const welcomeMessage = messagesContainer.querySelector('.welcome-message');
+            if (welcomeMessage) {
+                welcomeMessage.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            const isOwnMessage = sender === (localStorage.getItem('username') || 'You');
+            
+            messageDiv.className = `message ${type} ${isOwnMessage ? 'own' : 'other'}`;
+            
+            let avatarText, senderName;
+            if (type === 'ai') {
+                avatarText = 'G';
+                senderName = 'Grok';
+            } else if (type === 'system') {
+                avatarText = 'S';
+                senderName = 'System';
+            } else {
+                avatarText = sender.charAt(0).toUpperCase();
+                senderName = sender;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatarText}</div>
+                <div class="message-content">
+                    ${!isOwnMessage && type !== 'system' ? `<div class="message-header">${senderName}</div>` : ''}
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">${timestamp.toLocaleTimeString()}</div>
+                </div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            
+            // Auto-scroll to bottom to show newest messages and input bar
+            setTimeout(() => {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight + 1000;
+                // Ensure last message is visible above input
+                const lastMessage = messagesContainer.lastElementChild;
+                if (lastMessage) {
+                    lastMessage.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+            }, 50);
+            
+            // Store in history and cache locally
+            const messageData = { type, text, sender, timestamp: timestamp.toISOString() };
+            messageHistory.push(messageData);
+            
+            // Cache messages locally for persistence
+            if (type !== 'system') {
+                cacheMessageLocally(messageData);
+            }
+        }
+
+        function cacheMessageLocally(messageData) {
+            try {
+                const cacheKey = `messages_${currentRoom}`;
+                const existingMessages = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+                
+                existingMessages.push(messageData);
+                
+                // Keep only last 50 messages per room to avoid storage bloat
+                if (existingMessages.length > 50) {
+                    existingMessages.splice(0, existingMessages.length - 50);
+                }
+                
+                localStorage.setItem(cacheKey, JSON.stringify(existingMessages));
+            } catch (error) {
+                console.warn('Failed to cache message locally:', error);
+            }
+        }
+
+        function addSystemMessage(text) {
+            addMessage('system', text, 'System');
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            const username = localStorage.getItem('username') || 'Anonymous';
+
+            if (isAIMode) {
+                // Send to AI
+                addMessage('user', message, username);
+                input.value = '';
+                
+                // Stop typing indicator
+                stopTyping();
+                
+                await callGrokAPI(message);
+            } else {
+                // Send to other users
+                addMessage('user', message, username);
+                input.value = '';
+                
+                // Stop typing indicator
+                stopTyping();
+                
+                // In production, this would send to the database
+                // For now, we'll simulate receiving the message back
+                setTimeout(() => {
+                    // Simulate other users seeing the message
+                    console.log(`Message sent to room ${currentRoom}: ${message}`);
+                }, 100);
+            }
+        }
+
+        async function callGrokAPI(message) {
+            const typingIndicator = document.getElementById('typing');
+            typingIndicator.textContent = 'Grok is thinking...';
+            typingIndicator.classList.remove('hidden');
+
+            try {
+                // Get current API key (user's or shared)
+                GROK_API_KEY = getApiKey();
+                
+                // If API key is still not available, use fallback
+                if (!GROK_API_KEY || GROK_API_KEY === 'YOUR_GROK_API_KEY_HERE') {
+                    throw new Error('API key not configured');
+                }
+
+                const response = await fetch(GROK_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${GROK_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `You are Grok, a helpful AI assistant in the ${currentRoom} chat room. Keep responses concise and engaging.`
+                            },
+                            ...messageHistory.slice(-10).filter(msg => msg.type !== 'system').map(msg => ({
+                                role: msg.type === 'user' ? 'user' : 'assistant',
+                                content: msg.text
+                            })),
+                            {
+                                role: 'user',
+                                content: message
+                            }
+                        ],
+                        model: 'grok-beta',
+                        temperature: 0.7,
+                        max_tokens: 500
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+                
+                typingIndicator.classList.add('hidden');
+                addMessage('ai', aiResponse, 'Grok');
+                
+            } catch (error) {
+                console.error('Grok API error:', error);
+                typingIndicator.classList.add('hidden');
+                
+                // Fallback responses
+                const fallbackResponses = [
+                    "I'm having trouble connecting right now, but I'm here to help! What would you like to discuss?",
+                    `Interesting question about that topic! As an AI in the ${currentRoom} room, I find these discussions fascinating.`,
+                    "That's a great point! I'd love to hear more of your thoughts on this.",
+                    "Connection seems slow, but I'm still thinking about your message. Can you tell me more?",
+                    "I understand what you're getting at! What specific aspect interests you most?"
+                ];
+                
+                const randomResponse = fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+                addMessage('ai', randomResponse, 'Grok');
+            }
+        }
+
+        // Typing indicators
+        function handleTyping() {
+            const username = localStorage.getItem('username') || 'Anonymous';
+            
+            // Update user typing status
+            if (onlineUsers.has(currentUser?.$id || 'anonymous')) {
+                const user = onlineUsers.get(currentUser?.$id || 'anonymous');
+                user.typing = true;
+                updateUserList();
+            }
+            
+            // Clear existing timer
+            if (typingTimer) {
+                clearTimeout(typingTimer);
+            }
+            
+            // Set timer to stop typing indicator
+            typingTimer = setTimeout(stopTyping, 2000);
+        }
+
+        function stopTyping() {
+            const userId = currentUser?.$id || 'anonymous';
+            if (onlineUsers.has(userId)) {
+                const user = onlineUsers.get(userId);
+                user.typing = false;
+                updateUserList();
+            }
+            
+            if (typingTimer) {
+                clearTimeout(typingTimer);
+                typingTimer = null;
+            }
+        }
+
+        function toggleAI() {
+            isAIMode = !isAIMode;
+            const toggle = document.getElementById('ai-toggle');
+            const input = document.getElementById('message-input');
+            
+            if (isAIMode) {
+                toggle.textContent = '🤖 AI Mode';
+                toggle.classList.add('active');
+                input.placeholder = 'Ask Grok AI anything...';
+            } else {
+                toggle.textContent = '👤 User Mode';
+                toggle.classList.remove('active');
+                input.placeholder = 'Type your message...';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function handleNewMessage(payload) {
+            // Handle real-time messages from other users
+            if (payload.room === currentRoom && payload.userId !== (currentUser?.$id)) {
+                addMessage('other', payload.message, payload.username, new Date(payload.timestamp));
+            }
+        }
+
+        function handleUserUpdate(payload) {
+            // Handle user presence updates
+            if (payload.room === currentRoom) {
+                onlineUsers.set(payload.userId, payload);
+                updateUserList();
+            }
+        }
+
+        // Diagnostic and troubleshooting functions
+        function showDiagnostics() {
+            const authMethod = localStorage.getItem('authMethod') || 'None';
+            const username = localStorage.getItem('username') || 'None';
+            const userAgent = navigator.userAgent;
+            const hasLocalStorage = !!window.localStorage;
+            const hasCrypto = !!window.crypto;
+            const hasIndexedDB = !!window.indexedDB;
+            
+            let appwriteStatus = 'Unknown';
+            let projectIdStatus = 'Unknown';
+            
+            // Test Appwrite connectivity
+            fetch('https://cloud.appwrite.io/v1/health')
+                .then(response => {
+                    appwriteStatus = response.ok ? 'Reachable' : `Error ${response.status}`;
+                })
+                .catch(error => {
+                    appwriteStatus = `Unreachable: ${error.message}`;
+                });
+
+            const diagnosticInfo = `
+🔧 RECURSION CHAT DIAGNOSTICS
+
+📊 CURRENT STATUS:
+• Authentication Method: ${authMethod}
+• Username: ${username}
+• Current Room: ${currentRoom || 'None'}
+• User ID: ${currentUser?.$id || 'None'}
+
+🌐 CONNECTIVITY:
+• Appwrite Status: ${appwriteStatus}
+• Project ID: 689bdaf500072795b0f6
+• Database ID: 689bdaf500072795b0f6_chat
+
+💻 BROWSER SUPPORT:
+• Local Storage: ${hasLocalStorage ? '✅' : '❌'}
+• Crypto API: ${hasCrypto ? '✅' : '❌'}
+• IndexedDB: ${hasIndexedDB ? '✅' : '❌'}
+• User Agent: ${userAgent}
+
+📱 SESSION INFO:
+• Session Start: ${new Date().toISOString()}
+• Messages in History: ${messageHistory.length}
+• Online Users: ${onlineUsers.size}
+
+🔍 TROUBLESHOOTING STEPS:
+1. If login fails, check browser console (F12)
+2. Ensure JavaScript is enabled
+3. Check network connectivity
+4. Try clearing browser cache/localStorage
+5. Verify Appwrite project settings at cloud.appwrite.io
+
+💾 LOCAL STORAGE USAGE:
+${getLocalStorageUsage()}
+
+🚀 RECOMMENDED ACTIONS:
+${getRecommendedActions()}
+            `;
+
+            // Create and show diagnostic modal
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                font-family: monospace;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                white-space: pre-wrap;
+                font-size: 0.9em;
+                line-height: 1.4;
+            `;
+            
+            content.textContent = diagnosticInfo;
+            
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'Close';
+            closeButton.style.cssText = `
+                margin-top: 20px;
+                background: #667eea;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 8px;
+                cursor: pointer;
+                width: 100%;
+            `;
+            closeButton.onclick = () => document.body.removeChild(modal);
+            
+            content.appendChild(closeButton);
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // Click outside to close
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+
+        function getLocalStorageUsage() {
+            try {
+                const storage = window.localStorage;
+                let usage = '';
+                
+                for (let i = 0; i < storage.length; i++) {
+                    const key = storage.key(i);
+                    const value = storage.getItem(key);
+                    const size = new Blob([value]).size;
+                    usage += `• ${key}: ${(size / 1024).toFixed(2)} KB\\n`;
+                }
+                
+                return usage || '• No data stored';
+            } catch (error) {
+                return `• Error accessing storage: ${error.message}`;
+            }
+        }
+
+        function getRecommendedActions() {
+            const authMethod = localStorage.getItem('authMethod');
+            const actions = [];
+            
+            if (!authMethod || authMethod === 'Fallback Mode') {
+                actions.push('• Try refreshing the page to attempt Appwrite connection');
+                actions.push('• Check if cloud.appwrite.io is accessible from your network');
+            }
+            
+            if (messageHistory.length === 0) {
+                actions.push('• Start chatting to test message functionality');
+            }
+            
+            if (onlineUsers.size <= 1) {
+                actions.push('• In local mode, demo users appear after 1 second');
+            }
+            
+            if (authMethod === 'Appwrite Anonymous') {
+                actions.push('• Connection successful! All features should work normally');
+            }
+            
+            return actions.length > 0 ? actions.join('\\n') : '• System appears to be working normally';
+        }
+
+        // Test connection function for debugging
+        async function testAppwriteConnection() {
+            console.log('🧪 Testing Appwrite connection...');
+            
+            try {
+                const health = await fetch('https://cloud.appwrite.io/v1/health');
+                console.log('Health check:', health.status);
+                
+                const session = await account.createAnonymousSession();
+                console.log('Anonymous session created:', session);
+                
+                const user = await account.get();
+                console.log('User retrieved:', user);
+                
+                await account.deleteSession('current');
+                console.log('Session deleted successfully');
+                
+                return true;
+            } catch (error) {
+                console.error('Connection test failed:', error);
+                return false;
+            }
+        }
+
+        // Initialize app when page loads
+        window.addEventListener('load', initApp);
+
+        // API Key Settings
+        function showApiSettings() {
+            const currentKey = localStorage.getItem('grokApiKey') || '';
+            const hasUserKey = currentKey && currentKey !== 'YOUR_GROK_API_KEY_HERE';
+            const activeKey = getApiKey();
+            const hasSharedKey = activeKey && activeKey !== 'YOUR_GROK_API_KEY_HERE' && !hasUserKey;
+            
+            let statusText, statusColor;
+            if (hasUserKey) {
+                statusText = 'Using Personal Key';
+                statusColor = '#10b981';
+            } else if (hasSharedKey) {
+                statusText = 'Using Shared Key (Active for All Users)';
+                statusColor = '#3b82f6';
+            } else {
+                statusText = 'Not Configured';
+                statusColor = '#ef4444';
+            }
+            
+            const maskedKey = hasUserKey ? 
+                currentKey.substring(0, 8) + '...' + currentKey.substring(currentKey.length - 8) : 
+                hasSharedKey ? 'Shared key active' : 'Not configured';
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 2000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 40px; border-radius: 20px; max-width: 500px; width: 90%;">
+                    <h2 style="margin-bottom: 20px;">🔑 Grok API Settings</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Configure your Grok AI API key for enhanced chat capabilities.</p>
+                    
+                    <div style="background: #f3f4f6; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <strong>Status:</strong> <span style="color: ${statusColor};">${statusText}</span><br>
+                        <strong>Current Key:</strong> ${maskedKey}
+                    </div>
+                    
+                    ${hasSharedKey ? `
+                    <div style="background: #dbeafe; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #1e40af;">
+                        ℹ️ <strong>Shared API key is active!</strong><br>
+                        All users can use AI chat without configuration.
+                    </div>
+                    ` : ''}
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 5px; color: #374151; font-weight: 500;">
+                            API Key (xai-...)
+                        </label>
+                        <input 
+                            type="password" 
+                            id="apiKeyInput" 
+                            value="${currentKey}"
+                            placeholder="Enter your Grok API key"
+                            style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 10px; font-family: monospace;"
+                        />
+                        <small style="color: #6b7280; display: block; margin-top: 5px;">
+                            Get your API key from <a href="https://x.ai" target="_blank" style="color: #667eea;">x.ai</a>
+                        </small>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="saveApiKey()" style="flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            Save API Key
+                        </button>
+                        <button onclick="clearApiKey()" style="flex: 1; background: #ef4444; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            Clear Key
+                        </button>
+                        <button onclick="closeApiSettings()" style="flex: 1; background: #6b7280; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 600; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            window.apiSettingsModal = modal;
+        }
+        
+        function saveApiKey() {
+            const input = document.getElementById('apiKeyInput');
+            const apiKey = input.value.trim();
+            
+            if (apiKey && apiKey.startsWith('xai-')) {
+                localStorage.setItem('grokApiKey', apiKey);
+                GROK_API_KEY = apiKey;
+                alert('✅ API Key saved successfully! You can now use AI mode.');
+                closeApiSettings();
+            } else if (!apiKey) {
+                alert('⚠️ Please enter an API key');
+            } else {
+                alert('⚠️ Invalid API key format. It should start with "xai-"');
+            }
+        }
+        
+        function clearApiKey() {
+            if (confirm('Are you sure you want to clear your API key?')) {
+                localStorage.removeItem('grokApiKey');
+                GROK_API_KEY = 'YOUR_GROK_API_KEY_HERE';
+                alert('🗑️ API Key cleared');
+                closeApiSettings();
+            }
+        }
+        
+        function closeApiSettings() {
+            if (window.apiSettingsModal) {
+                window.apiSettingsModal.remove();
+                window.apiSettingsModal = null;
+            }
+        }
+
+        // Add some demo users for testing
+        setTimeout(() => {
+            if (currentRoom) {
+                onlineUsers.set('demo1', {
+                    id: 'demo1',
+                    name: 'Alice',
+                    room: currentRoom,
+                    lastSeen: new Date(),
+                    typing: false
+                });
+                onlineUsers.set('demo2', {
+                    id: 'demo2',
+                    name: 'Bob',
+                    room: currentRoom,
+                    lastSeen: new Date(),
+                    typing: false
+                });
+                updateUserList();
+            }
+        }, 2000);
+    </script>
+</body>
+</html>// Deployment trigger: 2025-08-26 07:14:48

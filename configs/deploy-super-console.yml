@@ -1,0 +1,108 @@
+name: Deploy Super Console to Appwrite
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create Super Console deployment
+      run: |
+        echo "🚀 Deploying Enhanced Super Console with Glassmorphic UI..."
+        
+        # Deploy the Enhanced Console with Particle Systems & Glassmorphic UI
+        cp active-projects/super-console/super-site/index.js index.js
+        
+        # Create Function deployment package  
+        cat > package.json << 'EOF'
+        {
+          "name": "enhanced-super-console",
+          "version": "2.0.0",
+          "description": "Enhanced glassmorphic console with particle systems and neural backgrounds",
+          "main": "index.js"
+        }
+        EOF
+        
+        # Create deployment archive
+        tar -czf enhanced-console-deployment.tar.gz index.js package.json
+        
+        # Deploy Enhanced Console Function using Appwrite API
+        cat > deploy.js << 'EOF'
+        const https = require('https');
+        const fs = require('fs');
+        
+        console.log('🚀 Deploying Enhanced Console to super.appwrite.network...');
+        
+        const fileData = fs.readFileSync('enhanced-console-deployment.tar.gz');
+        const boundary = '----WebKitFormBoundary' + Date.now();
+        
+        let body = '';
+        body += '--' + boundary + '\r\n';
+        body += 'Content-Disposition: form-data; name="entrypoint"\r\n\r\n';
+        body += 'index.js\r\n';
+        body += '--' + boundary + '\r\n';
+        body += 'Content-Disposition: form-data; name="activate"\r\n\r\n';
+        body += 'true\r\n';
+        body += '--' + boundary + '\r\n';
+        body += 'Content-Disposition: form-data; name="code"; filename="code.tar.gz"\r\n';
+        body += 'Content-Type: application/gzip\r\n\r\n';
+        
+        const bodyBuffer = Buffer.concat([
+          Buffer.from(body),
+          fileData,
+          Buffer.from('\r\n--' + boundary + '--\r\n')
+        ]);
+        
+        const options = {
+          hostname: 'nyc.cloud.appwrite.io',
+          path: '/v1/functions/super/deployments',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data; boundary=' + boundary,
+            'Content-Length': bodyBuffer.length,
+            'X-Appwrite-Project': '68a4e3da0022f3e129d0',
+            'X-Appwrite-Key': process.env.APPWRITE_API_KEY
+          }
+        };
+        
+        const req = https.request(options, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            console.log('Deploy Status:', res.statusCode);
+            console.log('Deploy Response:', data);
+            
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              console.log('✅ Enhanced Console deployed successfully!');
+              console.log('🌐 Enhanced UI live at: https://super.appwrite.network');
+              console.log('');
+              console.log('🎉 Features Now Active:');
+              console.log('  ⚡ Neural particle background system');
+              console.log('  🎨 Glassmorphic UI cards with blur effects');
+              console.log('  🔊 Immersive audio feedback system');
+              console.log('  📱 Responsive design for all devices');
+              console.log('  ✨ Advanced animations and transitions');
+            } else {
+              console.log('❌ Enhanced Console deployment failed');
+              process.exit(1);
+            }
+          });
+        });
+        
+        req.on('error', e => {
+          console.log('❌ Deploy error:', e.message);
+          process.exit(1);
+        });
+        
+        req.write(bodyBuffer);
+        req.end();
+        EOF
+        
+        # Run deployment
+        APPWRITE_API_KEY="${{ secrets.APPWRITE_API_KEY }}" node deploy.js

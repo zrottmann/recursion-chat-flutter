@@ -1,0 +1,336 @@
+name: Master Deployment Pipeline
+
+on:
+  # Manual trigger with project selection
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Project to deploy (or "all" for all projects)'
+        required: true
+        type: choice
+        options:
+          - all
+          - recursion-chat
+          - trading-post
+          - slumlord
+          - archon
+          - console-appwrite-grok
+          - enhanced-tech-lead-orchestrator
+          - gx-multi-agent-platform
+      skip_build:
+        description: 'Skip build step'
+        type: boolean
+        default: false
+      skip_health:
+        description: 'Skip health check'
+        type: boolean
+        default: false
+      environment:
+        description: 'Deployment environment'
+        type: choice
+        options:
+          - production
+          - staging
+        default: production
+
+  # Automatic deployment on push to main
+  push:
+    branches: [main, master]
+    paths:
+      - 'active-projects/**'
+      - 'console-appwrite-grok/**'
+      - 'enhanced-tech-lead-orchestrator/**'
+      - '!**/*.md'
+      - '!**/docs/**'
+
+  # Scheduled deployments
+  schedule:
+    # Daily health check and refresh at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  NODE_VERSION: '20'
+  DEPLOYMENT_TIMEOUT: '600000'
+  APPWRITE_ENDPOINT: 'https://nyc.cloud.appwrite.io/v1'
+
+jobs:
+  # Detect which projects need deployment
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      projects: ${{ steps.detect.outputs.projects }}
+      deploy_all: ${{ steps.detect.outputs.deploy_all }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+
+    - name: 🔍 Detect changed projects
+      id: detect
+      run: |
+        # For manual trigger, use the selected project
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event.inputs.project }}" = "all" ]; then
+            echo "deploy_all=true" >> $GITHUB_OUTPUT
+            echo 'projects=["recursion-chat","trading-post","slumlord","archon","console-appwrite-grok","enhanced-tech-lead-orchestrator","gx-multi-agent-platform"]' >> $GITHUB_OUTPUT
+          else
+            echo "deploy_all=false" >> $GITHUB_OUTPUT
+            echo 'projects=["${{ github.event.inputs.project }}"]' >> $GITHUB_OUTPUT
+          fi
+          exit 0
+        fi
+        
+        # For scheduled runs, deploy all
+        if [ "${{ github.event_name }}" = "schedule" ]; then
+          echo "deploy_all=true" >> $GITHUB_OUTPUT
+          echo 'projects=["recursion-chat","trading-post","slumlord","archon","console-appwrite-grok","enhanced-tech-lead-orchestrator","gx-multi-agent-platform"]' >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        
+        # For push events, detect changed projects
+        changed_projects=()
+        
+        # Check each project directory for changes
+        if git diff --name-only HEAD^ HEAD | grep -q "^active-projects/recursion-chat/"; then
+          changed_projects+=("recursion-chat")
+        fi
+        if git diff --name-only HEAD^ HEAD | grep -q "^active-projects/trading-post/"; then
+          changed_projects+=("trading-post")
+        fi
+        if git diff --name-only HEAD^ HEAD | grep -q "^active-projects/slumlord/"; then
+          changed_projects+=("slumlord")
+        fi
+        if git diff --name-only HEAD^ HEAD | grep -q "^active-projects/archon/"; then
+          changed_projects+=("archon")
+        fi
+        if git diff --name-only HEAD^ HEAD | grep -q "^console-appwrite-grok/"; then
+          changed_projects+=("console-appwrite-grok")
+        fi
+        if git diff --name-only HEAD^ HEAD | grep -q "^enhanced-tech-lead-orchestrator/"; then
+          changed_projects+=("enhanced-tech-lead-orchestrator")
+        fi
+        if git diff --name-only HEAD^ HEAD | grep -q "^active-projects/gx-multi-agent-platform/"; then
+          changed_projects+=("gx-multi-agent-platform")
+        fi
+        
+        # Convert to JSON array
+        if [ ${#changed_projects[@]} -eq 0 ]; then
+          echo "deploy_all=false" >> $GITHUB_OUTPUT
+          echo 'projects=[]' >> $GITHUB_OUTPUT
+        else
+          echo "deploy_all=false" >> $GITHUB_OUTPUT
+          projects_json=$(printf '%s\n' "${changed_projects[@]}" | jq -R . | jq -s -c .)
+          echo "projects=$projects_json" >> $GITHUB_OUTPUT
+        fi
+
+    - name: 📋 Show deployment plan
+      run: |
+        echo "Deployment Plan:"
+        echo "Event: ${{ github.event_name }}"
+        echo "Deploy All: ${{ steps.detect.outputs.deploy_all }}"
+        echo "Projects: ${{ steps.detect.outputs.projects }}"
+
+  # Build and deploy each project
+  deploy:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.projects != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: ${{ fromJson(needs.detect-changes.outputs.projects) }}
+      max-parallel: 2
+      fail-fast: false
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: 📦 Install deployment tools
+      run: |
+        npm install -g node-appwrite
+        npm install form-data
+
+    - name: 🔧 Load project configuration
+      id: config
+      run: |
+        # Read project config from deployment-config.json
+        PROJECT="${{ matrix.project }}"
+        CONFIG_FILE="scripts/deployment-config.json"
+        
+        if [ ! -f "$CONFIG_FILE" ]; then
+          echo "❌ Configuration file not found: $CONFIG_FILE"
+          exit 1
+        fi
+        
+        # Extract project configuration using jq
+        PROJECT_CONFIG=$(jq -r ".projects.\"$PROJECT\"" "$CONFIG_FILE")
+        
+        if [ "$PROJECT_CONFIG" = "null" ]; then
+          echo "❌ Project $PROJECT not found in configuration"
+          exit 1
+        fi
+        
+        # Export configuration values
+        echo "project_name=$(echo "$PROJECT_CONFIG" | jq -r '.name')" >> $GITHUB_OUTPUT
+        echo "project_path=$(echo "$PROJECT_CONFIG" | jq -r '.path')" >> $GITHUB_OUTPUT
+        echo "project_id=$(echo "$PROJECT_CONFIG" | jq -r '.projectId')" >> $GITHUB_OUTPUT
+        echo "site_id=$(echo "$PROJECT_CONFIG" | jq -r '.siteId')" >> $GITHUB_OUTPUT
+        echo "build_dir=$(echo "$PROJECT_CONFIG" | jq -r '.buildDir')" >> $GITHUB_OUTPUT
+        echo "output_dir=$(echo "$PROJECT_CONFIG" | jq -r '.outputDir')" >> $GITHUB_OUTPUT
+        echo "live_url=$(echo "$PROJECT_CONFIG" | jq -r '.liveUrl')" >> $GITHUB_OUTPUT
+        
+        echo "📋 Loaded configuration for: $PROJECT"
+
+    - name: 🏗️ Build project
+      if: github.event.inputs.skip_build != 'true'
+      working-directory: ${{ steps.config.outputs.project_path }}
+      env:
+        CI: false
+        VITE_APPWRITE_ENDPOINT: ${{ env.APPWRITE_ENDPOINT }}
+        VITE_APPWRITE_PROJECT_ID: ${{ steps.config.outputs.project_id }}
+      run: |
+        echo "🔨 Building ${{ steps.config.outputs.project_name }}..."
+        
+        # Navigate to build directory
+        cd "${{ steps.config.outputs.build_dir }}"
+        
+        # Install dependencies
+        if [ -f "package.json" ]; then
+          echo "📦 Installing dependencies..."
+          npm ci || npm install --legacy-peer-deps
+          
+          # Run build
+          echo "🏗️ Running build..."
+          npm run build
+        else
+          echo "⚠️ No package.json found, skipping Node.js build"
+        fi
+        
+        # Verify output exists
+        OUTPUT_PATH="${{ github.workspace }}/${{ steps.config.outputs.output_dir }}"
+        if [ -d "$OUTPUT_PATH" ]; then
+          echo "✅ Build output found at: $OUTPUT_PATH"
+          echo "📊 Build size: $(du -sh "$OUTPUT_PATH" | cut -f1)"
+        else
+          echo "❌ Build output not found at: $OUTPUT_PATH"
+          exit 1
+        fi
+
+    - name: 📦 Create deployment archive
+      id: archive
+      run: |
+        OUTPUT_DIR="${{ steps.config.outputs.output_dir }}"
+        ARCHIVE_NAME="${{ matrix.project }}-deployment.tar.gz"
+        
+        echo "📦 Creating deployment archive from: $OUTPUT_DIR"
+        
+        # Create archive
+        cd "$OUTPUT_DIR"
+        tar -czf "${{ github.workspace }}/$ARCHIVE_NAME" .
+        
+        # Verify archive
+        ARCHIVE_SIZE=$(ls -lh "${{ github.workspace }}/$ARCHIVE_NAME" | awk '{print $5}')
+        echo "✅ Archive created: $ARCHIVE_NAME ($ARCHIVE_SIZE)"
+        echo "archive_path=${{ github.workspace }}/$ARCHIVE_NAME" >> $GITHUB_OUTPUT
+
+    - name: 🚀 Deploy to Appwrite Sites
+      env:
+        APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+      run: |
+        echo "🚀 Deploying to Appwrite Sites..."
+        echo "📍 Project: ${{ steps.config.outputs.project_id }}"
+        echo "📍 Site: ${{ steps.config.outputs.site_id }}"
+        
+        # Deploy using unified script
+        node scripts/unified-deploy.js "${{ matrix.project }}" \
+          --skip-build \
+          ${{ github.event.inputs.skip_health == 'true' && '--skip-health' || '' }}
+
+    - name: 🏥 Health check
+      if: github.event.inputs.skip_health != 'true'
+      run: |
+        echo "🏥 Performing health check..."
+        
+        URL="${{ steps.config.outputs.live_url }}"
+        MAX_ATTEMPTS=12
+        ATTEMPT=1
+        
+        while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+          echo "Attempt $ATTEMPT/$MAX_ATTEMPTS: Checking $URL"
+          
+          if curl -f -s -o /dev/null -w "%{http_code}" "$URL" | grep -q "200"; then
+            echo "✅ Health check passed!"
+            exit 0
+          fi
+          
+          echo "⏳ Waiting 10 seconds before retry..."
+          sleep 10
+          ATTEMPT=$((ATTEMPT + 1))
+        done
+        
+        echo "❌ Health check failed after $MAX_ATTEMPTS attempts"
+        exit 1
+
+    - name: 📊 Deployment summary
+      if: success()
+      run: |
+        echo "## 🎉 Deployment Successful!"
+        echo ""
+        echo "### Project: ${{ steps.config.outputs.project_name }}"
+        echo "- **Live URL:** ${{ steps.config.outputs.live_url }}"
+        echo "- **Project ID:** ${{ steps.config.outputs.project_id }}"
+        echo "- **Site ID:** ${{ steps.config.outputs.site_id }}"
+        echo "- **Branch:** ${{ github.ref_name }}"
+        echo "- **Commit:** ${{ github.sha }}"
+        echo "- **Time:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+
+  # Send notifications
+  notify:
+    needs: [detect-changes, deploy]
+    if: always()
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📨 Send deployment notification
+      if: github.event_name != 'schedule'
+      run: |
+        # Determine status
+        if [ "${{ needs.deploy.result }}" = "success" ]; then
+          STATUS="✅ Success"
+          COLOR="good"
+        elif [ "${{ needs.deploy.result }}" = "failure" ]; then
+          STATUS="❌ Failed"
+          COLOR="danger"
+        else
+          STATUS="⚠️ Partial"
+          COLOR="warning"
+        fi
+        
+        echo "Deployment Status: $STATUS"
+        echo "Projects: ${{ needs.detect-changes.outputs.projects }}"
+        
+        # Here you would send to Slack, Discord, email, etc.
+        # Example: curl -X POST $SLACK_WEBHOOK_URL ...
+
+  # Cleanup old deployments
+  cleanup:
+    needs: deploy
+    if: success() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🧹 Cleanup old deployments
+      env:
+        APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+      run: |
+        echo "🧹 Cleaning up old deployments..."
+        # This would call Appwrite API to remove old inactive deployments
+        # Keeping only the last 5 deployments per site

@@ -1,0 +1,24 @@
+{
+    "name": "enhanced-tech-lead-orchestrator",
+    "version": "2.0.0",
+    "description": "Enhanced Tech-Lead Orchestrator with Vite build system",
+    "main": "index.html",
+    "type": "module",
+    "dependencies": {
+        "express": "^4.18.2"
+    },
+    "devDependencies": {
+        "vite": "^5.0.0"
+    },
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "start": "node index.js",
+        "sites:build": "vite build && echo 'Vite build complete'",
+        "deploy": "node deploy-flutter-remote.js"
+    },
+    "keywords": ["claude", "orchestrator", "vite", "web", "ui", "mobile"],
+    "author": "Enhanced Tech-Lead Orchestrator Team",
+    "license": "MIT"
+}

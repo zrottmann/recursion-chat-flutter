@@ -1,0 +1,293 @@
+# Artillery Load Testing Configuration for Mobile Multiplayer ARPG
+# Tests concurrent mobile users connecting to Slumlord game
+
+config:
+  target: 'https://slumlord.appwrite.network'
+  
+  # Test phases to simulate real-world mobile usage patterns
+  phases:
+    # Warm-up phase: Gradual user ramp-up
+    - duration: 60
+      arrivalRate: 2
+      name: "Mobile warm-up"
+    
+    # Peak mobile usage: Lunch break gaming
+    - duration: 300
+      arrivalRate: 10
+      name: "Mobile peak usage"
+    
+    # Sustained load: Evening gaming session
+    - duration: 600
+      arrivalRate: 15
+      name: "Mobile sustained load"
+    
+    # Spike test: Viral moment / app store feature
+    - duration: 120
+      arrivalRate: 25
+      name: "Mobile traffic spike"
+  
+  # Mobile-specific HTTP configuration
+  http:
+    timeout: 45
+    pool: 50
+    
+    # Mobile browser headers
+    defaults:
+      headers:
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+        'Accept-Language': 'en-US,en;q=0.5'
+        'Accept-Encoding': 'gzip, deflate, br'
+        'Connection': 'keep-alive'
+        'Upgrade-Insecure-Requests': '1'
+        'Sec-Fetch-Dest': 'document'
+        'Sec-Fetch-Mode': 'navigate'
+        'Sec-Fetch-Site': 'none'
+        'Cache-Control': 'max-age=0'
+
+  # WebSocket configuration for real-time multiplayer
+  ws:
+    timeout: 30000
+    
+  # Load testing plugins
+  plugins:
+    metrics-by-endpoint: {}
+    publish-metrics:
+      - type: statsd
+        host: localhost
+        port: 8125
+        prefix: 'slumlord.mobile'
+
+# Mobile user scenarios
+scenarios:
+  # Primary scenario: Mobile web game loading and basic gameplay
+  - name: "Mobile Game Session"
+    weight: 70
+    engine: http
+    flow:
+      # Initial game load - mobile optimized
+      - get:
+          url: "/"
+          headers:
+            'Viewport-Width': '393'
+            'Device-Memory': '4'
+            'Downlink': '1.5'  # 3G speed
+          capture:
+            - json: "$.gameLoaded"
+              as: "gameStatus"
+          expect:
+            - statusCode: 200
+            - hasHeader: "content-type"
+      
+      # Wait for game initialization (mobile takes longer)
+      - think: 5
+      
+      # Load game assets
+      - get:
+          url: "/src/rpg/arpg-game-system.js"
+          expect:
+            - statusCode: 200
+            - contentType: "application/javascript"
+      
+      # Mobile diagnostics
+      - get:
+          url: "/src/diagnostics/mobile-diagnostics.js"
+          expect:
+            - statusCode: 200
+      
+      # Wait for asset loading
+      - think: 3
+      
+      # Simulate touch interactions
+      - post:
+          url: "/api/touch-interaction"
+          json:
+            action: "tap"
+            x: "{{ $randomInt(0, 393) }}"
+            y: "{{ $randomInt(0, 851) }}"
+            timestamp: "{{ $timestamp }}"
+          expect:
+            - statusCode: [200, 404]  # 404 OK if endpoint doesn't exist yet
+      
+      # Character movement simulation
+      - think: 2
+      - post:
+          url: "/api/player-move"
+          json:
+            playerId: "mobile-{{ $uuid }}"
+            x: "{{ $randomInt(0, 800) }}"
+            y: "{{ $randomInt(0, 600) }}"
+            touchInput: true
+          expect:
+            - statusCode: [200, 404]
+      
+      # Equipment interaction (ARPG feature)
+      - think: 5
+      - post:
+          url: "/api/equipment-interact"
+          json:
+            playerId: "mobile-{{ $uuid }}"
+            action: "equip"
+            itemId: "weapon-{{ $randomInt(1, 10) }}"
+          expect:
+            - statusCode: [200, 404]
+      
+      # Combat simulation
+      - think: 3
+      - post:
+          url: "/api/combat-action"
+          json:
+            playerId: "mobile-{{ $uuid }}"
+            action: "attack"
+            target: "enemy-{{ $randomInt(1, 5) }}"
+            inputMethod: "touch"
+          expect:
+            - statusCode: [200, 404]
+      
+      # Chat message (multiplayer feature)
+      - think: 10
+      - post:
+          url: "/api/chat-message"
+          json:
+            playerId: "mobile-{{ $uuid }}"
+            message: "Playing on mobile!"
+            channel: "general"
+          expect:
+            - statusCode: [200, 404]
+      
+      # Session end
+      - think: 15
+
+  # WebSocket scenario: Real-time multiplayer connection
+  - name: "Mobile WebSocket Connection"
+    weight: 20
+    engine: ws
+    flow:
+      # Connect to game WebSocket
+      - connect:
+          url: "wss://slumlord.appwrite.network/ws"
+          headers:
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Pixel 5) AppleWebKit/537.36'
+      
+      # Send mobile client identification
+      - send:
+          payload: |
+            {
+              "type": "client_info",
+              "platform": "mobile",
+              "viewport": {"width": 393, "height": 851},
+              "device": "mobile",
+              "playerId": "mobile-{{ $uuid }}"
+            }
+      
+      # Wait for server response
+      - think: 1
+      
+      # Send periodic position updates
+      - loop:
+          count: 10
+          over:
+            - send:
+                payload: |
+                  {
+                    "type": "position_update",
+                    "playerId": "mobile-{{ $uuid }}",
+                    "x": {{ $randomInt(0, 800) }},
+                    "y": {{ $randomInt(0, 600) }},
+                    "timestamp": {{ $timestamp }}
+                  }
+            - think: 2
+      
+      # Send combat events
+      - send:
+          payload: |
+            {
+              "type": "combat_event",
+              "playerId": "mobile-{{ $uuid }}",
+              "action": "attack",
+              "damage": {{ $randomInt(10, 50) }}
+            }
+      
+      # Keep connection alive for multiplayer testing
+      - think: 30
+
+  # Heavy mobile user: Resource intensive gameplay
+  - name: "Mobile Power User"
+    weight: 10
+    engine: http
+    flow:
+      # Load game with all features
+      - get:
+          url: "/"
+          expect:
+            - statusCode: 200
+      
+      # Rapid fire interactions (testing performance)
+      - loop:
+          count: 20
+          over:
+            - post:
+                url: "/api/rapid-touch"
+                json:
+                  playerId: "power-{{ $uuid }}"
+                  actions: [
+                    {"type": "tap", "x": "{{ $randomInt(0, 393) }}", "y": "{{ $randomInt(0, 851) }}"},
+                    {"type": "swipe", "startX": 100, "startY": 100, "endX": 200, "endY": 200}
+                  ]
+                expect:
+                  - statusCode: [200, 404]
+            - think: 0.5
+      
+      # Equipment management session
+      - loop:
+          count: 5
+          over:
+            - post:
+                url: "/api/equipment-management"
+                json:
+                  playerId: "power-{{ $uuid }}"
+                  action: "{{ $randomString() }}"
+                  slot: "{{ $randomInt(1, 8) }}"
+                expect:
+                  - statusCode: [200, 404]
+            - think: 2
+      
+      # Multiplayer interaction burst
+      - post:
+          url: "/api/multiplayer-sync"
+          json:
+            playerId: "power-{{ $uuid }}"
+            events: [
+              {"type": "move", "data": {"x": 100, "y": 200}},
+              {"type": "attack", "data": {"target": "enemy1"}},
+              {"type": "chat", "data": {"message": "Mobile power user here!"}}
+            ]
+          expect:
+            - statusCode: [200, 404]
+
+# Performance expectations and SLA definitions
+expectations:
+  # Mobile-specific performance requirements
+  mobile_load_time:
+    - metric: "http.response_time.p95"
+      threshold: 8000  # 95% of requests should complete within 8 seconds on mobile
+      strict: false
+  
+  mobile_success_rate:
+    - metric: "http.codes.200"
+      threshold: 95    # 95% success rate minimum
+      strict: true
+  
+  websocket_stability:
+    - metric: "ws.messages_sent"
+      threshold: 100   # Minimum message throughput
+      strict: false
+
+# Custom mobile metrics
+custom_metrics:
+  - name: "mobile_session_duration"
+    unit: "seconds"
+  - name: "touch_interactions_per_session"
+    unit: "count"
+  - name: "mobile_memory_usage"
+    unit: "mb"

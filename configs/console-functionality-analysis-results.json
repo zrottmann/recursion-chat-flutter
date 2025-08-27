@@ -1,0 +1,247 @@
+{
+  "timestamp": "2025-08-24T14:54:44.721Z",
+  "purpose": "console-preservation-mapping",
+  "sites": {
+    "super.appwrite.network": {
+      "type": "nextjs-console",
+      "framework": "Next.js 14 + React 18 + TypeScript",
+      "criticalComponents": [
+        "Terminal Interface (@xterm/xterm)",
+        "File Explorer (project navigation)",
+        "Session Management (multiple sessions)",
+        "Real-time Connection (WebSocket-based)",
+        "Monaco Editor Integration",
+        "Appwrite Authentication",
+        "Status Monitoring"
+      ],
+      "routingStructure": {
+        "app/layout.tsx": "Root layout with AppwriteProvider",
+        "app/page.tsx": "Main console interface",
+        "components/terminal/Terminal.tsx": "Terminal component",
+        "components/file-explorer/FileExplorer.tsx": "File browser",
+        "components/Header.tsx": "Session management header",
+        "components/StatusBar.tsx": "Connection status"
+      },
+      "preservationRequirements": [
+        "CRITICAL: All Next.js routing must remain unchanged",
+        "CRITICAL: Terminal interface must work on desktop",
+        "CRITICAL: File explorer must remain fully functional",
+        "CRITICAL: Session management cannot be disrupted",
+        "CRITICAL: WebSocket connections must remain stable",
+        "CRITICAL: Authentication flow must work unchanged"
+      ],
+      "mobileEnhancementApproach": "progressive-enhancement-only",
+      "allowedModifications": [
+        "Add responsive CSS media queries (non-interfering)",
+        "Add mobile-specific overlay components (optional)",
+        "Add touch-friendly controls as alternatives",
+        "Add mobile splash route (e.g., /mobile) that redirects to main console",
+        "Add viewport meta improvements"
+      ],
+      "prohibitedModifications": [
+        "Change Next.js app structure",
+        "Modify existing component props or APIs",
+        "Change authentication logic",
+        "Modify WebSocket connection handling",
+        "Change routing structure",
+        "Modify terminal or file explorer core functionality"
+      ]
+    },
+    "remote.appwrite.network": {
+      "type": "landing-page-console",
+      "framework": "Static HTML + Vanilla JavaScript",
+      "criticalComponents": [
+        "Remote control setup instructions",
+        "GitHub repository links",
+        "Documentation access",
+        "Mobile-optimized loading fixes (already present)",
+        "Service worker management",
+        "LocalStorage handling"
+      ],
+      "routingStructure": {
+        "index.html": "Main landing page (single route)",
+        "appwrite-deployment/": "Deployment artifacts",
+        "functions/": "Appwrite function implementations"
+      },
+      "preservationRequirements": [
+        "CRITICAL: Main landing page must remain accessible",
+        "IMPORTANT: GitHub integration links must work",
+        "IMPORTANT: Setup instructions must remain clear",
+        "MODERATE: Mobile loading fixes should be preserved"
+      ],
+      "mobileEnhancementApproach": "responsive-improvement-allowed",
+      "allowedModifications": [
+        "Improve responsive design (already has mobile considerations)",
+        "Enhance touch interactions",
+        "Add mobile-specific navigation",
+        "Optimize loading performance",
+        "Add splash page routing"
+      ],
+      "prohibitedModifications": [
+        "Break GitHub repository links",
+        "Remove setup instructions",
+        "Modify core functionality descriptions"
+      ],
+      "currentMobileStatus": "partially-mobile-optimized",
+      "existingMobileFeatures": [
+        "Viewport meta tag configured",
+        "Mobile detection JavaScript",
+        "Service worker cleanup for mobile",
+        "iOS private mode localStorage fixes"
+      ]
+    },
+    "chat.recursionsystems.com": {
+      "type": "application-site",
+      "framework": "React + Vite + Appwrite",
+      "criticalComponents": [
+        "Real-time messaging (WebSocket)",
+        "Authentication system",
+        "Room/channel management",
+        "User management",
+        "Message history",
+        "File sharing capabilities"
+      ],
+      "preservationRequirements": [
+        "IMPORTANT: Real-time messaging must work",
+        "IMPORTANT: Authentication must function on mobile",
+        "MODERATE: User interface should be mobile-friendly"
+      ],
+      "mobileEnhancementApproach": "full-mobile-optimization-allowed",
+      "allowedModifications": [
+        "Complete responsive redesign",
+        "Mobile-first UI improvements",
+        "Touch-optimized interactions",
+        "Mobile keyboard optimizations",
+        "Splash page with mobile navigation"
+      ]
+    },
+    "tradingpost.appwrite.network": {
+      "type": "application-site",
+      "framework": "React + Vite + Appwrite",
+      "criticalComponents": [
+        "Marketplace interface",
+        "Authentication system",
+        "Image upload functionality",
+        "Product listings",
+        "Search and filtering",
+        "User profiles"
+      ],
+      "preservationRequirements": [
+        "IMPORTANT: Authentication must work on mobile",
+        "IMPORTANT: Image upload must function on mobile devices",
+        "MODERATE: Search and filtering should be mobile-friendly"
+      ],
+      "mobileEnhancementApproach": "full-mobile-optimization-allowed",
+      "allowedModifications": [
+        "Complete responsive redesign",
+        "Mobile-first marketplace UI",
+        "Touch-optimized product browsing",
+        "Mobile camera integration for uploads",
+        "Splash page with mobile navigation"
+      ]
+    },
+    "slumlord.appwrite.network": {
+      "type": "game-site",
+      "framework": "Vanilla JavaScript + HTML5 Canvas",
+      "criticalComponents": [
+        "Canvas game rendering",
+        "Real-time multiplayer (WebSocket)",
+        "Game state management",
+        "Player controls",
+        "Entity rendering system",
+        "Map system"
+      ],
+      "preservationRequirements": [
+        "CRITICAL: Game must function (recently fixed)",
+        "IMPORTANT: Canvas rendering must work on mobile",
+        "IMPORTANT: Touch controls needed for mobile"
+      ],
+      "mobileEnhancementApproach": "mobile-game-optimization",
+      "allowedModifications": [
+        "Add touch controls for mobile gameplay",
+        "Implement responsive canvas scaling",
+        "Add mobile-specific UI overlay",
+        "Optimize for mobile performance",
+        "Add mobile-friendly splash page"
+      ],
+      "currentIssues": [
+        "Touch interaction not working properly",
+        "Keyboard instructions shown on mobile",
+        "Small touch targets for mobile users"
+      ]
+    }
+  },
+  "routingStructures": {
+    "super.appwrite.network": {
+      "type": "nextjs-app-router",
+      "currentRoutes": [
+        "/ - Main console interface (app/page.tsx)",
+        "/api/* - Next.js API routes (if any)"
+      ],
+      "splashPageStrategy": "new-route-addition",
+      "proposedSplashRoutes": [
+        "/welcome - Mobile-friendly welcome page",
+        "/mobile - Mobile-optimized entry point",
+        "/console - Redirect to main console (preserve current /)"
+      ],
+      "implementationApproach": "Add new routes without modifying existing ones"
+    },
+    "remote.appwrite.network": {
+      "type": "static-single-page",
+      "currentRoutes": [
+        "/ - Main landing page (index.html)"
+      ],
+      "splashPageStrategy": "responsive-enhancement",
+      "implementationApproach": "Enhance existing page with mobile-specific sections"
+    },
+    "chat.recursionsystems.com": {
+      "type": "react-spa",
+      "splashPageStrategy": "new-landing-page",
+      "implementationApproach": "Add mobile-optimized landing page with app navigation"
+    },
+    "tradingpost.appwrite.network": {
+      "type": "react-spa",
+      "splashPageStrategy": "new-landing-page",
+      "implementationApproach": "Add mobile-optimized marketplace landing page"
+    },
+    "slumlord.appwrite.network": {
+      "type": "static-game",
+      "splashPageStrategy": "mobile-game-landing",
+      "implementationApproach": "Add mobile-optimized game entry page with touch instructions"
+    }
+  },
+  "criticalPreservationRequirements": [
+    {
+      "site": "super.appwrite.network",
+      "priority": "CRITICAL",
+      "requirements": [
+        "Next.js routing structure must remain unchanged",
+        "Terminal interface must work exactly as before on desktop",
+        "File explorer must retain all current functionality",
+        "WebSocket connections must remain stable",
+        "Session management cannot be disrupted",
+        "Authentication flow must work unchanged"
+      ]
+    },
+    {
+      "site": "remote.appwrite.network",
+      "priority": "IMPORTANT",
+      "requirements": [
+        "GitHub integration links must continue working",
+        "Setup instructions must remain accessible",
+        "Remote control functionality descriptions must be preserved"
+      ]
+    },
+    {
+      "site": "All Sites",
+      "priority": "CRITICAL",
+      "requirements": [
+        "All existing functionality must work after mobile enhancements",
+        "Desktop experience must remain unchanged",
+        "No breaking changes to authentication systems",
+        "Real-time features (WebSocket, etc.) must continue working",
+        "All API integrations must remain functional"
+      ]
+    }
+  ]
+}

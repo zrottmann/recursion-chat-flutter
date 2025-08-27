@@ -1,0 +1,259 @@
+{
+  "timestamp": "2025-08-21T23:36:05.799Z",
+  "gameState": {
+    "initialized": false,
+    "clientReady": false,
+    "serverReady": false,
+    "canvasCreated": false,
+    "assetsLoaded": false,
+    "scenesLoaded": false,
+    "errors": [
+      {
+        "error": {},
+        "context": "Game Initialization",
+        "timestamp": "2025-08-21T23:36:02.852Z"
+      }
+    ]
+  },
+  "logs": [
+    {
+      "timestamp": "2025-08-21T23:36:02.681Z",
+      "level": "info",
+      "category": "INIT",
+      "message": [
+        "RPG Game Manager created"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at new RPGGameManager (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64766)\n    at https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:84201"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.682Z",
+      "level": "info",
+      "category": "INIT",
+      "message": [
+        "Starting RPG-JS initialization..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64827)\n    at initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48912)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.682Z",
+      "level": "info",
+      "category": "ENV",
+      "message": [
+        "Checking environment compatibility..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.checkEnvironment (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65310)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64891)\n    at initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48912)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.688Z",
+      "level": "info",
+      "category": "ENV",
+      "message": [
+        "WebGL Support: ✅"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.checkEnvironment (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65394)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64891)\n    at initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48912)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.688Z",
+      "level": "info",
+      "category": "ENV",
+      "message": [
+        "Canvas Support: ✅"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.checkEnvironment (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65469)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64891)\n    at initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48912)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.688Z",
+      "level": "info",
+      "category": "ENV",
+      "message": [
+        "Standalone Mode: true"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.checkEnvironment (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65514)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64891)\n    at initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48912)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.688Z",
+      "level": "info",
+      "category": "ENV",
+      "message": [
+        "Environment checks:",
+        {
+          "fetch": true,
+          "Promise": true,
+          "requestAnimationFrame": true,
+          "WebGL": true,
+          "Canvas": true
+        }
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.checkEnvironment (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65731)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64891)\n    at initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48912)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.688Z",
+      "level": "success",
+      "category": "ENV",
+      "message": [
+        "Environment checks passed"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.success (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:1012)\n    at M.checkEnvironment (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65918)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64891)\n    at initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48912)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.688Z",
+      "level": "info",
+      "category": "CONTAINER",
+      "message": [
+        "Preparing game container..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.prepareGameContainer (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65992)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64921)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.689Z",
+      "level": "success",
+      "category": "CONTAINER",
+      "message": [
+        "Game container prepared"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.success (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:1012)\n    at M.prepareGameContainer (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67106)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64921)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.689Z",
+      "level": "info",
+      "category": "AUTH-GATE",
+      "message": [
+        "Checking authentication status..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.requireAuthentication (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:71281)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64960)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.689Z",
+      "level": "info",
+      "category": "AUTH-GATE",
+      "message": [
+        "User not authenticated - auto-continuing as guest"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.requireAuthentication (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:71713)\n    at async M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:64949)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.689Z",
+      "level": "info",
+      "category": "MODULES",
+      "message": [
+        "Loading RPG-JS modules..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67389)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65072)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.690Z",
+      "level": "debug",
+      "category": "LOADING",
+      "message": [
+        "Progress: 20% - Checking RPG engine availability..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.debug (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:1053)\n    at M.updateLoadingProgress (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67320)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67442)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65072)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.690Z",
+      "level": "info",
+      "category": "MODULES",
+      "message": [
+        "Attempting to load full RPG engine..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67508)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65072)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.690Z",
+      "level": "info",
+      "category": "RPG-ENGINE",
+      "message": [
+        "Starting unified RPG engine initialization..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.loadFullRPGEngine (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67890)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67575)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65072)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.690Z",
+      "level": "debug",
+      "category": "LOADING",
+      "message": [
+        "Progress: 30% - Loading unified game engine..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.debug (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:1053)\n    at M.updateLoadingProgress (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67320)\n    at M.loadFullRPGEngine (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67962)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67575)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65072)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.690Z",
+      "level": "info",
+      "category": "RPG-ENGINE",
+      "message": [
+        "Importing unified game demo module..."
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.info (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:972)\n    at M.loadFullRPGEngine (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:68680)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67575)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65072)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.852Z",
+      "level": "error",
+      "category": "RPG-ENGINE",
+      "message": [
+        "Unified RPG engine failed:",
+        {}
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.error (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:897)\n    at M.loadFullRPGEngine (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:71195)\n    at async M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67564)\n    at async M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65061)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.852Z",
+      "level": "error",
+      "category": "MODULES",
+      "message": [
+        "Failed to load full RPG engine:",
+        {}
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.error (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:897)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67706)\n    at async M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65061)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.852Z",
+      "level": "error",
+      "category": "MODULES",
+      "message": [
+        "Error details:",
+        "Failed to fetch dynamically imported module: https://slumlord.appwrite.network/assets/unified-game-demo-85zE8cWf.js"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.error (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:897)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67761)\n    at async M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65061)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.852Z",
+      "level": "error",
+      "category": "MODULES",
+      "message": [
+        "Stack trace:",
+        "TypeError: Failed to fetch dynamically imported module: https://slumlord.appwrite.network/assets/unified-game-demo-85zE8cWf.js"
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.error (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:897)\n    at M.loadRPGJSModules (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:67807)\n    at async M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65061)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.852Z",
+      "level": "error",
+      "category": "ERROR",
+      "message": [
+        "Game Initialization: Failed to fetch dynamically imported module: https://slumlord.appwrite.network/assets/unified-game-demo-85zE8cWf.js",
+        {}
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.error (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:897)\n    at r.addError (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:1335)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65224)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    },
+    {
+      "timestamp": "2025-08-21T23:36:02.852Z",
+      "level": "error",
+      "category": "ERROR",
+      "message": [
+        "Showing error screen:",
+        {}
+      ],
+      "stack": "Error\n    at r.log (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:838)\n    at r.error (https://slumlord.appwrite.network/assets/utils-Bl72UyVy.js:1:897)\n    at M.showErrorScreen (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:80262)\n    at M.initialize (https://slumlord.appwrite.network/assets/rpg-game-yDpqVYib.js:2:65263)\n    at async initializeApp (https://slumlord.appwrite.network/assets/main-DqQj8uxT.js:23:48904)"
+    }
+  ],
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+    "url": "https://slumlord.appwrite.network/",
+    "viewport": {
+      "width": 606,
+      "height": 994
+    },
+    "webgl": true,
+    "canvas": true
+  }
+}

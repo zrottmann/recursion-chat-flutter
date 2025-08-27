@@ -1,0 +1,104 @@
+name: archon_os_flutter
+description: Futuristic OS interface with advanced UI animations and glassmorphic design
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Core UI & Theming
+  flutter_animate: ^4.5.0        # Declarative animations
+  google_fonts: ^6.1.0           # Beautiful typography
+  dynamic_color: ^1.6.8          # Material You colors
+  
+  # Visual Effects & Animations
+  rive: ^0.12.4                  # Complex vector animations
+  lottie: ^3.0.0                 # After Effects animations
+  shimmer: ^3.0.0                # Loading shimmer effects
+  glassmorphism_ui: ^0.3.0      # Glass morphism effects
+  blurrycontainer: ^2.0.0       # Blur effects
+  gradient_borders: ^1.0.0       # Gradient borders
+  animated_text_kit: ^4.2.2     # Typing animations
+  
+  # 3D & Advanced Graphics
+  flutter_cube: ^0.1.1           # 3D rendering
+  particles_flutter: ^0.1.4      # Particle effects
+  matrix4_transform: ^2.0.0      # 3D transformations
+  
+  # Advanced Widgets
+  flutter_staggered_grid_view: ^0.7.0  # Staggered layouts
+  flutter_svg: ^2.0.9            # SVG support
+  
+  # State Management & Architecture
+  flutter_riverpod: ^2.4.10      # State management
+  riverpod_annotation: ^2.3.4    # Code generation
+  get_it: ^7.6.7                 # Service locator
+  
+  # Backend & Services
+  dio: ^5.4.0                    # HTTP client
+  
+  # Storage & Offline
+  hive_flutter: ^1.1.0           # Local database
+  shared_preferences: ^2.2.2     # Simple data persistence
+  
+  # Platform Features
+  flutter_local_notifications: ^16.3.0  # Push notifications
+  permission_handler: ^11.1.0     # Permissions
+  url_launcher: ^6.2.4           # URL launching
+  
+  # Utilities
+  intl: ^0.18.1                  # Internationalization
+  collection: ^1.18.0            # Collections utilities
+  uuid: ^4.3.3                   # UUID generation
+  
+  # Icons & Assets
+  flutter_vector_icons: ^2.0.0   # Icon packs
+  cupertino_icons: ^1.0.6        # iOS icons
+  
+  # System Integration
+  desktop_window: ^0.4.0         # Desktop window management
+  system_tray: ^2.0.3           # System tray integration
+  window_manager: ^0.3.7        # Window management
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.7
+  riverpod_generator: ^2.3.11
+  json_serializable: ^6.7.1
+  hive_generator: ^2.0.1
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/animations/
+    - assets/rive/
+    - assets/lottie/
+    - assets/icons/
+    - assets/sounds/
+    - assets/wallpapers/
+  
+  fonts:
+    - family: Orbitron
+      fonts:
+        - asset: fonts/Orbitron-Regular.ttf
+        - asset: fonts/Orbitron-Medium.ttf
+          weight: 500
+        - asset: fonts/Orbitron-Bold.ttf
+          weight: 700
+        - asset: fonts/Orbitron-Black.ttf
+          weight: 900
+    - family: JetBrainsMono
+      fonts:
+        - asset: fonts/JetBrainsMono-Regular.ttf
+        - asset: fonts/JetBrainsMono-Medium.ttf
+          weight: 500
+        - asset: fonts/JetBrainsMono-Bold.ttf
+          weight: 700

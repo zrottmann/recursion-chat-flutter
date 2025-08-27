@@ -1,0 +1,56 @@
+name: remote
+description: Mobile-first remote control app with Flutter
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Appwrite integration
+  appwrite: ^11.0.0
+  
+  # State management
+  provider: ^6.1.1
+  
+  # Local storage
+  shared_preferences: ^2.2.2
+  
+  # HTTP requests
+  http: ^1.1.0
+  dio: ^5.4.0
+  
+  # UI components
+  cupertino_icons: ^1.0.6
+  flutter_animate: ^4.3.0
+  shimmer: ^3.0.0
+  
+  # Utilities
+  intl: ^0.18.1
+  uuid: ^4.2.1
+  
+  # WebView for OAuth
+  webview_flutter: ^4.4.2
+  url_launcher: ^6.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/icons/
+  
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto-Regular.ttf
+        - asset: fonts/Roboto-Bold.ttf
+          weight: 700

@@ -1,0 +1,85 @@
+{
+  "projectId": "68a4e3da0022f3e129d0",
+  "projectName": "super-console",
+  "functions": [
+    {
+      "$id": "claude-executor",
+      "name": "Claude Command Executor",
+      "runtime": "node-18.0",
+      "execute": ["any"],
+      "events": [],
+      "schedule": "",
+      "timeout": 300,
+      "enabled": true,
+      "logging": true,
+      "entrypoint": "index.js",
+      "commands": "npm install",
+      "path": "functions/claude-executor"
+    }
+  ],
+  "databases": [
+    {
+      "$id": "super-console",
+      "name": "Super Console Database"
+    }
+  ],
+  "collections": [
+    {
+      "$id": "sessions",
+      "name": "Sessions",
+      "databaseId": "super-console",
+      "permissions": ["read(\"any\")", "write(\"users\")"],
+      "attributes": [
+        {"key": "userId", "type": "string", "size": 255, "required": true},
+        {"key": "sessionName", "type": "string", "size": 255, "required": true},
+        {"key": "status", "type": "string", "size": 50, "default": "active"},
+        {"key": "context", "type": "string", "size": 10000, "required": false},
+        {"key": "workspace", "type": "string", "size": 10000, "required": false},
+        {"key": "createdAt", "type": "datetime", "required": true},
+        {"key": "lastActiveAt", "type": "datetime", "required": true}
+      ]
+    },
+    {
+      "$id": "commands",
+      "name": "Commands",
+      "databaseId": "super-console",
+      "permissions": ["read(\"any\")", "write(\"users\")"],
+      "attributes": [
+        {"key": "sessionId", "type": "string", "size": 255, "required": true},
+        {"key": "command", "type": "string", "size": 1000, "required": true},
+        {"key": "input", "type": "string", "size": 10000, "required": false},
+        {"key": "output", "type": "string", "size": 100000, "required": false},
+        {"key": "status", "type": "string", "size": 50, "required": true},
+        {"key": "executionTime", "type": "integer", "min": 0, "max": 999999},
+        {"key": "toolsUsed", "type": "string", "size": 1000, "array": true},
+        {"key": "error", "type": "string", "size": 1000, "required": false},
+        {"key": "timestamp", "type": "datetime", "required": true}
+      ]
+    },
+    {
+      "$id": "files",
+      "name": "Files",
+      "databaseId": "super-console",
+      "permissions": ["read(\"any\")", "write(\"users\")"],
+      "attributes": [
+        {"key": "sessionId", "type": "string", "size": 255, "required": true},
+        {"key": "path", "type": "string", "size": 500, "required": true},
+        {"key": "name", "type": "string", "size": 255, "required": true},
+        {"key": "type", "type": "string", "size": 50, "required": true},
+        {"key": "content", "type": "string", "size": 100000, "required": false},
+        {"key": "storageId", "type": "string", "size": 255, "required": false},
+        {"key": "size", "type": "integer", "min": 0, "max": 9999999},
+        {"key": "metadata", "type": "string", "size": 5000, "required": false},
+        {"key": "createdAt", "type": "datetime", "required": true},
+        {"key": "modifiedAt", "type": "datetime", "required": true}
+      ]
+    }
+  ],
+  "buckets": [
+    {
+      "$id": "workspace-files",
+      "name": "Workspace Files",
+      "permissions": ["read(\"any\")", "write(\"users\")"]
+    }
+  ]
+}

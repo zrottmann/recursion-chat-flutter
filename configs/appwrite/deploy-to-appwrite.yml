@@ -1,0 +1,27 @@
+name: Deploy to Appwrite Sites
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Create deployment package
+      run: |
+        tar -czf claude-site.tar.gz index.html package.json
+        
+    - name: Deploy to Appwrite
+      run: |
+        curl -X POST \
+          "https://nyc.cloud.appwrite.io/v1/sites/${{ secrets.SITE_ID }}/deployments" \
+          -H "X-Appwrite-Project: ${{ secrets.PROJECT_ID }}" \
+          -H "X-Appwrite-Key: ${{ secrets.APPWRITE_API_KEY }}" \
+          -H "Content-Type: multipart/form-data" \
+          -F "code=@claude-site.tar.gz" \
+          -F "activate=true"

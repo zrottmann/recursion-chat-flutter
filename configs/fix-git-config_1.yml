@@ -1,0 +1,114 @@
+name: Fix Git Configuration
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  configure-git:
+    name: Configure Git Settings
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure Git User
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global init.defaultBranch main
+          git config --global pull.rebase false
+
+      - name: Verify Git Configuration
+        run: |
+          echo "Git configuration:"
+          git config --list | grep -E "(user\.|init\.|pull\.)" || true
+          
+          echo ""
+          echo "Current branch:"
+          git branch --show-current
+          
+          echo ""
+          echo "Remote configuration:"
+          git remote -v
+          
+          echo ""
+          echo "Repository status:"
+          git status
+
+      - name: Fix Line Endings
+        run: |
+          # Configure git to handle line endings properly
+          git config core.autocrlf input
+          git config core.eol lf
+          
+          # Normalize line endings in text files
+          find . -type f -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.js" -o -name "*.jsx" -o -name "*.ts" -o -name "*.tsx" -o -name "*.md" | while read file; do
+            if [ -f "$file" ]; then
+              # Convert CRLF to LF
+              sed -i 's/\r$//' "$file" 2>/dev/null || true
+            fi
+          done
+
+      - name: Create .gitattributes if missing
+        run: |
+          if [ ! -f .gitattributes ]; then
+            cat > .gitattributes << 'EOF'
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Force LF for specific file types
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.env text eol=lf
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+EOF
+            
+            git add .gitattributes
+            git commit -m "chore: Add .gitattributes for consistent line endings" || echo "No changes to commit"
+          else
+            echo ".gitattributes already exists"
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Git Configuration Fixed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Git user configured" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Line endings normalized" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Git attributes configured" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository**: ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

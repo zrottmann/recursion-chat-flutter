@@ -1,0 +1,7 @@
+{
+  "name": "enhanced-super-console",
+  "version": "2.0.0",
+  "description": "Enhanced glassmorphic console with particle systems",
+  "main": "index.js",
+  "type": "module"
+}

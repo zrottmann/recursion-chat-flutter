@@ -1,0 +1,1 @@
+console.warn("⚠️ leafletIconFix.js is deprecated. Use MapWrapper.jsx for new map components.");const e=null,n=()=>null,o=()=>{console.log("📍 Legacy leaflet icon initialization (deprecated)")};export{n as createCustomIcon,e as defaultIcon,o as initLeafletIcons};

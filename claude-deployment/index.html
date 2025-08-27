@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Remote & UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="glass rounded-3xl p-8 max-w-4xl w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-white mb-4">Claude Code Remote & UI</h1>
+                <p class="text-gray-200">Control and interact with Claude Code from anywhere</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Claude Code Remote Section -->
+                <div class="glass rounded-xl p-6">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Claude Code Remote</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-200">Remote Control Enabled</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-200">Webhook Integration</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-200">Real-time Updates</span>
+                        </div>
+                    </div>
+                    <button id="remoteBtn" class="mt-6 w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                        Open Remote Console
+                    </button>
+                </div>
+                
+                <!-- Claude Code UI Section -->
+                <div class="glass rounded-xl p-6">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Claude Code UI</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-200">Interactive Interface</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-200">Code Editor</span>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="text-gray-200">File Management</span>
+                        </div>
+                    </div>
+                    <button id="uiBtn" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+                        Launch UI Dashboard
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Terminal Section -->
+            <div class="mt-6 glass rounded-xl p-6">
+                <h3 class="text-xl font-semibold text-white mb-4">Command Terminal</h3>
+                <div class="bg-black bg-opacity-50 rounded-lg p-4 font-mono text-green-400">
+                    <div id="terminal-output" class="space-y-2">
+                        <div>$ claude-code status</div>
+                        <div class="text-gray-400">✓ Claude Code is running</div>
+                        <div class="text-gray-400">✓ Remote access enabled</div>
+                        <div class="text-gray-400">✓ UI server active on port 3000</div>
+                        <div>$ <span class="animate-pulse">_</span></div>
+                    </div>
+                </div>
+                <input id="terminal-input" type="text" class="mt-4 w-full bg-black bg-opacity-30 text-white px-4 py-2 rounded-lg border border-gray-600 focus:border-purple-500 focus:outline-none" placeholder="Enter command...">
+            </div>
+            
+            <!-- Status Section -->
+            <div class="mt-6 grid grid-cols-3 gap-4">
+                <div class="glass rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-green-400">Active</div>
+                    <div class="text-gray-300 text-sm mt-1">System Status</div>
+                </div>
+                <div class="glass rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-blue-400">3</div>
+                    <div class="text-gray-300 text-sm mt-1">Active Sessions</div>
+                </div>
+                <div class="glass rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-purple-400">100%</div>
+                    <div class="text-gray-300 text-sm mt-1">Uptime</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Handle button clicks
+        document.getElementById('remoteBtn').addEventListener('click', () => {
+            addTerminalOutput('Launching Claude Code Remote console...');
+            setTimeout(() => {
+                addTerminalOutput('✓ Remote console ready at https://remote.claude.code');
+            }, 1000);
+        });
+        
+        document.getElementById('uiBtn').addEventListener('click', () => {
+            addTerminalOutput('Starting Claude Code UI dashboard...');
+            setTimeout(() => {
+                addTerminalOutput('✓ UI dashboard available at https://ui.claude.code');
+            }, 1000);
+        });
+        
+        // Terminal functionality
+        const terminalInput = document.getElementById('terminal-input');
+        const terminalOutput = document.getElementById('terminal-output');
+        
+        terminalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.target.value.trim()) {
+                const command = e.target.value;
+                addTerminalOutput(`$ ${command}`);
+                handleCommand(command);
+                e.target.value = '';
+            }
+        });
+        
+        function addTerminalOutput(text, isError = false) {
+            const lines = terminalOutput.querySelectorAll('div');
+            const lastLine = lines[lines.length - 1];
+            const newLine = document.createElement('div');
+            newLine.className = isError ? 'text-red-400' : 'text-gray-400';
+            newLine.textContent = text;
+            terminalOutput.insertBefore(newLine, lastLine);
+            
+            // Keep only last 10 lines
+            if (lines.length > 10) {
+                lines[0].remove();
+            }
+        }
+        
+        function handleCommand(command) {
+            const cmd = command.toLowerCase().trim();
+            
+            if (cmd === 'help') {
+                addTerminalOutput('Available commands: status, connect, disconnect, clear, help');
+            } else if (cmd === 'status') {
+                addTerminalOutput('✓ All systems operational');
+            } else if (cmd === 'connect') {
+                addTerminalOutput('Establishing connection...');
+                setTimeout(() => addTerminalOutput('✓ Connected to Claude Code'), 500);
+            } else if (cmd === 'disconnect') {
+                addTerminalOutput('Disconnecting...');
+                setTimeout(() => addTerminalOutput('✓ Disconnected'), 500);
+            } else if (cmd === 'clear') {
+                const lines = terminalOutput.querySelectorAll('div');
+                lines.forEach((line, index) => {
+                    if (index < lines.length - 1) line.remove();
+                });
+            } else {
+                addTerminalOutput(`Command not found: ${command}`, true);
+            }
+        }
+    </script>
+</body>
+</html>

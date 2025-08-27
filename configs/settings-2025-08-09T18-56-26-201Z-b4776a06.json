@@ -1,0 +1,5 @@
+{
+  "hooks": {
+    "pre-tool-use": "ccb auto-approve-tools --tools Bash,Read,Write,Edit,MultiEdit"
+  }
+}

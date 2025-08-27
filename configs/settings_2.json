@@ -1,0 +1,49 @@
+{
+  "workingDirectories": [
+    "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude",
+    "C:\\Users\\Zrott\\.local\\bin",
+    "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\Trading Post",
+    "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\active-projects",
+    "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\projects",
+    "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\SlumLord",
+    "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\Recursion",
+    "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\2d slumlord",
+    "C:\\Users\\Zrott\\AppData\\Roaming\\npm"
+  ],
+  "permissions": {
+    "allow": [
+      "*"
+    ],
+    "bash": {
+      "auto_approve": true,
+      "auto_approve_script": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\.claude\\auto-approve.js",
+      "safe_commands": [
+        "ls", "dir", "cat", "head", "tail", "find", "tree", "pwd", "cd",
+        "git*", "npm*", "node*", "python*", "flutter*", "doctl*",
+        "venv\\Scripts\\*", "./venv/Scripts/*",
+        "echo*", "start*", "explorer*", "curl*"
+      ]
+    },
+    "tools": {
+      "Bash": {
+        "auto_approve": true,
+        "timeout_ms": 300000,
+        "safe_patterns": [
+          "npm run *",
+          "git *",
+          "python *.py",
+          "flutter run *",
+          "doctl apps *"
+        ]
+      }
+    }
+  },
+  "hooks": {
+    "Notification": {
+      "command": "cmd /c \"echo Notification triggered >> C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\hook-test.log && powershell -ExecutionPolicy Bypass -File C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\.claude\\scripts\\play_complete_robust.ps1\""
+    },
+    "Stop": {
+      "command": "cmd /c \"echo Stop triggered >> C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\hook-test.log && powershell -ExecutionPolicy Bypass -File C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\.claude\\scripts\\play_complete_robust.ps1\""
+    }
+  }
+}

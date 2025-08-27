@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🤖 Agent Swarm Orchestrator - Operations Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .connection-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .connected { background-color: #10B981; }
+        .connecting { background-color: #F59E0B; animation: pulse 1s infinite; }
+        .disconnected { background-color: #EF4444; }
+        
+        .sidebar {
+            background: linear-gradient(180deg, #1F2937 0%, #111827 100%);
+        }
+        
+        .debug-log-entry {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.4s ease-out;
+        }
+        
+        .animate-pulse-scale {
+            animation: pulseScale 2s infinite;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulseScale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Mobile Navigation */
+        .mobile-nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 40;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .mobile-nav-overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .mobile-nav {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100%;
+            background: linear-gradient(180deg, #1F2937 0%, #111827 100%);
+            z-index: 50;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .mobile-nav.open {
+            left: 0;
+        }
+        
+        .hamburger {
+            width: 24px;
+            height: 18px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .hamburger span {
+            display: block;
+            height: 2px;
+            width: 100%;
+            background: currentColor;
+            transition: 0.3s;
+        }
+        
+        .hamburger.open span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .hamburger.open span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+        
+        /* Mobile Responsive Breakpoints */
+        @media (max-width: 768px) {
+            .min-h-screen {
+                min-height: 100vh;
+                min-height: -webkit-fill-available;
+            }
+            
+            .chat-input {
+                font-size: 16px !important;
+            }
+            
+            .message-bubble {
+                max-width: 85% !important;
+            }
+            
+            .quick-action {
+                font-size: 0.8rem !important;
+                padding: 0.5rem 0.75rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .message-bubble {
+                max-width: 90% !important;
+                padding: 1rem !important;
+            }
+            
+            .chat-input {
+                padding: 0.75rem 1rem !important;
+            }
+        }
+        
+        .message-bubble {
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chat-input:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen overflow-hidden">
+    <!-- Mobile Navigation Overlay -->
+    <div id="mobileOverlay" class="mobile-nav-overlay lg:hidden"></div>
+    
+    <!-- Mobile Navigation -->
+    <div id="mobileNav" class="mobile-nav lg:hidden text-white">
+        <div class="p-6 border-b border-gray-700">
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-bold">📱 Operations Menu</h2>
+                <button id="closeMobileNav" class="text-gray-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <nav class="p-4 space-y-2">
+            <a href="#" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                <span class="text-xl mr-3">📊</span>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                <span class="text-xl mr-3">🎯</span>
+                <span class="font-medium">Missions</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                <span class="text-xl mr-3">🤖</span>
+                <span class="font-medium">Agents</span>
+            </a>
+            <a href="#" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                <span class="text-xl mr-3">📈</span>
+                <span class="font-medium">Analytics</span>
+            </a>
+        </nav>
+    </div>
+    <!-- Error Display Panel -->
+    <div id="error-panel" class="fixed bottom-4 right-4 z-50 max-w-md hidden">
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-xl">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.293 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                    <h3 class="text-sm font-medium text-red-800">System Error</h3>
+                    <div class="mt-2 text-sm text-red-700" id="error-message"></div>
+                    <div class="mt-3">
+                        <button onclick="window.opsCenter.retryConnection()" class="text-sm font-medium text-red-600 hover:text-red-500">
+                            Retry Connection →
+                        </button>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('error-panel').classList.add('hidden')" class="ml-4 text-red-400 hover:text-red-500">
+                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug Console Panel -->
+    <div id="debug-console" class="fixed bottom-4 left-4 z-50 bg-gray-900 text-green-400 rounded-lg shadow-2xl p-4 font-mono text-xs max-w-lg max-h-96 overflow-y-auto">
+        <div class="flex justify-between items-center mb-2 border-b border-gray-700 pb-2">
+            <span class="text-white font-bold">🔧 Debug Console</span>
+            <div class="flex gap-2">
+                <button onclick="window.opsCenter?.startOrchestrator()" class="text-yellow-400 hover:text-yellow-300 text-xs">Start Backend</button>
+                <button onclick="clearDebugConsole()" class="text-gray-400 hover:text-white text-xs">Clear</button>
+                <button onclick="toggleDebugConsole()" class="text-red-400 hover:text-red-300 text-xs">Hide</button>
+            </div>
+        </div>
+        <div id="debug-logs" class="space-y-1"></div>
+    </div>
+
+    <!-- Loading Overlay - Hidden by default -->
+    <div id="loading-overlay" class="fixed inset-0 z-50 bg-gray-900 bg-opacity-75 flex items-center justify-center hidden"></div>
+
+    <!-- Main Chat Container -->
+    <div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <!-- Chat Header -->
+        <header class="bg-black/20 backdrop-blur-md border-b border-white/10 sticky top-0 z-40">
+            <div class="max-w-4xl mx-auto px-4 lg:px-6 py-4">
+                <!-- Mobile Header -->
+                <div class="flex lg:hidden items-center justify-between">
+                    <button id="openMobileNav" class="hamburger text-white">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                            <span class="text-white text-sm">🤖</span>
+                        </div>
+                        <div>
+                            <h1 class="text-sm font-bold text-white">Agent Console</h1>
+                        </div>
+                    </div>
+                    <div class="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-xs">
+                        Live
+                    </div>
+                </div>
+                
+                <!-- Desktop Header -->
+                <div class="hidden lg:block">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+                                <span class="text-white text-xl">🤖</span>
+                            </div>
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-black animate-pulse"></div>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-white">Agent Swarm Console</h1>
+                            <p class="text-sm text-gray-300">Enhanced AI Orchestrator • No Limits • Instant Results</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="px-4 py-2 bg-green-500/20 text-green-300 rounded-full text-sm font-medium border border-green-500/30">
+                            <span class="w-2 h-2 bg-green-400 rounded-full inline-block mr-2 animate-pulse"></span>
+                            Live
+                        </div>
+                        <button onclick="clearMessages()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 text-sm font-medium">
+                            Clear Chat
+                        </button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Chat Messages Area -->
+        <main class="flex-1 max-w-4xl mx-auto px-4 lg:px-6 py-4 lg:py-8">
+            <div id="messages-container" class="space-y-6 mb-8 min-h-[60vh]">
+                <!-- Welcome Message -->
+                <div class="flex items-start space-x-4 animate-fade-in">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <span class="text-white text-sm">🤖</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-600/90 to-purple-600/90 backdrop-blur-sm text-white p-6 rounded-2xl rounded-tl-lg max-w-2xl shadow-xl border border-white/10">
+                        <div class="text-sm leading-relaxed">
+                            <div class="font-semibold mb-2">🚀 Welcome to Agent Swarm Console!</div>
+                            <p class="mb-3">I'm your enhanced AI orchestrator with unlimited processing power and instant responses. I coordinate multiple specialized agents to build exactly what you need.</p>
+                            <div class="text-xs text-blue-100 bg-black/20 rounded-lg p-3 mt-4">
+                                <div class="font-medium mb-1">✨ Try these commands:</div>
+                                <div>• "build a modern portfolio website"</div>
+                                <div>• "create a React dashboard with charts"</div> 
+                                <div>• "setup an API with authentication"</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="sticky bottom-4 lg:bottom-6">
+                <div class="bg-black/40 backdrop-blur-xl rounded-xl lg:rounded-2xl border border-white/10 shadow-2xl p-4 lg:p-6">
+                    <div class="flex flex-col lg:flex-row lg:space-x-4 space-y-4 lg:space-y-0">
+                        <div class="flex-1 relative mb-4 lg:mb-0">
+                            <textarea 
+                                id="chat-input" 
+                                rows="1"
+                                placeholder="Ask me to build something amazing... (e.g., 'build a portfolio website')"
+                                class="chat-input w-full px-4 lg:px-6 py-3 lg:py-4 bg-white/10 border border-white/20 rounded-lg lg:rounded-xl text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 backdrop-blur-sm text-base lg:text-lg resize-none overflow-hidden"
+                                onkeypress="handleEnterKey(event)"
+                                oninput="autoResizeTextarea(this)"
+                            ></textarea>
+                            <div class="hidden lg:block absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                                <span class="text-sm opacity-60">⌨️ Shift+Enter for new line</span>
+                            </div>
+                        </div>
+                        <button 
+                            onclick="sendChatMessage()" 
+                            id="send-button"
+                            class="w-full lg:w-auto px-6 lg:px-8 py-3 lg:py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg lg:rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-50 transition-all duration-200 shadow-lg font-medium"
+                        >
+                            Send
+                        </button>
+                    </div>
+                    
+                    <!-- Quick Action Buttons -->
+                    <div class="mt-4 flex flex-wrap gap-2 justify-center lg:justify-start">
+                        <button onclick="quickPrompt('build a modern portfolio website')" class="quick-action px-3 lg:px-4 py-2 text-xs lg:text-sm bg-purple-500/20 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors border border-purple-500/30">
+                            🎨 Portfolio Site
+                        </button>
+                        <button onclick="quickPrompt('create a React dashboard with charts')" class="quick-action px-3 lg:px-4 py-2 text-xs lg:text-sm bg-blue-500/20 text-blue-300 rounded-lg hover:bg-blue-500/30 transition-colors border border-blue-500/30">
+                            📊 React Dashboard
+                        </button>
+                        <button onclick="quickPrompt('build a cat adoption website')" class="quick-action px-3 lg:px-4 py-2 text-xs lg:text-sm bg-pink-500/20 text-pink-300 rounded-lg hover:bg-pink-500/30 transition-colors border border-pink-500/30">
+                            🐱 Cat Website
+                        </button>
+                        <button onclick="quickPrompt('setup an API with JWT authentication')" class="quick-action px-3 lg:px-4 py-2 text-xs lg:text-sm bg-green-500/20 text-green-300 rounded-lg hover:bg-green-500/30 transition-colors border border-green-500/30">
+                            🔐 API Setup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Enhanced Debug Logging System
+        class DebugLogger {
+            constructor() {
+                this.logs = [];
+                this.maxLogs = 500;
+                this.logLevels = {
+                    'debug': { color: 'text-gray-400', console: '#9CA3AF' },
+                    'info': { color: 'text-green-400', console: '#10B981' },
+                    'warn': { color: 'text-yellow-400', console: '#F59E0B' },
+                    'error': { color: 'text-red-400', console: '#EF4444' },
+                    'success': { color: 'text-blue-400', console: '#3B82F6' },
+                    'system': { color: 'text-purple-400', console: '#8B5CF6' }
+                };
+            }
+
+            log(message, level = 'info', details = null) {
+                const timestamp = new Date().toLocaleTimeString('en-US', { 
+                    hour12: false, 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit',
+                    fractionalSecondDigits: 3 
+                });
+
+                const logEntry = {
+                    timestamp,
+                    level,
+                    message,
+                    details,
+                    id: Date.now() + Math.random()
+                };
+
+                this.logs.push(logEntry);
+                if (this.logs.length > this.maxLogs) {
+                    this.logs.shift();
+                }
+
+                this.renderLog(logEntry);
+                this.consoleLog(logEntry);
+            }
+
+            renderLog(entry) {
+                const debugPanel = document.getElementById('debug-logs');
+                if (!debugPanel) return;
+
+                const levelConfig = this.logLevels[entry.level] || this.logLevels.info;
+                
+                const logDiv = document.createElement('div');
+                logDiv.className = `debug-log-entry ${levelConfig.color}`;
+                
+                let content = `[${entry.timestamp}] ${entry.level.toUpperCase().padEnd(7)} | ${entry.message}`;
+                if (entry.details) {
+                    content += `\n    └─ ${JSON.stringify(entry.details, null, 2).replace(/\n/g, '\n       ')}`;
+                }
+                
+                logDiv.textContent = content;
+                debugPanel.appendChild(logDiv);
+                
+                // Auto-scroll to bottom
+                debugPanel.scrollTop = debugPanel.scrollHeight;
+            }
+
+            consoleLog(entry) {
+                const levelConfig = this.logLevels[entry.level] || this.logLevels.info;
+                const style = `color: ${levelConfig.console}; font-weight: ${entry.level === 'error' ? 'bold' : 'normal'}`;
+                
+                console.log(
+                    `%c[AGENT SWARM ${entry.level.toUpperCase()}] ${entry.message}`,
+                    style,
+                    entry.details || ''
+                );
+            }
+
+            clear() {
+                this.logs = [];
+                const debugPanel = document.getElementById('debug-logs');
+                if (debugPanel) {
+                    debugPanel.innerHTML = '';
+                }
+                this.log('Debug console cleared', 'system');
+            }
+        }
+
+        // Global logger instance
+        const logger = new DebugLogger();
+
+        // Helper functions
+        function debugLog(message, level = 'info', details = null) {
+            logger.log(message, level, details);
+        }
+
+        function clearDebugConsole() {
+            logger.clear();
+        }
+
+        function toggleDebugConsole() {
+            const console = document.getElementById('debug-console');
+            console.classList.toggle('hidden');
+        }
+
+        function showError(message, details = null) {
+            const errorPanel = document.getElementById('error-panel');
+            const errorMessage = document.getElementById('error-message');
+            
+            let errorContent = message;
+            if (details) {
+                errorContent += `<div class="mt-2 text-xs text-gray-600">${details}</div>`;
+            }
+            
+            errorMessage.innerHTML = errorContent;
+            errorPanel.classList.remove('hidden');
+            
+            debugLog(message, 'error', details);
+        }
+
+        function updateLoadingStatus(component, status, isSuccess = false) {
+            const element = document.getElementById(`${component}-status`);
+            if (element) {
+                element.textContent = status;
+                element.className = `text-sm font-medium ${
+                    isSuccess ? 'text-green-600' : 
+                    status.includes('Failed') ? 'text-red-600' : 
+                    'text-yellow-600'
+                }`;
+            }
+            
+            debugLog(`${component} status: ${status}`, isSuccess ? 'success' : 'info');
+        }
+
+        // Enhanced Operations Center Class
+        class OperationsCenter {
+            constructor() {
+                this.ws = null;
+                this.wsUrl = 'ws://localhost:12200';
+                this.alternativeUrls = [
+                    'ws://localhost:12100',
+                    'ws://localhost:12300',
+                    'ws://localhost:12400',
+                    'ws://localhost:9400',
+                    'ws://localhost:9100',
+                    'ws://localhost:9200',
+                    'ws://localhost:9300',
+                    'ws://localhost:8080',
+                    'ws://localhost:8081',
+                    'ws://localhost:3000',
+                    'ws://127.0.0.1:12200',
+                    'ws://127.0.0.1:9400',
+                    'ws://127.0.0.1:8090',
+                    'ws://127.0.0.1:8080',
+                    'ws://127.0.0.1:3000'
+                ];
+                this.currentUrlIndex = 0;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 5;
+                this.reconnectInterval = 3000;
+                this.reconnectTimeout = null;
+                this.isConnected = false;
+                this.demoMode = false;
+                this.connectionStartTime = Date.now();
+                
+                // Demo data
+                this.demoData = {
+                    missions: [
+                        { id: 1, name: 'Deploy API Gateway', status: 'active', progress: 75 },
+                        { id: 2, name: 'Security Audit', status: 'pending', progress: 0 },
+                        { id: 3, name: 'Database Migration', status: 'active', progress: 45 }
+                    ],
+                    agents: [
+                        { id: 'a1', name: 'React Expert', status: 'busy', performance: 95 },
+                        { id: 'a2', name: 'Backend Architect', status: 'available', performance: 88 },
+                        { id: 'a3', name: 'DevOps Engineer', status: 'busy', performance: 92 }
+                    ]
+                };
+            }
+
+            async initialize() {
+                debugLog('=== AGENT SWARM INITIALIZATION STARTED ===', 'system');
+                debugLog(`Version: 2.0.0 | Time: ${new Date().toISOString()}`, 'system');
+                
+                // Show loading overlay
+                document.getElementById('loading-overlay').classList.remove('hidden');
+                
+                // Try to connect to WebSocket
+                await this.connectWebSocket();
+                
+                // Setup event listeners
+                this.setupEventListeners();
+                
+                debugLog('Initialization complete', 'success');
+            }
+
+            async connectWebSocket() {
+                const url = this.getCurrentUrl();
+                debugLog(`Attempting WebSocket connection to: ${url}`, 'info');
+                updateLoadingStatus('ws', `Connecting to ${url}...`);
+                
+                document.getElementById('attempt-count').textContent = this.reconnectAttempts + 1;
+                document.getElementById('loading-message').textContent = `Connecting to ${url}`;
+
+                try {
+                    this.ws = new WebSocket(url);
+                    
+                    // Set up connection timeout
+                    const connectionTimeout = setTimeout(() => {
+                        if (this.ws.readyState !== WebSocket.OPEN) {
+                            debugLog('Connection timeout after 5 seconds', 'warn');
+                            this.ws.close();
+                            this.handleConnectionFailure();
+                        }
+                    }, 5000);
+
+                    this.ws.onopen = (event) => {
+                        clearTimeout(connectionTimeout);
+                        this.handleConnectionOpen(event);
+                    };
+
+                    this.ws.onmessage = (event) => {
+                        this.handleMessage(event);
+                    };
+
+                    this.ws.onerror = (error) => {
+                        clearTimeout(connectionTimeout);
+                        this.handleConnectionError(error);
+                    };
+
+                    this.ws.onclose = (event) => {
+                        clearTimeout(connectionTimeout);
+                        this.handleConnectionClose(event);
+                    };
+
+                } catch (error) {
+                    debugLog(`WebSocket creation failed: ${error.message}`, 'error', error);
+                    this.handleConnectionFailure();
+                }
+            }
+
+            getCurrentUrl() {
+                if (this.currentUrlIndex >= this.alternativeUrls.length) {
+                    this.currentUrlIndex = 0;
+                }
+                return this.currentUrlIndex === 0 ? this.wsUrl : this.alternativeUrls[this.currentUrlIndex - 1];
+            }
+
+            handleConnectionOpen(event) {
+                this.isConnected = true;
+                this.reconnectAttempts = 0;
+                const connectionTime = Date.now() - this.connectionStartTime;
+                
+                debugLog(`WebSocket connected successfully! (${connectionTime}ms)`, 'success');
+                updateLoadingStatus('ws', 'Connected', true);
+                updateLoadingStatus('engine', 'Initializing...');
+                
+                // Update UI
+                document.getElementById('connection-indicator').className = 'connection-indicator connected';
+                document.getElementById('connection-status').textContent = 'Connected';
+                document.getElementById('mode-indicator').textContent = 'Live Mode';
+                document.getElementById('mode-indicator').className = 'text-sm px-3 py-1 rounded-full bg-green-100 text-green-800';
+                
+                // Send initial handshake
+                this.sendMessage({
+                    type: 'handshake',
+                    clientType: 'dashboard',
+                    version: '2.0.0'
+                });
+                
+                // Request initial data
+                setTimeout(() => {
+                    this.requestInitialData();
+                }, 500);
+            }
+
+            handleConnectionError(error) {
+                debugLog(`WebSocket error occurred`, 'error', { 
+                    readyState: this.ws?.readyState,
+                    url: this.getCurrentUrl(),
+                    error: error.message || 'Unknown error'
+                });
+                
+                updateLoadingStatus('ws', 'Connection failed');
+                this.handleConnectionFailure();
+            }
+
+            handleConnectionClose(event) {
+                this.isConnected = false;
+                debugLog(`WebSocket connection closed`, 'warn', {
+                    code: event.code,
+                    reason: event.reason || 'No reason provided',
+                    wasClean: event.wasClean
+                });
+                
+                document.getElementById('connection-indicator').className = 'connection-indicator disconnected';
+                document.getElementById('connection-status').textContent = 'Disconnected';
+                
+                if (!this.demoMode && this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.scheduleReconnect();
+                } else if (!this.demoMode) {
+                    this.promptDemoMode();
+                }
+            }
+
+            handleConnectionFailure() {
+                this.reconnectAttempts++;
+                
+                if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+                    debugLog('Maximum reconnection attempts reached', 'error');
+                    this.promptDemoMode();
+                } else {
+                    // Try next URL
+                    this.currentUrlIndex++;
+                    this.scheduleReconnect();
+                }
+            }
+
+            scheduleReconnect() {
+                const delay = Math.min(this.reconnectInterval * Math.pow(1.5, this.reconnectAttempts - 1), 30000);
+                debugLog(`Scheduling reconnection attempt ${this.reconnectAttempts + 1} in ${delay}ms`, 'info');
+                
+                this.reconnectTimeout = setTimeout(() => {
+                    this.connectWebSocket();
+                }, delay);
+            }
+
+            retryConnection() {
+                debugLog('Manual retry requested', 'info');
+                this.reconnectAttempts = 0;
+                this.currentUrlIndex = 0;
+                document.getElementById('error-panel').classList.add('hidden');
+                document.getElementById('loading-overlay').classList.remove('hidden');
+                
+                if (this.reconnectTimeout) {
+                    clearTimeout(this.reconnectTimeout);
+                }
+                
+                this.connectWebSocket();
+            }
+
+            skipConnection() {
+                debugLog('Entering demo mode', 'warn');
+                this.enterDemoMode();
+            }
+
+            promptDemoMode() {
+                showError(
+                    'Unable to connect to Orchestrator Backend',
+                    'The WebSocket server appears to be offline. You can continue in demo mode with simulated data, or try starting the backend server manually.'
+                );
+                
+                updateLoadingStatus('ws', 'Failed - Using Demo Mode');
+                updateLoadingStatus('engine', 'Demo Mode');
+                updateLoadingStatus('data', 'Simulated Data');
+                
+                setTimeout(() => {
+                    this.enterDemoMode();
+                }, 2000);
+            }
+
+            enterDemoMode() {
+                this.demoMode = true;
+                debugLog('=== DEMO MODE ACTIVATED ===', 'system');
+                
+                // Hide loading overlay
+                document.getElementById('loading-overlay').classList.add('hidden');
+                
+                // Update UI for demo mode
+                document.getElementById('connection-indicator').className = 'connection-indicator connecting';
+                document.getElementById('connection-status').textContent = 'Demo Mode';
+                document.getElementById('mode-indicator').textContent = 'Demo Mode';
+                document.getElementById('mode-indicator').className = 'text-sm px-3 py-1 rounded-full bg-yellow-100 text-yellow-800';
+                
+                // Load demo data
+                this.loadDemoData();
+            }
+
+            loadDemoData() {
+                debugLog('Loading demo data', 'info');
+                
+                // Update counters
+                document.getElementById('missions-count').textContent = this.demoData.missions.length;
+                document.getElementById('agents-count').textContent = this.demoData.agents.length;
+                
+                // Display demo content
+                this.displaySystemStatus();
+                
+                debugLog('Demo data loaded successfully', 'success');
+            }
+
+            displaySystemStatus() {
+                const statusArea = document.getElementById('system-status');
+                if (!statusArea) return;
+                
+                const statusHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                            <span class="text-sm font-medium text-gray-700">Operating Mode</span>
+                            <span class="text-sm text-yellow-800 font-semibold">Demo Mode (No Backend)</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span class="text-sm font-medium text-gray-700">Active Missions</span>
+                            <span class="text-sm text-gray-900 font-semibold">${this.demoData.missions.length}</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span class="text-sm font-medium text-gray-700">Available Agents</span>
+                            <span class="text-sm text-gray-900 font-semibold">${this.demoData.agents.length}</span>
+                        </div>
+                        
+                        <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                            <h4 class="text-sm font-semibold text-blue-900 mb-2">How to Start the Backend:</h4>
+                            <ol class="text-xs text-blue-800 space-y-1 list-decimal list-inside">
+                                <li>Open a terminal in the orchestrator directory</li>
+                                <li>Run: <code class="bg-blue-100 px-1 rounded">npm install</code></li>
+                                <li>Run: <code class="bg-blue-100 px-1 rounded">npm run start:server</code></li>
+                                <li>Refresh this page once the server is running</li>
+                            </ol>
+                        </div>
+                    </div>
+                `;
+                
+                statusArea.innerHTML = statusHTML;
+            }
+
+            sendMessage(data) {
+                if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+                    const message = JSON.stringify(data);
+                    this.ws.send(message);
+                    debugLog(`Sent message: ${data.type}`, 'debug', data);
+                } else {
+                    debugLog(`Cannot send message - WebSocket not connected`, 'warn');
+                }
+            }
+
+            handleMessage(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    debugLog(`Received message: ${data.type}`, 'debug', data);
+                    
+                    switch(data.type) {
+                        case 'handshake:response':
+                            this.handleHandshakeResponse(data);
+                            break;
+                        case 'data:initial':
+                            this.handleInitialData(data);
+                            break;
+                        case 'mission:update':
+                            this.handleMissionUpdate(data);
+                            break;
+                        case 'agent:update':
+                            this.handleAgentUpdate(data);
+                            break;
+                        default:
+                            debugLog(`Unknown message type: ${data.type}`, 'warn');
+                    }
+                } catch (error) {
+                    debugLog(`Error parsing message: ${error.message}`, 'error', error);
+                }
+            }
+
+            handleHandshakeResponse(data) {
+                debugLog('Handshake successful', 'success', data);
+                updateLoadingStatus('engine', 'Connected', true);
+                updateLoadingStatus('data', 'Syncing...');
+            }
+
+            requestInitialData() {
+                this.sendMessage({
+                    type: 'request:initial-data',
+                    timestamp: Date.now()
+                });
+            }
+
+            handleInitialData(data) {
+                debugLog('Initial data received', 'success');
+                updateLoadingStatus('data', 'Synced', true);
+                
+                // Hide loading overlay
+                setTimeout(() => {
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                }, 500);
+                
+                // Update UI with real data
+                this.updateUI(data);
+            }
+
+            handleMissionUpdate(data) {
+                debugLog(`Mission update: ${data.missionId}`, 'info', data);
+                // Update mission display
+            }
+
+            handleAgentUpdate(data) {
+                debugLog(`Agent update: ${data.agentId}`, 'info', data);
+                // Update agent display
+            }
+
+            updateUI(data) {
+                // Update mission and agent counts
+                if (data.missions) {
+                    document.getElementById('missions-count').textContent = data.missions.length;
+                }
+                if (data.agents) {
+                    document.getElementById('agents-count').textContent = data.agents.filter(a => a.status === 'available').length;
+                }
+                
+                // Update main content
+                this.displayLiveStatus(data);
+            }
+
+            displayLiveStatus(data) {
+                const statusArea = document.getElementById('system-status');
+                if (!statusArea) return;
+                
+                const statusHTML = `
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <span class="text-sm font-medium text-gray-700">Operating Mode</span>
+                            <span class="text-sm text-green-800 font-semibold">Live - Connected</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span class="text-sm font-medium text-gray-700">WebSocket Status</span>
+                            <span class="text-sm text-green-600 font-semibold">● Connected</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span class="text-sm font-medium text-gray-700">Backend Version</span>
+                            <span class="text-sm text-gray-900 font-semibold">${data.version || 'Unknown'}</span>
+                        </div>
+                    </div>
+                `;
+                
+                statusArea.innerHTML = statusHTML;
+            }
+
+            startOrchestrator() {
+                debugLog('Attempting to start orchestrator backend...', 'system');
+                showError(
+                    'Manual Start Required',
+                    'Please run "npm run start:server" in the orchestrator directory from your terminal.'
+                );
+            }
+
+            setupEventListeners() {
+                // Handle visibility change
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        debugLog('Page hidden - pausing updates', 'debug');
+                    } else {
+                        debugLog('Page visible - resuming updates', 'debug');
+                        if (!this.isConnected && !this.demoMode) {
+                            this.retryConnection();
+                        }
+                    }
+                });
+                
+                // Handle online/offline
+                window.addEventListener('online', () => {
+                    debugLog('Network online', 'success');
+                    if (!this.isConnected && !this.demoMode) {
+                        this.retryConnection();
+                    }
+                });
+                
+                window.addEventListener('offline', () => {
+                    debugLog('Network offline', 'warn');
+                });
+            }
+        }
+
+        // Chat functions
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addChatMessage('user', message);
+            input.value = '';
+            
+            // Reset textarea height
+            input.style.height = 'auto';
+            
+            // Reset placeholder visibility
+            const placeholder = input.nextElementSibling;
+            if (placeholder && placeholder.classList.contains('pointer-events-none')) {
+                placeholder.style.opacity = '0.6';
+            }
+            
+            // Show typing indicator
+            addTypingIndicator();
+            
+            // Simulate AI response after a delay
+            setTimeout(() => {
+                removeTypingIndicator();
+                handleAIResponse(message);
+            }, 1500 + Math.random() * 1000);
+        }
+        
+        function addChatMessage(sender, content) {
+            const container = document.getElementById('messages-container');
+            const messageDiv = document.createElement('div');
+            
+            const isUser = sender === 'user';
+            const alignClass = isUser ? 'flex-row-reverse' : '';
+            const bubbleClass = isUser ? 
+                'bg-gradient-to-br from-pink-500/90 to-red-500/90' : 
+                'bg-gradient-to-br from-blue-600/90 to-purple-600/90';
+            const iconGradient = isUser ?
+                'from-pink-500 to-red-600' :
+                'from-blue-500 to-purple-600';
+            const borderRadius = isUser ?
+                'rounded-2xl rounded-tr-lg' :
+                'rounded-2xl rounded-tl-lg';
+            
+            messageDiv.className = `flex items-start space-x-4 animate-slide-up ${alignClass}`;
+            
+            messageDiv.innerHTML = `
+                <div class="w-8 lg:w-10 h-8 lg:h-10 bg-gradient-to-br ${iconGradient} rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <span class="text-white text-xs lg:text-sm">${isUser ? '👤' : '🤖'}</span>
+                </div>
+                <div class="message-bubble ${bubbleClass} backdrop-blur-sm text-white p-4 lg:p-6 ${borderRadius} max-w-xs lg:max-w-2xl shadow-xl border border-white/10">
+                    <div class="text-sm leading-relaxed whitespace-pre-line">${content}</div>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function addTypingIndicator() {
+            const container = document.getElementById('messages-container');
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.className = 'flex items-start space-x-4 animate-fade-in';
+            
+            typingDiv.innerHTML = `
+                <div class="w-8 lg:w-10 h-8 lg:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg animate-pulse-scale">
+                    <span class="text-white text-xs lg:text-sm">🤖</span>
+                </div>
+                <div class="message-bubble bg-gradient-to-br from-gray-600/90 to-gray-700/90 backdrop-blur-sm text-white p-4 lg:p-6 rounded-2xl rounded-tl-lg max-w-xs lg:max-w-2xl shadow-xl border border-white/10">
+                    <div class="flex items-center space-x-2">
+                        <div class="text-sm">Agent swarm thinking</div>
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 bg-white/60 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 bg-white/60 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 bg-white/60 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(typingDiv);
+            typingDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        
+        function removeTypingIndicator() {
+            const typingDiv = document.getElementById('typing-indicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+        
+        function handleAIResponse(userMessage) {
+            let response = '';
+            
+            if (userMessage.toLowerCase().includes('cat')) {
+                response = `🐱 **Building Amazing Cat Website**
+
+I'll create a beautiful cat adoption website with:
+• Modern responsive design with purr-fect animations
+• Interactive cat gallery with detailed profiles
+• Adoption application forms and contact system
+• Mobile-optimized with smooth scrolling
+
+**🚀 Agent Assignments:**
+• Frontend Agent: Building React components & animations
+• Design Agent: Creating cat-themed UI/UX with custom illustrations  
+• Content Agent: Curating adorable cat photos and descriptions
+• Backend Agent: Setting up adoption form processing
+• DevOps Agent: Configuring deployment pipeline
+
+**⏱️ Estimated Time:** 2-3 hours
+**👥 Agents Required:** 5 specialized agents
+**🌐 Deployment:** Auto-deploy to your preferred hosting
+
+Starting build process now! 🎯`;
+
+            } else if (userMessage.toLowerCase().includes('portfolio')) {
+                response = `🎨 **Creating Stunning Portfolio Website**
+
+Building a professional portfolio that showcases your work beautifully:
+• Modern, minimalist design with smooth animations
+• Project showcase with interactive previews
+• About section with professional bio and skills
+• Contact form with social media integration
+• Dark/light mode toggle
+
+**🚀 Agent Assignments:**
+• UI/UX Agent: Designing modern interface layouts
+• Frontend Agent: Building responsive React components
+• Animation Agent: Adding subtle motion and transitions
+• Content Agent: Structuring portfolio sections
+• SEO Agent: Optimizing for search engines
+
+**⏱️ Estimated Time:** 3-4 hours
+**👥 Agents Required:** 5 specialized agents
+**🎯 Features:** Fully responsive, fast-loading, SEO-optimized
+
+Initiating portfolio creation sequence! ✨`;
+
+            } else if (userMessage.toLowerCase().includes('dashboard')) {
+                response = `📊 **Building Advanced React Dashboard**
+
+Creating a comprehensive dashboard with real-time data:
+• Interactive charts and graphs (Chart.js/D3)
+• Responsive grid layout with draggable widgets
+• Real-time data updates and filtering
+• Dark theme with beautiful gradients
+• Export functionality for reports
+
+**🚀 Agent Assignments:**
+• Data Visualization Agent: Implementing charts and graphs
+• Frontend Agent: Building React component architecture
+• Backend Agent: Setting up API endpoints and data processing
+• UI/UX Agent: Designing intuitive interface patterns
+• Performance Agent: Optimizing rendering and data loading
+
+**⏱️ Estimated Time:** 4-5 hours
+**👥 Agents Required:** 5 specialized agents
+**📈 Features:** Real-time updates, interactive visualizations
+
+Dashboard construction commencing! 🔥`;
+
+            } else {
+                response = `🤖 **Agent Swarm Ready for Action**
+
+I understand you want: "${userMessage}"
+
+**Analyzing Requirements...**
+• Breaking down your request into actionable tasks
+• Assigning specialized agents to each component
+• Calculating optimal development timeline
+• Preparing quality gates and testing protocols
+
+**🎯 Next Steps:**
+1. Detailed requirement analysis
+2. Agent assignment and coordination
+3. Parallel development execution
+4. Quality assurance and testing
+5. Deployment and optimization
+
+**💡 Pro Tip:** Be specific about features, technologies, or design preferences for even better results!
+
+Ready to build something extraordinary! 🚀`;
+            }
+            
+            addChatMessage('ai', response);
+        }
+        
+        function quickPrompt(prompt) {
+            document.getElementById('chat-input').value = prompt;
+            sendChatMessage();
+        }
+        
+        function handleEnterKey(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+        
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            const maxHeight = 120; // Max height in pixels (roughly 5 lines)
+            const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+            textarea.style.height = newHeight + 'px';
+            
+            // Update placeholder visibility based on content
+            const placeholder = textarea.nextElementSibling;
+            if (placeholder && placeholder.classList.contains('pointer-events-none')) {
+                placeholder.style.opacity = textarea.value.length > 0 ? '0' : '0.6';
+            }
+        }
+        
+        function clearMessages() {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = `
+                <div class="flex items-start space-x-4 animate-fade-in">
+                    <div class="w-8 lg:w-10 h-8 lg:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <span class="text-white text-xs lg:text-sm">🤖</span>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-600/90 to-purple-600/90 backdrop-blur-sm text-white p-4 lg:p-6 rounded-2xl rounded-tl-lg max-w-xs lg:max-w-2xl shadow-xl border border-white/10">
+                        <div class="text-sm leading-relaxed">
+                            <div class="font-semibold mb-2">🚀 Welcome back to Agent Swarm Console!</div>
+                            <p class="mb-3">Chat cleared! I'm ready to help you build amazing projects with unlimited AI power.</p>
+                            <div class="text-xs text-blue-100 bg-black/20 rounded-lg p-3 mt-4">
+                                <div class="font-medium mb-1">✨ What should we build next?</div>
+                                <div>Ask me to create anything - websites, apps, APIs, or tools!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            debugLog('=== AGENT SWARM CONSOLE LOADED ===', 'system');
+            debugLog('Chat interface ready for user interaction', 'success');
+            
+            // Focus the chat input
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.focus();
+            }
+            
+            // Add welcome animation
+            setTimeout(() => {
+                const welcomeMessage = document.querySelector('.animate-fade-in');
+                if (welcomeMessage) {
+                    welcomeMessage.style.animation = 'fadeIn 0.8s ease-out';
+                }
+            }, 100);
+        });
+
+        // Error handling
+        window.addEventListener('error', (event) => {
+            debugLog(`Global error: ${event.message}`, 'error', {
+                filename: event.filename,
+                line: event.lineno,
+                column: event.colno
+            });
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            debugLog(`Unhandled promise rejection: ${event.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>

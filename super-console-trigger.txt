@@ -1,0 +1,1 @@
+Trigger Super Console deployment workflow - Fix applied: Update Super Console branding and implement direct xAI API integration

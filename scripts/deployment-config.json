@@ -1,0 +1,196 @@
+{
+  "appwrite": {
+    "endpoint": "https://nyc.cloud.appwrite.io/v1",
+    "region": "nyc"
+  },
+  "projects": {
+    "recursion-chat": {
+      "name": "Recursion Chat",
+      "path": "active-projects/recursion-chat",
+      "projectId": "689bdaf500072795b0f6",
+      "siteId": "689cb6a9003b47a75929",
+      "buildDir": "client",
+      "buildCommand": "npm run build",
+      "outputDir": "client/dist",
+      "liveUrl": "https://chat.recursionsystems.com",
+      "directUrl": "https://689cb6a9003b47a75929.appwrite.global",
+      "envVars": {
+        "VITE_APPWRITE_ENDPOINT": "${appwrite.endpoint}",
+        "VITE_APPWRITE_PROJECT_ID": "${projectId}",
+        "VITE_APPWRITE_DATABASE_ID": "recursion_chat_db",
+        "VITE_USE_APPWRITE": "true",
+        "VITE_USE_APPWRITE_REALTIME": "true",
+        "VITE_APP_URL": "${liveUrl}"
+      },
+      "healthCheck": {
+        "enabled": true,
+        "endpoint": "/",
+        "expectedStatus": 200,
+        "timeout": 120
+      }
+    },
+    "trading-post": {
+      "name": "Trading Post",
+      "path": "active-projects/trading-post",
+      "projectId": "689bdee000098bd9d55c",
+      "siteId": "689cb415001a367e69f8",
+      "buildDir": "trading-app-frontend",
+      "buildCommand": "npm run build",
+      "outputDir": "trading-app-frontend/dist",
+      "liveUrl": "https://tradingpost.appwrite.network",
+      "directUrl": "https://689cb415001a367e69f8.appwrite.global",
+      "envVars": {
+        "VITE_APPWRITE_ENDPOINT": "${appwrite.endpoint}",
+        "VITE_APPWRITE_PROJECT_ID": "${projectId}",
+        "VITE_APPWRITE_DATABASE_ID": "trading_post_db",
+        "VITE_GITHUB_CLIENT_ID": "Ov23li8DbOD8r2LQcuOe"
+      },
+      "healthCheck": {
+        "enabled": true,
+        "endpoint": "/",
+        "expectedStatus": 200,
+        "timeout": 120
+      }
+    },
+    "slumlord": {
+      "name": "Slum Lord RPG",
+      "path": "active-projects/slumlord",
+      "projectId": "68a0db634634a6d0392f",
+      "siteId": "slumlord",
+      "buildDir": "web/appwrite-deployment",
+      "buildCommand": "npm run build",
+      "outputDir": "web/appwrite-deployment/dist",
+      "liveUrl": "https://slumlord.appwrite.network",
+      "directUrl": "https://slumlord.appwrite.global",
+      "envVars": {
+        "VITE_APPWRITE_ENDPOINT": "${appwrite.endpoint}",
+        "VITE_APPWRITE_PROJECT_ID": "${projectId}"
+      },
+      "healthCheck": {
+        "enabled": true,
+        "endpoint": "/",
+        "expectedStatus": 200,
+        "timeout": 120
+      }
+    },
+    "archon": {
+      "name": "Archon",
+      "path": "active-projects/archon",
+      "projectId": "68a4e3da0022f3e129d0",
+      "siteId": "archon",
+      "buildDir": "frontend",
+      "buildCommand": "npm run build",
+      "outputDir": "frontend/dist",
+      "liveUrl": "https://archon.appwrite.network",
+      "directUrl": "https://archon.appwrite.global",
+      "envVars": {
+        "VITE_APPWRITE_ENDPOINT": "${appwrite.endpoint}",
+        "VITE_APPWRITE_PROJECT_ID": "${projectId}",
+        "VITE_APPWRITE_FUNCTION_ID": "archon-backend"
+      },
+      "healthCheck": {
+        "enabled": true,
+        "endpoint": "/",
+        "expectedStatus": 200,
+        "timeout": 120
+      }
+    },
+    "console-appwrite-grok": {
+      "name": "Grok Console",
+      "path": "console-appwrite-grok",
+      "projectId": "68a4e3da0022f3e129d0",
+      "siteId": "grok-console",
+      "buildDir": ".",
+      "buildCommand": "npm run build",
+      "outputDir": "build",
+      "liveUrl": "https://grok-console.appwrite.network",
+      "directUrl": "https://grok-console.appwrite.global",
+      "envVars": {
+        "VITE_APPWRITE_ENDPOINT": "${appwrite.endpoint}",
+        "VITE_APPWRITE_PROJECT_ID": "${projectId}",
+        "VITE_GROK_API_KEY": "${env.GROK_API_KEY}"
+      },
+      "healthCheck": {
+        "enabled": true,
+        "endpoint": "/",
+        "expectedStatus": 200,
+        "timeout": 120
+      }
+    },
+    "enhanced-tech-lead-orchestrator": {
+      "name": "Tech Lead Orchestrator",
+      "path": "enhanced-tech-lead-orchestrator",
+      "projectId": "68a4e3da0022f3e129d0",
+      "siteId": "tech-orchestrator",
+      "buildDir": ".",
+      "buildCommand": "npm run sites:build",
+      "outputDir": "dist",
+      "liveUrl": "https://tech-orchestrator.appwrite.network",
+      "directUrl": "https://tech-orchestrator.appwrite.global",
+      "envVars": {
+        "VITE_APPWRITE_ENDPOINT": "${appwrite.endpoint}",
+        "VITE_APPWRITE_PROJECT_ID": "${projectId}"
+      },
+      "healthCheck": {
+        "enabled": true,
+        "endpoint": "/",
+        "expectedStatus": 200,
+        "timeout": 120
+      }
+    },
+    "gx-multi-agent-platform": {
+      "name": "GX Multi-Agent Platform",
+      "path": "active-projects/gx-multi-agent-platform",
+      "projectId": "68a4e3da0022f3e129d0",
+      "siteId": "gx-platform",
+      "buildDir": ".",
+      "buildCommand": "npm run build",
+      "outputDir": "dist",
+      "liveUrl": "https://gx-platform.appwrite.network",
+      "directUrl": "https://gx-platform.appwrite.global",
+      "envVars": {
+        "VITE_APPWRITE_ENDPOINT": "${appwrite.endpoint}",
+        "VITE_APPWRITE_PROJECT_ID": "${projectId}"
+      },
+      "healthCheck": {
+        "enabled": true,
+        "endpoint": "/",
+        "expectedStatus": 200,
+        "timeout": 120
+      }
+    }
+  },
+  "deployment": {
+    "timeout": 600000,
+    "retryAttempts": 3,
+    "retryDelay": 30000,
+    "healthCheckTimeout": 120000,
+    "rollbackOnFailure": true,
+    "parallelBuilds": false,
+    "cleanBuildCache": false,
+    "logLevel": "info",
+    "notifications": {
+      "slack": {
+        "enabled": false,
+        "webhookUrl": "${env.SLACK_WEBHOOK_URL}"
+      },
+      "email": {
+        "enabled": false,
+        "recipients": []
+      }
+    }
+  },
+  "github": {
+    "defaultBranch": "main",
+    "autoDeploy": true,
+    "deployOnTag": false,
+    "requiredChecks": [],
+    "protectedBranches": ["main", "master"]
+  },
+  "security": {
+    "apiKeySource": "environment",
+    "encryptSecrets": true,
+    "auditLogging": true,
+    "requireApproval": false
+  }
+}

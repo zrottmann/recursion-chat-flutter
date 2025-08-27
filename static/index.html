@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursion Chat - Flutter Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 600px;
+            margin: 20px;
+        }
+        
+        .logo {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        .status {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .status h3 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            color: #28a745;
+        }
+        
+        .feature-icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .github-link {
+            display: inline-block;
+            background: #24292e;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .github-link:hover {
+            background: #40464e;
+            transform: translateY(-2px);
+        }
+        
+        .flutter-link {
+            display: inline-block;
+            background: #0175c2;
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .flutter-link:hover {
+            background: #025a9c;
+            transform: translateY(-2px);
+        }
+        
+        .instructions {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .instructions h4 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .instructions code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">💬</div>
+        <h1>Recursion Chat</h1>
+        <div class="subtitle">Flutter Version - Stable & High Performance</div>
+        
+        <div class="status">
+            <h3>🚀 Flutter Project Ready</h3>
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>No React Error #301 infinite loops</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>Cross-platform (Web, iOS, Android, Desktop)</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>Material Design 3 UI</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>Real-time chat with Appwrite</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">✅</span>
+                <span>Stable authentication system</span>
+            </div>
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ Flutter Build Required</strong><br>
+            This project requires the Flutter SDK to build and run. Appwrite Sites currently doesn't support Flutter builds automatically.
+        </div>
+        
+        <div class="instructions">
+            <h4>🛠️ To Run This App:</h4>
+            <p>1. Install Flutter SDK</p>
+            <p>2. Clone the repository: <code>git clone https://github.com/zrottmann/recursion-chat-flutter.git</code></p>
+            <p>3. Install dependencies: <code>flutter pub get</code></p>
+            <p>4. Run the app: <code>flutter run -d chrome</code></p>
+            <p>5. Build for web: <code>flutter build web --release</code></p>
+        </div>
+        
+        <div>
+            <a href="https://github.com/zrottmann/recursion-chat-flutter" class="github-link" target="_blank">
+                📂 View on GitHub
+            </a>
+            <a href="https://docs.flutter.dev/get-started/install" class="flutter-link" target="_blank">
+                📘 Install Flutter
+            </a>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; color: #6c757d;">
+            <p><strong>Why Flutter?</strong></p>
+            <p>Eliminates React's infinite render loops and provides stable, high-performance chat experience across all platforms.</p>
+        </div>
+    </div>
+</body>
+</html>

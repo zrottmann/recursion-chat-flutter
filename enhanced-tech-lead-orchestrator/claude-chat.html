@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Claude Code UI - Real-Time Chat</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.connected { background: #4CAF50; }
+        .status-dot.connecting { background: #ffd93d; }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .chat-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #4CAF50;
+        }
+        
+        .connection-status {
+            font-size: 0.85em;
+            color: #888;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(180deg, #0a0a0a 0%, #151515 100%);
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        
+        .message.system {
+            justify-content: center;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+        
+        .user .message-avatar {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+        
+        .assistant .message-avatar {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+        }
+        
+        .system .message-avatar {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            width: 30px;
+            height: 30px;
+            font-size: 0.9em;
+        }
+        
+        .message-content {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        
+        .user .message-content {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .assistant .message-content {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .system .message-content {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            color: #ff9800;
+            text-align: center;
+            font-size: 0.85em;
+            max-width: 70%;
+        }
+        
+        .message-time {
+            font-size: 0.75em;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        
+        .chat-input {
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        
+        .input-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        .message-input {
+            width: 100%;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #fff;
+            font-size: 16px;
+            resize: none;
+            max-height: 120px;
+            min-height: 44px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        
+        .message-input:focus {
+            border-color: #4CAF50;
+        }
+        
+        .message-input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+        
+        .send-button:disabled {
+            background: #333;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 10px 20px;
+            color: #888;
+            font-style: italic;
+        }
+        
+        .typing-dots {
+            display: inline-block;
+        }
+        
+        .typing-dots:after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px 10px;
+            overflow-x: auto;
+        }
+        
+        .quick-action {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 15px;
+            padding: 8px 15px;
+            color: #ccc;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 0.85em;
+            transition: all 0.2s;
+        }
+        
+        .quick-action:hover {
+            background: #3a3a3a;
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .quick-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .connection-panel {
+            background: rgba(255, 152, 0, 0.1);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px;
+            text-align: center;
+        }
+        
+        .connection-panel h3 {
+            color: #ff9800;
+            margin-bottom: 10px;
+        }
+        
+        .connection-panel button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin: 5px;
+        }
+        
+        .connection-panel button:hover {
+            transform: scale(1.05);
+        }
+        
+        .error-message {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 10px 20px;
+            color: #f44336;
+            font-size: 0.9em;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .chat-header {
+                padding: 12px 15px;
+            }
+            
+            .chat-title {
+                font-size: 1.1em;
+            }
+            
+            .message-content {
+                max-width: 85%;
+                font-size: 0.95em;
+            }
+            
+            .chat-input {
+                padding: 15px;
+            }
+            
+            .message-input {
+                font-size: 16px; /* Prevent zoom on iOS */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .message-content {
+                max-width: 90%;
+            }
+            
+            .quick-actions {
+                padding: 0 15px 10px;
+            }
+            
+            .quick-action {
+                font-size: 0.8em;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div>
+                <div class="chat-title">🤖 Claude Code UI</div>
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span class="connection-status" id="connectionStatus">Connecting...</span>
+                </div>
+            </div>
+            <div style="font-size: 0.8em; color: #666;">
+                💬 Real-Time Chat
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="connection-panel" id="connectionPanel">
+                <h3>🚀 Claude Code UI Chat</h3>
+                <p>Connecting to real-time chat service...</p>
+                <button onclick="initializeChat()">Connect Now</button>
+                <button onclick="showHelp()">Help</button>
+            </div>
+        </div>
+        
+        <div class="quick-actions" id="quickActions">
+            <div class="quick-action" onclick="sendQuickMessage('status')" id="statusBtn" disabled>📊 Status</div>
+            <div class="quick-action" onclick="sendQuickMessage('help')" id="helpBtn">❓ Help</div>
+            <div class="quick-action" onclick="sendQuickMessage('list files')" id="filesBtn" disabled>📁 Files</div>
+            <div class="quick-action" onclick="sendQuickMessage('git status')" id="gitBtn" disabled>🔄 Git</div>
+            <div class="quick-action" onclick="sendQuickMessage('run tests')" id="testsBtn" disabled>🧪 Tests</div>
+            <div class="quick-action" onclick="sendQuickMessage('deploy')" id="deployBtn" disabled>🚀 Deploy</div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            Claude is thinking<span class="typing-dots"></span>
+        </div>
+        
+        <div class="chat-input">
+            <div class="input-container">
+                <textarea 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Type your command or question..."
+                    rows="1"
+                    disabled></textarea>
+            </div>
+            <button class="send-button" id="sendButton" onclick="sendMessage()" disabled>
+                ➤
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Appwrite configuration
+        const APPWRITE_CONFIG = {
+            endpoint: 'https://nyc.cloud.appwrite.io/v1',
+            projectId: '68a4e3da0022f3e129d0', // Update with actual project ID
+            databaseId: 'claude_chat_db',
+            chatCollectionId: 'messages',
+            roomsCollectionId: 'chatrooms',
+            functionId: 'chatroom-function'
+        };
+        
+        // Global state
+        let appwrite = null;
+        let currentRoomId = null;
+        let currentUserId = null;
+        let isConnected = false;
+        let realtimeSubscription = null;
+        
+        // Initialize chat system
+        async function initializeChat() {
+            try {
+                updateConnectionStatus('connecting', 'Initializing...');
+                
+                // Initialize Appwrite SDK (would be loaded from CDN)
+                if (typeof Appwrite === 'undefined') {
+                    await loadAppwriteSDK();
+                }
+                
+                // Initialize Appwrite client
+                appwrite = {
+                    client: new Appwrite.Client()
+                        .setEndpoint(APPWRITE_CONFIG.endpoint)
+                        .setProject(APPWRITE_CONFIG.projectId),
+                    account: null,
+                    databases: null,
+                    functions: null,
+                    realtime: null
+                };
+                
+                appwrite.account = new Appwrite.Account(appwrite.client);
+                appwrite.databases = new Appwrite.Databases(appwrite.client);
+                appwrite.functions = new Appwrite.Functions(appwrite.client);
+                appwrite.realtime = new Appwrite.Realtime(appwrite.client);
+                
+                // Create anonymous session or use existing
+                await createOrGetSession();
+                
+                // Create or join default room
+                await joinDefaultRoom();
+                
+                // Set up real-time subscriptions
+                await setupRealtimeSubscriptions();
+                
+                updateConnectionStatus('connected', 'Connected');
+                enableInterface();
+                hideConnectionPanel();
+                
+                addSystemMessage('Connected to Claude Code UI! Ready to help with your development tasks.');
+                
+            } catch (error) {
+                console.error('Chat initialization failed:', error);
+                updateConnectionStatus('disconnected', 'Connection failed');
+                showError(`Failed to connect: ${error.message}`);
+            }
+        }
+        
+        async function loadAppwriteSDK() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/appwrite@13.0.0/dist/iife/sdk.js';
+                script.onload = resolve;
+                script.onerror = () => reject(new Error('Failed to load Appwrite SDK'));
+                document.head.appendChild(script);
+            });
+        }
+        
+        async function createOrGetSession() {
+            try {
+                // Try to get current session
+                const session = await appwrite.account.getSession('current');
+                currentUserId = session.userId;
+                console.log('Using existing session:', currentUserId);
+            } catch (error) {
+                // Create anonymous session
+                const response = await appwrite.account.createAnonymousSession();
+                currentUserId = response.userId;
+                console.log('Created anonymous session:', currentUserId);
+            }
+        }
+        
+        async function joinDefaultRoom() {
+            try {
+                // Try to create or join a default public room
+                const response = await appwrite.functions.createExecution(
+                    APPWRITE_CONFIG.functionId,
+                    JSON.stringify({
+                        action: 'createRoom',
+                        userId: currentUserId,
+                        metadata: {
+                            name: 'Claude Code UI General Chat',
+                            description: 'General chat room for Claude Code UI users',
+                            isPrivate: false,
+                            maxParticipants: 100,
+                            grokEnabled: true
+                        }
+                    })
+                );
+                
+                const result = JSON.parse(response.response);
+                if (result.success) {
+                    currentRoomId = result.room.id;
+                    console.log('Joined room:', currentRoomId);
+                } else {
+                    throw new Error(result.error || 'Failed to join room');
+                }
+            } catch (error) {
+                console.error('Failed to join room:', error);
+                // Fallback to a default room ID if creation fails
+                currentRoomId = 'general-chat';
+            }
+        }
+        
+        async function setupRealtimeSubscriptions() {
+            if (!currentRoomId) return;
+            
+            // Subscribe to real-time messages for the current room
+            realtimeSubscription = appwrite.realtime.subscribe(
+                [`databases.${APPWRITE_CONFIG.databaseId}.collections.${APPWRITE_CONFIG.chatCollectionId}.documents`],
+                (response) => {
+                    console.log('Real-time update:', response);
+                    
+                    if (response.events.includes('databases.*.collections.*.documents.*.create')) {
+                        const message = response.payload;
+                        if (message.roomId === currentRoomId && message.userId !== currentUserId) {
+                            displayMessage(message);
+                        }
+                    }
+                }
+            );
+            
+            console.log('Real-time subscriptions established');
+        }
+        
+        function updateConnectionStatus(status, text) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('connectionStatus');
+            
+            statusDot.className = `status-dot ${status}`;
+            statusText.textContent = text;
+            isConnected = (status === 'connected');
+        }
+        
+        function enableInterface() {
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendButton').disabled = false;
+            
+            // Enable quick action buttons
+            const buttons = ['statusBtn', 'filesBtn', 'gitBtn', 'testsBtn', 'deployBtn'];
+            buttons.forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                    btn.removeAttribute('disabled');
+                }
+            });
+        }
+        
+        function hideConnectionPanel() {
+            const panel = document.getElementById('connectionPanel');
+            if (panel) {
+                panel.style.display = 'none';
+            }
+        }
+        
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.appendChild(errorDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Remove error after 10 seconds
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 10000);
+        }
+        
+        function addSystemMessage(content) {
+            addMessage(content, 'system', '🔧');
+        }
+        
+        function addMessage(content, type = 'user', avatar = null, time = new Date()) {
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            let displayAvatar = avatar;
+            if (!displayAvatar) {
+                displayAvatar = type === 'user' ? '👤' : 
+                              type === 'assistant' ? '🤖' : '🔧';
+            }
+            
+            const timeStr = time.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${displayAvatar}</div>
+                <div>
+                    <div class="message-content">${content}</div>
+                    <div class="message-time">${timeStr}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function displayMessage(messageData) {
+            const type = messageData.userId === 'grok' ? 'assistant' : 
+                        messageData.userId === 'system' ? 'system' : 'user';
+            const avatar = messageData.userId === 'grok' ? '🤖' : 
+                          messageData.userId === 'system' ? '🔧' : '👤';
+            
+            addMessage(messageData.content, type, avatar, new Date(messageData.timestamp));
+        }
+        
+        async function sendMessage() {
+            if (!isConnected || !currentRoomId) {
+                showError('Not connected to chat service. Please connect first.');
+                return;
+            }
+            
+            const input = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message immediately
+            addMessage(message, 'user');
+            
+            // Clear input and disable button
+            input.value = '';
+            input.style.height = 'auto';
+            sendButton.disabled = true;
+            
+            try {
+                // Send message via Appwrite function
+                const response = await appwrite.functions.createExecution(
+                    APPWRITE_CONFIG.functionId,
+                    JSON.stringify({
+                        action: 'sendMessage',
+                        roomId: currentRoomId,
+                        userId: currentUserId,
+                        message: {
+                            content: message,
+                            type: 'text',
+                            userName: `User_${currentUserId.substring(0, 8)}`
+                        }
+                    })
+                );
+                
+                const result = JSON.parse(response.response);
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to send message');
+                }
+                
+                // Check if this is a command that should get an AI response
+                if (shouldGetAIResponse(message)) {
+                    showTyping();
+                    await requestAIResponse(message);
+                }
+                
+            } catch (error) {
+                console.error('Failed to send message:', error);
+                showError(`Failed to send message: ${error.message}`);
+            } finally {
+                sendButton.disabled = false;
+                input.focus();
+                hideTyping();
+            }
+        }
+        
+        function shouldGetAIResponse(message) {
+            const commands = ['help', 'status', 'list', 'git', 'test', 'deploy', 'build', 'run', 'debug'];
+            const lowerMessage = message.toLowerCase();
+            return commands.some(cmd => lowerMessage.includes(cmd)) || 
+                   lowerMessage.includes('?') || 
+                   lowerMessage.includes('how') ||
+                   lowerMessage.includes('what') ||
+                   lowerMessage.includes('claude');
+        }
+        
+        async function requestAIResponse(prompt) {
+            try {
+                const response = await appwrite.functions.createExecution(
+                    APPWRITE_CONFIG.functionId,
+                    JSON.stringify({
+                        action: 'askGrok',
+                        roomId: currentRoomId,
+                        userId: currentUserId,
+                        prompt: prompt
+                    })
+                );
+                
+                const result = JSON.parse(response.response);
+                if (result.success) {
+                    // AI response will be received via real-time subscription
+                    console.log('AI response requested successfully');
+                } else {
+                    throw new Error(result.error || 'Failed to get AI response');
+                }
+            } catch (error) {
+                console.error('Failed to get AI response:', error);
+                addMessage('Sorry, I encountered an error processing your request. Please try again.', 'assistant');
+            }
+        }
+        
+        function showTyping() {
+            document.getElementById('typingIndicator').style.display = 'block';
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function hideTyping() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+        
+        function sendQuickMessage(message) {
+            document.getElementById('messageInput').value = message;
+            sendMessage();
+        }
+        
+        function showHelp() {
+            const helpText = `🤖 Claude Code UI Help
+
+Available Features:
+• Real-time chat with AI assistance
+• File operations and project management
+• Git version control integration
+• Testing and build automation
+• Deployment management
+
+Quick Commands:
+• "status" - Check system status
+• "list files" - View project files
+• "git status" - Check repository status
+• "run tests" - Execute test suite
+• "deploy" - Deploy application
+
+Getting Started:
+1. Click "Connect Now" to join the chat
+2. Use quick action buttons for common tasks
+3. Type natural language questions
+4. Get real-time responses from Claude AI
+
+For advanced features, ensure your development environment is properly configured with Claude Code Remote.`;
+
+            addSystemMessage(helpText);
+        }
+        
+        // Auto-resize textarea
+        const messageInput = document.getElementById('messageInput');
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+        
+        // Send on Enter (but allow Shift+Enter for new lines)
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Claude Code UI Chat loaded');
+            
+            // Add initial help message
+            setTimeout(() => {
+                addSystemMessage('Welcome to Claude Code UI! Click "Connect Now" to start chatting with AI assistance for your development tasks.');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+name: Deployment Notifications
+
+on:
+  workflow_call:
+    inputs:
+      deployment_status:
+        required: true
+        type: string
+      project_name:
+        required: false
+        type: string
+        default: 'Unknown Project'
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: false
+
+jobs:
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare Notification Data
+        id: prep
+        run: |
+          if [ "${{ inputs.deployment_status }}" = "success" ]; then
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+            echo "color=good" >> $GITHUB_OUTPUT
+            echo "title=Deployment Successful" >> $GITHUB_OUTPUT
+          elif [ "${{ inputs.deployment_status }}" = "failure" ]; then
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+            echo "color=danger" >> $GITHUB_OUTPUT
+            echo "title=Deployment Failed" >> $GITHUB_OUTPUT
+          else
+            echo "emoji=⚠️" >> $GITHUB_OUTPUT
+            echo "color=warning" >> $GITHUB_OUTPUT
+            echo "title=Deployment Status Unknown" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack Notification
+        if: secrets.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1.24.0
+        continue-on-error: true
+        with:
+          payload: |
+            {
+              "text": "${{ steps.prep.outputs.emoji }} ${{ steps.prep.outputs.title }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.prep.outputs.title }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project:*\n${{ inputs.project_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\n${{ inputs.deployment_status }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Actor:*\n${{ github.actor }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Details>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: GitHub Issue Notification (Fallback)
+        if: failure() && inputs.deployment_status == 'failure'
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            try {
+              const issue = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `Deployment Failed: ${context.payload.head_commit.message.substring(0, 50)}`,
+                body: `## Deployment Failure Report
+                
+                **Project**: ${{ inputs.project_name }}
+                **Branch**: ${{ github.ref_name }}
+                **Commit**: ${{ github.sha }}
+                **Actor**: ${{ github.actor }}
+                **Workflow Run**: [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+                
+                ### Action Required
+                Please investigate the deployment failure and take appropriate action.
+                
+                ---
+                *This issue was automatically created by the deployment pipeline.*`,
+                labels: ['deployment-failure', 'automated']
+              });
+              
+              console.log(`Created issue #${issue.data.number}`);
+            } catch (error) {
+              console.log('Could not create issue:', error.message);
+            }
+
+      - name: Create Summary
+        if: always()
+        run: |
+          echo "## Notification Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ inputs.deployment_status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Project**: ${{ inputs.project_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Slack Notification**: ${{ secrets.SLACK_WEBHOOK_URL != '' && 'Sent' || 'Skipped (no webhook)' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY

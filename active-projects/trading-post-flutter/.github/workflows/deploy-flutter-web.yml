@@ -1,0 +1,115 @@
+name: Deploy Flutter Web to Appwrite Sites
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'lib/**'
+      - 'web/**'
+      - 'pubspec.yaml'
+      - '.github/workflows/deploy-flutter-web.yml'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+    
+    - name: Install dependencies
+      run: flutter pub get
+    
+    - name: Build Flutter Web
+      run: |
+        flutter build web --release --web-renderer canvaskit
+        echo "✅ Flutter web build complete"
+    
+    - name: Prepare deployment package
+      run: |
+        cd build/web
+        # Create package.json for Appwrite Sites
+        echo '{
+          "name": "trading-post-flutter-web",
+          "version": "1.0.0",
+          "description": "Flutter Trading Post Web App",
+          "scripts": {
+            "start": "python3 -m http.server 8000"
+          }
+        }' > package.json
+        
+        # Create deployment archive
+        tar -czf ../../flutter-web-deploy.tar.gz .
+        cd ../..
+        echo "📦 Deployment package created"
+    
+    - name: Deploy to Appwrite Sites
+      env:
+        APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+        APPWRITE_PROJECT_ID: ${{ secrets.APPWRITE_PROJECT_ID }}
+        APPWRITE_SITE_ID: ${{ secrets.APPWRITE_SITE_ID }}
+      run: |
+        # Deploy Flutter web build to Appwrite
+        node -e "
+        const https = require('https');
+        const fs = require('fs');
+        
+        const fileData = fs.readFileSync('flutter-web-deploy.tar.gz');
+        const boundary = '----WebKitFormBoundary' + Date.now();
+        
+        let body = '';
+        body += '--' + boundary + '\\r\\n';
+        body += 'Content-Disposition: form-data; name=\"activate\"\\r\\n\\r\\n';
+        body += 'true\\r\\n';
+        body += '--' + boundary + '\\r\\n';
+        body += 'Content-Disposition: form-data; name=\"code\"; filename=\"flutter-web.tar.gz\"\\r\\n';
+        body += 'Content-Type: application/gzip\\r\\n\\r\\n';
+        
+        const bodyBuffer = Buffer.concat([
+          Buffer.from(body),
+          fileData,
+          Buffer.from('\\r\\n--' + boundary + '--\\r\\n')
+        ]);
+        
+        const options = {
+          hostname: 'nyc.cloud.appwrite.io',
+          port: 443,
+          path: '/v1/sites/' + process.env.APPWRITE_SITE_ID + '/deployments',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data; boundary=' + boundary,
+            'Content-Length': bodyBuffer.length,
+            'X-Appwrite-Project': process.env.APPWRITE_PROJECT_ID,
+            'X-Appwrite-Key': process.env.APPWRITE_API_KEY
+          }
+        };
+        
+        const req = https.request(options, (res) => {
+          let data = '';
+          res.on('data', chunk => data += chunk);
+          res.on('end', () => {
+            console.log('Deploy Status:', res.statusCode);
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              console.log('✅ Flutter Web deployed successfully!');
+              console.log('🌐 Site: https://tradingpost.appwrite.network');
+            } else {
+              console.log('❌ Deployment failed:', data);
+              process.exit(1);
+            }
+          });
+        });
+        
+        req.on('error', e => {
+          console.log('❌ Request error:', e.message);
+          process.exit(1);
+        });
+        
+        req.write(bodyBuffer);
+        req.end();
+        "

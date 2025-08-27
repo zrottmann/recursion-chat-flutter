@@ -1,0 +1,89 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/flutter_exports_environment.sh
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Node modules
+node_modules/
+dist/
+.next/
+
+# Large files that should not be tracked
+digest.txt
+gh.exe
+gh-cli/
+repomix-output.xml
+*.exe
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Claude specific
+.claude/settings.local.json
+
+# Security - Environment Variables
+*.env
+.env*
+!.env.example
+!.env.template
+
+# Security - Secrets and Keys
+/secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa*
+id_dsa*
+id_ed25519*
+id_ecdsa*

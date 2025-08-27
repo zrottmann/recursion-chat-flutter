@@ -1,0 +1,19 @@
+{
+    "name": "claude-code-remote-flutter-ui",
+    "version": "2.0.0",
+    "description": "Claude Code Remote with Flutter Web Integration",
+    "main": "flutter-web-claude-ui.html",
+    "type": "commonjs",
+    "dependencies": {
+        "express": "^4.18.2"
+    },
+    "scripts": {
+        "start": "node index.js",
+        "build": "cp flutter-web-claude-ui.html index.html",
+        "sites:build": "cp flutter-web-claude-ui.html index.html && echo 'Flutter UI ready for deployment'",
+        "deploy": "node deploy-flutter-remote.js"
+    },
+    "keywords": ["claude", "remote", "flutter", "web", "ui", "mobile"],
+    "author": "Claude Code Remote Team",
+    "license": "MIT"
+}

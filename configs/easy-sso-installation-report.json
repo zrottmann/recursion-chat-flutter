@@ -1,0 +1,78 @@
+{
+  "timestamp": "2025-08-23T21:38:27.497Z",
+  "summary": {
+    "total": 6,
+    "successful": 5,
+    "failed": 1
+  },
+  "results": [
+    {
+      "project": "Recursion Chat",
+      "success": true,
+      "actions": [
+        "Appwrite dependency already present",
+        "Copied easy-appwrite-sso.js service",
+        "Copied EasySSOButton.jsx component",
+        "Created example integration: AuthExample.jsx",
+        "Updated/created environment configuration",
+        "Created OAuth callback pages"
+      ],
+      "projectPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\active-projects\\recursion-chat\\client"
+    },
+    {
+      "project": "Trading Post Frontend",
+      "success": true,
+      "actions": [
+        "Appwrite dependency already present",
+        "Copied easy-appwrite-sso.js service",
+        "Copied EasySSOButton.jsx component",
+        "Created example integration: AuthExample.jsx",
+        "Updated/created environment configuration",
+        "Created OAuth callback pages"
+      ],
+      "projectPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\active-projects\\trading-post\\trading-app-frontend"
+    },
+    {
+      "project": "Archon Knowledge Engine",
+      "success": true,
+      "actions": [
+        "Appwrite dependency already present",
+        "Copied easy-appwrite-sso.js service",
+        "Copied EasySSOButton.jsx component",
+        "Created example integration: AuthExample.jsx",
+        "Updated/created environment configuration",
+        "Created OAuth callback pages"
+      ],
+      "projectPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\active-projects\\archon\\frontend"
+    },
+    {
+      "project": "Claude Code Remote",
+      "success": true,
+      "actions": [
+        "Installed appwrite dependency",
+        "Copied easy-appwrite-sso.js service",
+        "Copied EasySSOButton.jsx component",
+        "Created example integration: auth-example.js",
+        "Updated/created environment configuration",
+        "Created OAuth callback pages"
+      ],
+      "projectPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\active-projects\\Claude-Code-Remote"
+    },
+    {
+      "project": "Slumlord Web",
+      "success": true,
+      "actions": [
+        "Appwrite dependency already present",
+        "Copied easy-appwrite-sso.js service",
+        "Created example integration: auth-example.js",
+        "Updated/created environment configuration"
+      ],
+      "projectPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\active-projects\\slumlord\\web\\appwrite-deployment"
+    },
+    {
+      "project": "Super Console",
+      "success": false,
+      "error": "package.json not found in project directory"
+    }
+  ]
+}

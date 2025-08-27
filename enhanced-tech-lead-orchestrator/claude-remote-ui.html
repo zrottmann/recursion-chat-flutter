@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Remote - Interactive UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .chat-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #6366f1;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <div class="gradient-bg p-4 shadow-lg">
+        <div class="container mx-auto max-w-6xl">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">🤖</div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Claude Code Remote</h1>
+                        <p class="text-sm text-white/80">Interactive UI + Remote Control</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-green-400">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm">Live at remote.appwrite.network</span>
+                    </div>
+                    <button id="toggleMode" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-exchange-alt mr-1"></i>Switch Mode
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto max-w-6xl p-4">
+        <!-- Mode Toggle -->
+        <div class="mb-6">
+            <div class="flex bg-gray-800 rounded-lg p-1 w-fit mx-auto">
+                <button id="chatModeBtn" class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-blue-600 text-white">
+                    <i class="fas fa-comments mr-2"></i>Chat UI
+                </button>
+                <button id="remoteModeBtn" class="px-4 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:text-white">
+                    <i class="fas fa-satellite-dish mr-2"></i>Remote Control
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat UI Mode -->
+        <div id="chatMode" class="space-y-6">
+            <div class="bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+                <!-- Chat Header -->
+                <div class="bg-gray-700 px-6 py-4 border-b border-gray-600">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold">Claude Code Chat</h3>
+                            <p class="text-sm text-gray-300">Direct interaction with Claude Code</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button id="clearChat" class="text-gray-400 hover:text-white transition-colors" title="Clear Chat">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button id="exportChat" class="text-gray-400 hover:text-white transition-colors" title="Export Chat">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chatMessages" class="chat-container p-6 space-y-4 bg-gray-800">
+                    <div class="flex justify-start slide-up">
+                        <div class="max-w-[80%] bg-gray-700 rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-robot text-blue-400"></i>
+                                <span class="text-sm font-medium text-blue-400">Claude Code</span>
+                                <span class="text-xs text-gray-500">Just now</span>
+                            </div>
+                            <p class="text-gray-100">👋 Welcome to Claude Code Remote UI! I'm ready to help you with:</p>
+                            <ul class="mt-2 text-sm text-gray-300 list-disc list-inside">
+                                <li>Code analysis and debugging</li>
+                                <li>Project development assistance</li>
+                                <li>File operations and management</li>
+                                <li>System administration tasks</li>
+                            </ul>
+                            <p class="mt-2 text-sm text-gray-400">How can I assist you today?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="px-6 pb-2">
+                    <div class="flex justify-start">
+                        <div class="max-w-[80%] bg-gray-700 rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-robot text-blue-400"></i>
+                                <span class="text-sm font-medium text-blue-400">Claude Code</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <span class="ml-2 text-sm text-gray-400">is thinking...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="border-t border-gray-600 p-4 bg-gray-750">
+                    <div class="flex gap-3">
+                        <div class="flex-1">
+                            <textarea
+                                id="chatInput"
+                                placeholder="Ask Claude Code anything... (Press Ctrl+Enter to send)"
+                                class="w-full bg-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                rows="2"
+                            ></textarea>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <button
+                                id="sendMessage"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                            >
+                                <i class="fas fa-paper-plane"></i>
+                                Send
+                            </button>
+                            <button
+                                id="voiceInput"
+                                class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-lg transition-colors flex items-center justify-center"
+                                title="Voice Input"
+                            >
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <button class="quick-action bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-colors" data-command="analyze this codebase">
+                            <i class="fas fa-search mr-1"></i>Analyze Code
+                        </button>
+                        <button class="quick-action bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-colors" data-command="run tests">
+                            <i class="fas fa-vial mr-1"></i>Run Tests
+                        </button>
+                        <button class="quick-action bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-colors" data-command="deploy to production">
+                            <i class="fas fa-rocket mr-1"></i>Deploy
+                        </button>
+                        <button class="quick-action bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-colors" data-command="check system status">
+                            <i class="fas fa-heartbeat mr-1"></i>System Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remote Control Mode -->
+        <div id="remoteMode" class="space-y-6 hidden">
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Remote Control Features -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-satellite-dish text-blue-400"></i>
+                        Remote Control
+                    </h2>
+                    <p class="text-gray-300 mb-6">Control Claude Code remotely via multiple messaging platforms</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
+                            <i class="fas fa-envelope text-red-400 text-xl"></i>
+                            <div>
+                                <h4 class="font-semibold">Email Commands</h4>
+                                <p class="text-sm text-gray-400">Send tasks via email notifications</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
+                            <i class="fab fa-discord text-indigo-400 text-xl"></i>
+                            <div>
+                                <h4 class="font-semibold">Discord Integration</h4>
+                                <p class="text-sm text-gray-400">Control via Discord bot commands</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
+                            <i class="fab fa-telegram-plane text-blue-400 text-xl"></i>
+                            <div>
+                                <h4 class="font-semibold">Telegram Bot</h4>
+                                <p class="text-sm text-gray-400">Instant commands via Telegram</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setup Instructions -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-cog text-green-400"></i>
+                        Quick Setup
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-900 rounded-lg p-4">
+                            <pre class="text-green-400 text-sm overflow-x-auto"><code>git clone https://github.com/zrottmann/Claude-Code-Remote.git
+cd Claude-Code-Remote && npm install
+cp .env.example .env
+# Edit .env with your credentials
+npm run daemon:start</code></pre>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <a href="https://github.com/zrottmann/Claude-Code-Remote" target="_blank" 
+                               class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2">
+                                <i class="fab fa-github"></i>
+                                View on GitHub
+                            </a>
+                            <button id="copySetup" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2">
+                                <i class="fas fa-copy"></i>
+                                Copy Setup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gray-800 rounded-lg p-4 text-center">
+                    <div class="text-3xl mb-2">🚀</div>
+                    <h4 class="font-semibold mb-1">Start Tasks Remotely</h4>
+                    <p class="text-sm text-gray-400">Send commands from anywhere</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center">
+                    <div class="text-3xl mb-2">🔔</div>
+                    <h4 class="font-semibold mb-1">Real-time Notifications</h4>
+                    <p class="text-sm text-gray-400">Instant task completion alerts</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center">
+                    <div class="text-3xl mb-2">💬</div>
+                    <h4 class="font-semibold mb-1">Reply to Continue</h4>
+                    <p class="text-sm text-gray-400">Simple reply-based workflow</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <h4 class="font-semibold mb-1">Secure & Private</h4>
+                    <p class="text-sm text-gray-400">Encrypted communications</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-12 py-6">
+        <div class="container mx-auto max-w-6xl px-4 text-center text-gray-400">
+            <p>&copy; 2024 Claude Code Remote. Open source project for remote Claude control.</p>
+        </div>
+    </footer>
+
+    <script>
+        let isLoading = false;
+        let messageId = 0;
+
+        // DOM Elements
+        const chatModeBtn = document.getElementById('chatModeBtn');
+        const remoteModeBtn = document.getElementById('remoteModeBtn');
+        const chatMode = document.getElementById('chatMode');
+        const remoteMode = document.getElementById('remoteMode');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessage = document.getElementById('sendMessage');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const clearChat = document.getElementById('clearChat');
+        const exportChat = document.getElementById('exportChat');
+        const quickActions = document.querySelectorAll('.quick-action');
+        const voiceInput = document.getElementById('voiceInput');
+        const copySetup = document.getElementById('copySetup');
+
+        // Mode Switching
+        chatModeBtn.addEventListener('click', () => switchMode('chat'));
+        remoteModeBtn.addEventListener('click', () => switchMode('remote'));
+        document.getElementById('toggleMode').addEventListener('click', () => {
+            const currentMode = chatMode.classList.contains('hidden') ? 'remote' : 'chat';
+            switchMode(currentMode === 'chat' ? 'remote' : 'chat');
+        });
+
+        function switchMode(mode) {
+            if (mode === 'chat') {
+                chatMode.classList.remove('hidden');
+                remoteMode.classList.add('hidden');
+                chatModeBtn.classList.add('bg-blue-600', 'text-white');
+                chatModeBtn.classList.remove('text-gray-300');
+                remoteModeBtn.classList.remove('bg-blue-600', 'text-white');
+                remoteModeBtn.classList.add('text-gray-300');
+            } else {
+                chatMode.classList.add('hidden');
+                remoteMode.classList.remove('hidden');
+                remoteModeBtn.classList.add('bg-blue-600', 'text-white');
+                remoteModeBtn.classList.remove('text-gray-300');
+                chatModeBtn.classList.remove('bg-blue-600', 'text-white');
+                chatModeBtn.classList.add('text-gray-300');
+            }
+        }
+
+        // Chat Functionality
+        function addMessage(content, isUser = false, isSystem = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} slide-up`;
+            
+            const now = new Date().toLocaleTimeString();
+            const messageClass = isUser ? 'bg-blue-600' : isSystem ? 'bg-orange-600' : 'bg-gray-700';
+            const iconClass = isUser ? 'fas fa-user' : isSystem ? 'fas fa-exclamation-triangle' : 'fas fa-robot';
+            const nameClass = isUser ? 'text-blue-200' : isSystem ? 'text-orange-200' : 'text-blue-400';
+            const senderName = isUser ? 'You' : isSystem ? 'System' : 'Claude Code';
+            
+            messageDiv.innerHTML = `
+                <div class="max-w-[80%] ${messageClass} rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="${iconClass} ${nameClass}"></i>
+                        <span class="text-sm font-medium ${nameClass}">${senderName}</span>
+                        <span class="text-xs text-gray-300">${now}</span>
+                    </div>
+                    <div class="text-gray-100 whitespace-pre-wrap">${content}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            messageId++;
+        }
+
+        async function sendChatMessage() {
+            if (isLoading) return;
+            
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            isLoading = true;
+            addMessage(message, true);
+            chatInput.value = '';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            typingIndicator.querySelector('.typing-indicator').style.display = 'flex';
+            
+            try {
+                // Simulate Claude Code processing
+                await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 2000));
+                
+                // Generate response based on message content
+                let response = generateClaudeResponse(message);
+                
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                // Add Claude's response
+                addMessage(response, false);
+                
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                addMessage('⚠️ Connection error. This is a demo interface. For actual Claude Code integration, please set up the remote daemon following the setup instructions.', false, true);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function generateClaudeResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('analyze') || lowerMessage.includes('code')) {
+                return `🔍 I'll analyze the codebase for you. This would typically involve:
+
+• Scanning file structure and dependencies
+• Identifying potential issues and improvements
+• Checking code quality and standards
+• Generating a comprehensive analysis report
+
+*Note: This is a demo interface. For actual code analysis, please set up the Claude Code Remote daemon.*`;
+            }
+            
+            if (lowerMessage.includes('test')) {
+                return `🧪 Running tests... This would execute:
+
+• Unit tests across all modules
+• Integration tests for API endpoints
+• End-to-end testing scenarios
+• Generate test coverage reports
+
+*Demo mode: No actual tests executed. Set up the remote daemon for real functionality.*`;
+            }
+            
+            if (lowerMessage.includes('deploy')) {
+                return `🚀 Deployment process initiated:
+
+✅ Building production assets
+✅ Running pre-deployment checks
+✅ Uploading to staging environment
+⏳ Waiting for approval to production
+
+*Demo interface: No actual deployment. Use the remote setup for real deployments.*`;
+            }
+            
+            if (lowerMessage.includes('status') || lowerMessage.includes('system')) {
+                return `📊 System Status Check:
+
+🟢 Services: All operational
+🟢 Database: Connected (latency: 23ms)
+🟢 API: Responding normally
+🟢 Storage: 78% available
+🟡 Cache: Needs refresh
+
+*Demo data shown. Real system monitoring available via remote daemon.*`;
+            }
+            
+            // Default responses
+            const responses = [
+                `I understand you want help with: "${message}"\n\n🤖 As this is the demo interface, I can show you what Claude Code would do, but for actual execution, please set up the remote daemon following the setup instructions in the Remote Control tab.`,
+                `Interesting request! "${message}"\n\n💡 In a live environment, I would:\n• Process your request immediately\n• Provide real-time updates\n• Execute the requested actions\n• Send notifications when complete\n\n*Set up the remote daemon for full functionality.*`,
+                `I'd be happy to help with: "${message}"\n\n⚡ This demo shows the UI interface. For actual Claude Code integration:\n\n1. Follow the setup instructions\n2. Configure your messaging platforms\n3. Start the remote daemon\n4. Send commands from anywhere!`
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Event Listeners
+        sendMessage.addEventListener('click', sendChatMessage);
+        
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                sendChatMessage();
+            } else if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', () => {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+        });
+
+        // Quick Actions
+        quickActions.forEach(button => {
+            button.addEventListener('click', () => {
+                const command = button.dataset.command;
+                chatInput.value = command;
+                sendChatMessage();
+            });
+        });
+
+        // Clear Chat
+        clearChat.addEventListener('click', () => {
+            const messages = chatMessages.querySelectorAll('.slide-up');
+            messages.forEach((msg, index) => {
+                if (index > 0) { // Keep the welcome message
+                    msg.remove();
+                }
+            });
+        });
+
+        // Export Chat
+        exportChat.addEventListener('click', () => {
+            const messages = Array.from(chatMessages.querySelectorAll('.slide-up')).map(msg => {
+                const sender = msg.querySelector('.text-sm.font-medium').textContent;
+                const time = msg.querySelector('.text-xs').textContent;
+                const content = msg.querySelector('.whitespace-pre-wrap').textContent;
+                return `[${time}] ${sender}: ${content}`;
+            }).join('\n\n');
+            
+            const blob = new Blob([messages], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `claude-chat-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Voice Input (placeholder)
+        voiceInput.addEventListener('click', () => {
+            addMessage('🎤 Voice input feature coming soon! For now, please type your commands.', false, true);
+        });
+
+        // Copy Setup Command
+        copySetup.addEventListener('click', () => {
+            const setupText = `git clone https://github.com/zrottmann/Claude-Code-Remote.git
+cd Claude-Code-Remote && npm install
+cp .env.example .env
+# Edit .env with your credentials
+npm run daemon:start`;
+            
+            navigator.clipboard.writeText(setupText).then(() => {
+                copySetup.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    copySetup.innerHTML = '<i class="fas fa-copy"></i> Copy Setup';
+                }, 2000);
+            });
+        });
+
+        // Auto-focus chat input when in chat mode
+        chatModeBtn.addEventListener('click', () => {
+            setTimeout(() => chatInput.focus(), 100);
+        });
+        
+        // Initial focus
+        chatInput.focus();
+    </script>
+</body>
+</html>

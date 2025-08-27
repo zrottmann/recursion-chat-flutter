@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="/">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Recursion Chat - Flutter chat application with Slumlord game">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Recursion Chat">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <title>Recursion Chat</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6366F1">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    .loading-container {
+      text-align: center;
+      color: white;
+    }
+    
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      font-size: 18px;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+    
+    .app-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .app-subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-container" id="loading">
+    <div class="app-title">Recursion Chat</div>
+    <div class="app-subtitle">Flutter Chat with Slumlord Game</div>
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading application...</div>
+  </div>
+
+  <script>
+    // Service worker registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('flutter-first-frame', function () {
+        navigator.serviceWorker.register('flutter_service_worker.js');
+      });
+    }
+  </script>
+  
+  <!-- This script installs service_worker.js to provide PWA functionality -->
+  <script src="flutter.js" defer></script>
+  
+  <script>
+    window.addEventListener('load', function(ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: '1.0.0',
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+            // Hide loading screen once app starts
+            setTimeout(() => {
+              document.getElementById('loading').style.display = 'none';
+            }, 1000);
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

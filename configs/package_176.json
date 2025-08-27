@@ -1,0 +1,9 @@
+{
+  "name": "grok-api-robust",
+  "version": "1.0.0",
+  "description": "Robust Grok API with fallback support",
+  "main": "index.js",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}

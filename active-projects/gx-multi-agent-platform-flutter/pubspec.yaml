@@ -1,0 +1,110 @@
+name: gx_multi_agent_platform
+description: "Sophisticated Flutter dashboard for AI agent orchestration and management with real-time monitoring and beautiful data visualizations"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+  flutter: ">=3.13.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI and Animations
+  flutter_animate: ^4.5.0        # Declarative animations
+  glassmorphism_ui: ^0.3.0      # Glass morphism effects  
+  shimmer: ^3.0.0               # Shimmer loading effects
+  google_fonts: ^6.1.0           # Beautiful typography
+  dynamic_color: ^1.6.8          # Material You colors
+  flutter_staggered_grid_view: ^0.7.0  # Staggered layouts
+  flutter_staggered_animations: ^1.1.1  # Staggered animations
+  flutter_card_swiper: ^6.2.0    # Card swiping animations
+  
+  # Advanced Visual Effects
+  rive: ^0.12.4                  # Complex vector animations
+  lottie: ^3.0.0                 # After Effects animations  
+  particles_flutter: ^0.1.4      # Particle effects
+  flutter_cube: ^0.1.1           # 3D rendering
+  
+  # Charts and Data Visualization
+  fl_chart: ^0.66.2              # Beautiful charts
+  syncfusion_flutter_charts: ^24.1.41  # Advanced charts
+  syncfusion_flutter_gauges: ^24.1.41  # Progress gauges
+  percent_indicator: ^4.2.3       # Progress indicators
+  
+  # Real-time and WebSocket
+  web_socket_channel: ^2.4.0     # WebSocket connectivity
+  socket_io_client: ^2.0.3       # Socket.IO client
+  signalr_netcore: ^1.3.7        # SignalR for real-time updates
+  
+  # State Management
+  flutter_riverpod: ^2.4.10      # Advanced state management
+  riverpod_annotation: ^2.3.5    # Annotations for Riverpod
+  
+  # Storage and Preferences
+  shared_preferences: ^2.2.2     # Local storage
+  sqflite: ^2.3.0                # SQLite database
+  hive: ^2.2.3                   # Fast NoSQL database
+  hive_flutter: ^1.1.0           # Hive Flutter integration
+  
+  # HTTP and API
+  dio: ^5.4.0                    # Advanced HTTP client
+  json_annotation: ^4.8.1        # JSON serialization
+  
+  # Utilities
+  collection: ^1.18.0            # Collection utilities
+  uuid: ^4.3.3                   # UUID generation
+  intl: ^0.19.0                  # Internationalization
+  equatable: ^2.0.5              # Value equality
+  freezed_annotation: ^2.4.1     # Data classes
+  
+  # Platform Integration
+  url_launcher: ^6.2.4           # Launch URLs
+  path_provider: ^2.1.2          # File system paths
+  device_info_plus: ^9.1.2       # Device information
+  connectivity_plus: ^5.0.2      # Network connectivity
+  
+  # Authentication (if needed)
+  appwrite: ^12.0.0              # Backend services
+  firebase_auth: ^4.17.8         # Firebase authentication
+  local_auth: ^2.1.7             # Biometric authentication
+  
+  # Development
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  
+  # Code Generation
+  build_runner: ^2.4.7
+  json_serializable: ^6.7.1
+  freezed: ^2.4.7
+  riverpod_generator: ^2.3.11
+  custom_lint: ^0.5.7
+  riverpod_lint: ^2.3.10
+
+flutter:
+  uses-material-design: true
+  
+  # Assets
+  assets:
+    - assets/images/
+    - assets/animations/
+    - assets/icons/
+    - assets/rive/
+    
+  # Fonts (Google Fonts handles most fonts automatically)
+  fonts:
+    - family: Orbitron
+      fonts:
+        - asset: assets/fonts/Orbitron-Regular.ttf
+        - asset: assets/fonts/Orbitron-Bold.ttf
+          weight: 700
+    - family: JetBrainsMono  
+      fonts:
+        - asset: assets/fonts/JetBrainsMono-Regular.ttf
+        - asset: assets/fonts/JetBrainsMono-Bold.ttf
+          weight: 700

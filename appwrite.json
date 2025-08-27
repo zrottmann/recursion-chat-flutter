@@ -1,0 +1,147 @@
+{
+  "projectId": "67432fe4001a2ab30fb8",
+  "projectName": "Recursion Chat Flutter",
+  "functions": [],
+  "databases": [
+    {
+      "databaseId": "67432fe4001a2ab30fb8",
+      "name": "recursion_chat",
+      "collections": [
+        {
+          "collectionId": "users",
+          "name": "Users",
+          "attributes": [
+            {
+              "key": "user_id",
+              "type": "string",
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "email",
+              "type": "string",
+              "size": 320,
+              "required": true
+            },
+            {
+              "key": "username",
+              "type": "string",
+              "size": 100,
+              "required": true
+            },
+            {
+              "key": "name",
+              "type": "string",
+              "size": 255,
+              "required": false
+            },
+            {
+              "key": "created_at",
+              "type": "datetime",
+              "required": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "user_id_index",
+              "type": "unique",
+              "attributes": ["user_id"]
+            },
+            {
+              "key": "email_index",
+              "type": "unique", 
+              "attributes": ["email"]
+            }
+          ]
+        },
+        {
+          "collectionId": "rooms",
+          "name": "Chat Rooms",
+          "attributes": [
+            {
+              "key": "name",
+              "type": "string",
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "description",
+              "type": "string",
+              "size": 500,
+              "required": false
+            },
+            {
+              "key": "member_count",
+              "type": "integer",
+              "required": true,
+              "default": 0
+            }
+          ]
+        },
+        {
+          "collectionId": "messages",
+          "name": "Chat Messages",
+          "attributes": [
+            {
+              "key": "content",
+              "type": "string",
+              "size": 2000,
+              "required": true
+            },
+            {
+              "key": "user_id",
+              "type": "string",
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "username",
+              "type": "string",
+              "size": 100,
+              "required": true
+            },
+            {
+              "key": "room_id",
+              "type": "string", 
+              "size": 255,
+              "required": true
+            },
+            {
+              "key": "is_ai",
+              "type": "boolean",
+              "required": true,
+              "default": false
+            },
+            {
+              "key": "timestamp",
+              "type": "datetime",
+              "required": true
+            }
+          ],
+          "indexes": [
+            {
+              "key": "room_messages",
+              "type": "key",
+              "attributes": ["room_id", "timestamp"]
+            },
+            {
+              "key": "user_messages",
+              "type": "key",
+              "attributes": ["user_id"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "storage": {
+    "buckets": []
+  },
+  "auth": {
+    "providers": {
+      "email": true,
+      "google": true,
+      "github": true
+    }
+  }
+}

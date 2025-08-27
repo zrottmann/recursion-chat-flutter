@@ -1,0 +1,11 @@
+{
+  "name": "enhanced-tech-lead-orchestrator-web",
+  "version": "1.0.4",
+  "description": "Enhanced Tech-Lead Orchestrator Web Interface for Appwrite Sites",
+  "main": "index.html",
+  "scripts": {
+    "install": "echo 'Installing Enhanced Tech-Lead Orchestrator...' && cp ../examples/demo-operations-center-enhanced.html ./index.html && cp ../mobile-operations-center.html ./mobile.html && echo 'Deployment ready!'"
+  },
+  "dependencies": {},
+  "keywords": ["orchestrator", "appwrite", "tech-lead", "ai"]
+}

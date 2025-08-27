@@ -1,0 +1,25 @@
+{
+  "name": "Task Management App",
+  "description": "A simple task management application with user authentication",
+  "features": {
+    "api": true,
+    "database": true,
+    "authentication": true,
+    "frontend": true,
+    "realTime": false,
+    "mobile": false
+  },
+  "scale": "simple",
+  "performance": {
+    "highLoad": false,
+    "realTime": false
+  },
+  "security": {
+    "compliance": false,
+    "encryption": true
+  },
+  "timeline": {
+    "deadline": "2025-02-15",
+    "urgent": false
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "super-site-function",
+  "version": "1.0.0",
+  "description": "Fast HTML response function for Console Appwrite Grok - super.appwrite.network",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Function ready for deployment\" && exit 0"
+  },
+  "keywords": [
+    "appwrite",
+    "function",
+    "html",
+    "grok",
+    "console",
+    "fast-loading"
+  ],
+  "author": "Console Appwrite Grok",
+  "license": "MIT",
+  "dependencies": {
+    "node-appwrite": "^13.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "appwrite": {
+    "runtime": "node-18.0",
+    "entrypoint": "index.js",
+    "timeout": 30,
+    "memory": 256,
+    "environment": "production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/console-appwrite-grok/super-site-function"
+  },
+  "bugs": {
+    "url": "https://github.com/console-appwrite-grok/super-site-function/issues"
+  },
+  "homepage": "https://super.appwrite.network"
+}

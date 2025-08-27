@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Console - AI Development Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 min-h-screen">
+    <div class="container mx-auto max-w-4xl h-screen flex flex-col">
+        <!-- Header -->
+        <div class="bg-black/30 backdrop-blur-lg p-4 border-b border-white/10">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">⚡</div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Super Console</h1>
+                        <p class="text-xs text-white/60">Powered by xAI Grok</p>
+                    </div>
+                </div>
+                <div class="text-green-400 text-sm flex items-center gap-2">
+                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>Online</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+            <div class="flex justify-start">
+                <div class="max-w-[70%] rounded-lg p-4 bg-white/10 text-white backdrop-blur-lg">
+                    <div>⚡ Welcome to Super Console! I'm your AI assistant powered by xAI Grok. How can I help you today?</div>
+                    <div class="text-xs opacity-60 mt-2">Just now</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="bg-black/30 backdrop-blur-lg p-4 border-t border-white/10">
+            <div class="flex gap-2">
+                <input
+                    id="input"
+                    type="text"
+                    placeholder="Ask Super Console anything..."
+                    class="flex-1 bg-white/10 text-white placeholder-white/50 rounded-lg px-4 py-3 backdrop-blur-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onkeypress="if(event.key === 'Enter') sendMessage()"
+                />
+                <button
+                    onclick="sendMessage()"
+                    id="sendBtn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                    Send
+                </button>
+            </div>
+            <div class="text-xs text-white/40 mt-2 text-center">
+                Press Enter to send • Shift+Enter for new line
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isLoading = false;
+
+        function addMessage(content, isUser = false) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+            
+            const now = new Date().toLocaleTimeString();
+            messageDiv.innerHTML = `
+                <div class="max-w-[70%] rounded-lg p-4 ${
+                    isUser 
+                        ? 'bg-blue-600 text-white' 
+                        : 'bg-white/10 text-white backdrop-blur-lg'
+                }">
+                    <div class="whitespace-pre-wrap break-words">${content}</div>
+                    <div class="text-xs opacity-60 mt-2">${now}</div>
+                </div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        async function sendMessage() {
+            if (isLoading) return;
+            
+            const input = document.getElementById('input');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            isLoading = true;
+            addMessage(message, true);
+            input.value = '';
+            sendBtn.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>';
+            
+            // Add loading message
+            addMessage('⚡ Thinking...', false);
+            
+            try {
+                // Direct xAI API call
+                const XAI_API_KEY = 'xai-pzXhXnX2YteViTp9omT0PE06hv1xn2PDhwQcUMtIfKJmrPRgkXoljhbhSswDbWW3t5NvXZxJDhVQwrAQ';
+                
+                console.log('🤖 [SuperConsole] Calling xAI API directly:', message.substring(0, 50) + '...');
+                
+                const response = await fetch('https://api.x.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${XAI_API_KEY}`,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'grok-4-0709',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are Grok, a helpful AI assistant integrated into Super Console. Provide concise, accurate, and helpful responses. Be friendly and conversational while maintaining a professional tone suitable for a development platform.'
+                            },
+                            {
+                                role: 'user',
+                                content: message
+                            }
+                        ],
+                        stream: false,
+                        max_tokens: 1000,
+                        temperature: 0.7
+                    })
+                });
+
+                // Remove loading message
+                const messages = document.getElementById('messages');
+                messages.removeChild(messages.lastChild);
+                
+                if (!response.ok) {
+                    throw new Error(`xAI API error: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ [SuperConsole] xAI API response received successfully');
+                
+                let responseContent = 'I encountered an issue processing your request. Please try again.';
+                
+                if (data.choices && data.choices.length > 0 && data.choices[0].message?.content) {
+                    responseContent = data.choices[0].message.content.trim();
+                } else {
+                    console.error('❌ [SuperConsole] Unexpected xAI API response format:', data);
+                    responseContent = 'The AI service returned an unexpected response format. Please try again.';
+                }
+
+                addMessage(responseContent, false);
+                
+            } catch (error) {
+                console.error('❌ [SuperConsole] xAI API call failed:', error);
+                
+                // Remove loading message
+                const messages = document.getElementById('messages');
+                if (messages.lastChild) {
+                    messages.removeChild(messages.lastChild);
+                }
+                
+                addMessage('⚠️ I\'m having trouble connecting to the AI service right now. This could be due to network issues or API limitations. Please try again in a moment.', false);
+            } finally {
+                isLoading = false;
+                sendBtn.innerHTML = 'Send';
+            }
+        }
+
+        // Auto-focus input
+        document.getElementById('input').focus();
+        
+        // Log successful load
+        console.log('⚡ Super Console loaded successfully');
+        console.log('✅ Ready for AI interactions');
+    </script>
+</body>
+</html>

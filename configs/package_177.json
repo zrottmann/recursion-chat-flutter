@@ -1,0 +1,13 @@
+{
+  "name": "grok-api-function",
+  "version": "1.0.0",
+  "description": "Grok API integration for console",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}

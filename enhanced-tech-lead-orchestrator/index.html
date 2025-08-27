@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code Remote - Flutter Web Integration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Flutter Web Support -->
+    <script src="https://unpkg.com/flutter-web@1.0.0/flutter.js"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .chat-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #6366f1;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dot:nth-child(3) { animation-delay: 0s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        /* Flutter Web Integration Styles */
+        .flutter-widget {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .flutter-responsive {
+            width: 100%;
+            height: auto;
+            min-height: 200px;
+        }
+        /* Mobile-first responsive design */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .grid-cols-2 { grid-template-columns: 1fr; }
+            .text-2xl { font-size: 1.5rem; }
+            .chat-container { max-height: 350px; }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header -->
+    <div class="gradient-bg p-4 shadow-lg">
+        <div class="container mx-auto max-w-6xl">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">🤖</div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Claude Code Remote</h1>
+                        <p class="text-sm text-white/80">Flutter Web + Interactive UI</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 text-green-400">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm">Live at remote.appwrite.network</span>
+                    </div>
+                    <button id="toggleMode" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-sm transition-colors">
+                        <i class="fas fa-exchange-alt mr-1"></i>Switch Mode
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto max-w-6xl p-4">
+        <!-- Mode Toggle -->
+        <div class="mb-6">
+            <div class="flex bg-gray-800 rounded-lg p-1 w-fit mx-auto">
+                <button id="chatModeBtn" class="px-4 py-2 rounded-md text-sm font-medium transition-colors bg-blue-600 text-white">
+                    <i class="fas fa-comments mr-2"></i>Chat UI
+                </button>
+                <button id="flutterModeBtn" class="px-4 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:text-white">
+                    <i class="fab fa-flutter mr-2"></i>Flutter App
+                </button>
+                <button id="remoteModeBtn" class="px-4 py-2 rounded-md text-sm font-medium transition-colors text-gray-300 hover:text-white">
+                    <i class="fas fa-satellite-dish mr-2"></i>Remote Info
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat UI Mode -->
+        <div id="chatMode" class="space-y-6">
+            <div class="bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+                <!-- Chat Header -->
+                <div class="bg-gray-700 px-6 py-4 border-b border-gray-600">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold">Claude Code Chat</h3>
+                            <p class="text-sm text-gray-300">Direct interaction with Claude Code</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button id="clearChat" class="text-gray-400 hover:text-white transition-colors" title="Clear Chat">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button id="exportChat" class="text-gray-400 hover:text-white transition-colors" title="Export Chat">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button id="flutterIntegration" class="text-gray-400 hover:text-white transition-colors" title="Open Flutter App">
+                                <i class="fab fa-flutter"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chatMessages" class="chat-container p-6 space-y-4 bg-gray-800">
+                    <div class="flex justify-start slide-up">
+                        <div class="max-w-[80%] bg-gray-700 rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-robot text-blue-400"></i>
+                                <span class="text-sm font-medium text-blue-400">Claude Code</span>
+                                <span class="text-xs text-gray-500">Just now</span>
+                            </div>
+                            <p class="text-gray-100">👋 Welcome to Claude Code Remote with Flutter Web Integration!</p>
+                            <p class="mt-2 text-sm text-gray-300">Available features:</p>
+                            <ul class="mt-2 text-sm text-gray-300 list-disc list-inside">
+                                <li>Interactive chat interface</li>
+                                <li>Flutter web app integration</li>
+                                <li>Mobile-responsive design</li>
+                                <li>Real-time command execution (when connected)</li>
+                                <li>Native mobile app experience</li>
+                            </ul>
+                            <p class="mt-2 text-sm text-gray-400">Try switching to Flutter mode for native app experience!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="px-6 pb-2">
+                    <div class="flex justify-start">
+                        <div class="max-w-[80%] bg-gray-700 rounded-lg p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-robot text-blue-400"></i>
+                                <span class="text-sm font-medium text-blue-400">Claude Code</span>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <span class="ml-2 text-sm text-gray-400">is thinking...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="border-t border-gray-600 p-4 bg-gray-750">
+                    <div class="flex gap-3">
+                        <div class="flex-1">
+                            <textarea
+                                id="chatInput"
+                                placeholder="Ask Claude Code anything... (Press Enter to send)"
+                                class="w-full bg-gray-600 text-white placeholder-gray-400 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                                rows="2"
+                            ></textarea>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <button
+                                id="sendMessage"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                            >
+                                <i class="fas fa-paper-plane"></i>
+                                Send
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <button class="quick-action bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-colors" data-command="analyze this codebase">
+                            <i class="fas fa-search mr-1"></i>Analyze Code
+                        </button>
+                        <button class="quick-action bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-colors" data-command="deploy to flutter web">
+                            <i class="fab fa-flutter mr-1"></i>Flutter Deploy
+                        </button>
+                        <button class="quick-action bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-sm transition-colors" data-command="check mobile compatibility">
+                            <i class="fas fa-mobile-alt mr-1"></i>Mobile Check
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flutter Web Mode -->
+        <div id="flutterMode" class="space-y-6 hidden">
+            <div class="bg-gray-800 rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold flex items-center gap-2">
+                            <i class="fab fa-flutter text-blue-400"></i>
+                            Flutter Web App
+                        </h2>
+                        <p class="text-gray-300">Native mobile experience in your browser</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="fullscreenFlutter" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
+                            <i class="fas fa-expand mr-1"></i>Fullscreen
+                        </button>
+                        <button id="reloadFlutter" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm">
+                            <i class="fas fa-refresh mr-1"></i>Reload
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Flutter App Container -->
+                <div class="flutter-widget bg-white rounded-lg" id="flutterContainer">
+                    <div class="flutter-responsive bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center text-gray-800 p-8">
+                        <div class="text-center">
+                            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                            <h3 class="text-xl font-bold mb-2">Loading Flutter App</h3>
+                            <p class="text-sm text-gray-600">Initializing native mobile interface...</p>
+                            <div class="mt-4 space-y-2">
+                                <div class="bg-blue-200 rounded-full h-2 w-full">
+                                    <div class="bg-blue-500 h-2 rounded-full animate-pulse" style="width: 70%"></div>
+                                </div>
+                                <p class="text-xs text-gray-500">This would load the actual Flutter web build in production</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flutter Features -->
+                <div class="grid md:grid-cols-2 gap-4 mt-6">
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <h4 class="font-semibold text-blue-400 mb-2">
+                            <i class="fas fa-mobile-alt mr-2"></i>Mobile-First Design
+                        </h4>
+                        <p class="text-sm text-gray-300">Native mobile experience with touch gestures, smooth animations, and responsive layouts optimized for all screen sizes.</p>
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <h4 class="font-semibold text-green-400 mb-2">
+                            <i class="fas fa-sync mr-2"></i>Real-time Sync
+                        </h4>
+                        <p class="text-sm text-gray-300">Seamless synchronization between web and mobile interfaces with instant updates and state persistence.</p>
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <h4 class="font-semibold text-purple-400 mb-2">
+                            <i class="fas fa-palette mr-2"></i>Native Performance
+                        </h4>
+                        <p class="text-sm text-gray-300">Flutter's compiled-to-native performance with 60fps animations and minimal latency for optimal user experience.</p>
+                    </div>
+                    <div class="bg-gray-700 rounded-lg p-4">
+                        <h4 class="font-semibold text-orange-400 mb-2">
+                            <i class="fas fa-shield-alt mr-2"></i>Secure Integration
+                        </h4>
+                        <p class="text-sm text-gray-300">End-to-end encrypted communication with Appwrite backend and secure OAuth authentication flow.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remote Control Mode -->
+        <div id="remoteMode" class="space-y-6 hidden">
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Remote Control Features -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-satellite-dish text-blue-400"></i>
+                        Remote Control
+                    </h2>
+                    <p class="text-gray-300 mb-6">Control Claude Code remotely via multiple messaging platforms</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
+                            <i class="fas fa-envelope text-red-400 text-xl"></i>
+                            <div>
+                                <h4 class="font-semibold">Email Commands</h4>
+                                <p class="text-sm text-gray-400">Send tasks via email notifications</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
+                            <i class="fab fa-discord text-indigo-400 text-xl"></i>
+                            <div>
+                                <h4 class="font-semibold">Discord Integration</h4>
+                                <p class="text-sm text-gray-400">Control via Discord bot commands</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-gray-700 rounded-lg">
+                            <i class="fab fa-flutter text-blue-400 text-xl"></i>
+                            <div>
+                                <h4 class="font-semibold">Flutter Mobile App</h4>
+                                <p class="text-sm text-gray-400">Native mobile control interface</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setup Instructions -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-cog text-green-400"></i>
+                        Quick Setup
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-900 rounded-lg p-4">
+                            <pre class="text-green-400 text-sm overflow-x-auto"><code>git clone https://github.com/zrottmann/enhanced-tech-lead-orchestrator.git
+cd enhanced-tech-lead-orchestrator
+npm install
+# Flutter Web Setup
+cd flutter-apps/remote
+flutter build web
+# Deploy to remote.appwrite.network</code></pre>
+                        </div>
+                        
+                        <div class="flex gap-3">
+                            <a href="https://github.com/zrottmann/enhanced-tech-lead-orchestrator" target="_blank" 
+                               class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2">
+                                <i class="fab fa-github"></i>
+                                View on GitHub
+                            </a>
+                            <button id="copySetup" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center gap-2">
+                                <i class="fas fa-copy"></i>
+                                Copy Setup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-12 py-6">
+        <div class="container mx-auto max-w-6xl px-4 text-center text-gray-400">
+            <p>&copy; 2024 Claude Code Remote with Flutter Integration. Open source project for remote Claude control.</p>
+        </div>
+    </footer>
+
+    <script>
+        let isLoading = false;
+        let messageId = 0;
+
+        // DOM Elements
+        const chatModeBtn = document.getElementById('chatModeBtn');
+        const flutterModeBtn = document.getElementById('flutterModeBtn');
+        const remoteModeBtn = document.getElementById('remoteModeBtn');
+        const chatMode = document.getElementById('chatMode');
+        const flutterMode = document.getElementById('flutterMode');
+        const remoteMode = document.getElementById('remoteMode');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendMessage = document.getElementById('sendMessage');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const clearChat = document.getElementById('clearChat');
+        const exportChat = document.getElementById('exportChat');
+        const quickActions = document.querySelectorAll('.quick-action');
+        const copySetup = document.getElementById('copySetup');
+
+        // Mode Switching
+        chatModeBtn.addEventListener('click', () => switchMode('chat'));
+        flutterModeBtn.addEventListener('click', () => switchMode('flutter'));
+        remoteModeBtn.addEventListener('click', () => switchMode('remote'));
+        
+        document.getElementById('toggleMode').addEventListener('click', () => {
+            const modes = ['chat', 'flutter', 'remote'];
+            let currentMode = 'chat';
+            if (!flutterMode.classList.contains('hidden')) currentMode = 'flutter';
+            if (!remoteMode.classList.contains('hidden')) currentMode = 'remote';
+            
+            const currentIndex = modes.indexOf(currentMode);
+            const nextMode = modes[(currentIndex + 1) % modes.length];
+            switchMode(nextMode);
+        });
+
+        function switchMode(mode) {
+            // Hide all modes
+            chatMode.classList.add('hidden');
+            flutterMode.classList.add('hidden');
+            remoteMode.classList.add('hidden');
+            
+            // Reset button styles
+            [chatModeBtn, flutterModeBtn, remoteModeBtn].forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('text-gray-300');
+            });
+            
+            // Show selected mode and update button
+            if (mode === 'chat') {
+                chatMode.classList.remove('hidden');
+                chatModeBtn.classList.add('bg-blue-600', 'text-white');
+                chatModeBtn.classList.remove('text-gray-300');
+                setTimeout(() => chatInput.focus(), 100);
+            } else if (mode === 'flutter') {
+                flutterMode.classList.remove('hidden');
+                flutterModeBtn.classList.add('bg-blue-600', 'text-white');
+                flutterModeBtn.classList.remove('text-gray-300');
+                simulateFlutterLoad();
+            } else {
+                remoteMode.classList.remove('hidden');
+                remoteModeBtn.classList.add('bg-blue-600', 'text-white');
+                remoteModeBtn.classList.remove('text-gray-300');
+            }
+        }
+
+        // Flutter Integration
+        function simulateFlutterLoad() {
+            const container = document.getElementById('flutterContainer');
+            setTimeout(() => {
+                container.innerHTML = `
+                    <div class="flutter-responsive bg-gradient-to-br from-blue-50 to-purple-100 text-gray-800 p-8">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">🤖</div>
+                            <h3 class="text-2xl font-bold mb-4">Claude Remote Flutter</h3>
+                            <p class="text-gray-600 mb-6">Native mobile experience loaded!</p>
+                            
+                            <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                                <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-lg">
+                                    <i class="fas fa-comments mr-2"></i>
+                                    Chat
+                                </button>
+                                <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-lg">
+                                    <i class="fas fa-cog mr-2"></i>
+                                    Settings
+                                </button>
+                                <button class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-lg">
+                                    <i class="fas fa-chart-bar mr-2"></i>
+                                    Analytics
+                                </button>
+                                <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-3 rounded-lg font-semibold transition-colors shadow-lg">
+                                    <i class="fas fa-bell mr-2"></i>
+                                    Alerts
+                                </button>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-white rounded-lg shadow-inner">
+                                <p class="text-sm text-gray-500">Flutter Web Demo Interface</p>
+                                <p class="text-xs text-gray-400 mt-1">This represents the Flutter web build integrated into the page</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        // Chat Functionality (Enhanced for Flutter integration)
+        function addMessage(content, isUser = false, isSystem = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${isUser ? 'justify-end' : 'justify-start'} slide-up`;
+            
+            const now = new Date().toLocaleTimeString();
+            const messageClass = isUser ? 'bg-blue-600' : isSystem ? 'bg-orange-600' : 'bg-gray-700';
+            const iconClass = isUser ? 'fas fa-user' : isSystem ? 'fas fa-exclamation-triangle' : 'fas fa-robot';
+            const nameClass = isUser ? 'text-blue-200' : isSystem ? 'text-orange-200' : 'text-blue-400';
+            const senderName = isUser ? 'You' : isSystem ? 'System' : 'Claude Code';
+            
+            messageDiv.innerHTML = `
+                <div class="max-w-[80%] ${messageClass} rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="${iconClass} ${nameClass}"></i>
+                        <span class="text-sm font-medium ${nameClass}">${senderName}</span>
+                        <span class="text-xs text-gray-300">${now}</span>
+                    </div>
+                    <div class="text-gray-100 whitespace-pre-wrap">${content}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            messageId++;
+        }
+
+        async function sendChatMessage() {
+            if (isLoading) return;
+            
+            const message = chatInput.value.trim();
+            if (!message) return;
+            
+            isLoading = true;
+            addMessage(message, true);
+            chatInput.value = '';
+            
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            typingIndicator.querySelector('.typing-indicator').style.display = 'flex';
+            
+            try {
+                // Simulate Claude Code processing
+                await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 2000));
+                
+                // Generate response based on message content
+                let response = generateFlutterEnhancedResponse(message);
+                
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                
+                // Add Claude's response
+                addMessage(response, false);
+                
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                addMessage('⚠️ Connection error. This is a Flutter web demo interface. For actual Claude Code integration, please set up the remote daemon.', false, true);
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        function generateFlutterEnhancedResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('flutter') || lowerMessage.includes('mobile')) {
+                return `📱 Flutter Integration Active!
+
+✅ Flutter web build ready for deployment
+✅ Mobile-responsive UI components loaded  
+✅ Native performance optimization enabled
+✅ Cross-platform compatibility verified
+
+Try switching to Flutter mode to see the native interface!
+
+*Demo mode: Real Flutter integration requires flutter build web*`;
+            }
+            
+            if (lowerMessage.includes('deploy') && lowerMessage.includes('flutter')) {
+                return `🚀 Flutter Deployment Process:
+
+📱 Building Flutter web app...
+✅ Compiling Dart to JavaScript
+✅ Optimizing assets for web delivery
+✅ Generating responsive layouts
+✅ Configuring PWA manifest
+⏳ Deploying to remote.appwrite.network
+
+*Demo interface: Use 'flutter build web' for actual deployment*`;
+            }
+            
+            if (lowerMessage.includes('analyze') || lowerMessage.includes('code')) {
+                return `🔍 Flutter-Enhanced Code Analysis:
+
+• Flutter web compatibility check: ✅ Ready
+• Responsive design validation: ✅ Optimized  
+• Mobile performance metrics: ✅ 60fps target
+• Cross-platform compatibility: ✅ Web/iOS/Android
+
+*Note: This is a demo interface with Flutter web integration preview.*`;
+            }
+            
+            // Default responses with Flutter context
+            const responses = [
+                `I understand you want help with: "${message}"\n\n🤖 This is the Flutter-enhanced demo interface! Switch to Flutter mode to see the native mobile experience, or set up the remote daemon for full functionality.`,
+                `Flutter Integration: "${message}"\n\n📱 In the Flutter app, I would:\n• Process your request with native performance\n• Update the UI with smooth animations\n• Sync across all your devices\n• Send push notifications when complete\n\n*Try Flutter mode above!*`,
+                `Interesting request! "${message}"\n\n⚡ With Flutter web integration:\n\n1. Native mobile experience in browser\n2. 60fps smooth animations\n3. Responsive design for all devices\n4. Offline capability with local storage\n\n*Click the Flutter tab to see the demo!*`
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Event Listeners
+        sendMessage.addEventListener('click', sendChatMessage);
+        
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', () => {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+        });
+
+        // Quick Actions
+        quickActions.forEach(button => {
+            button.addEventListener('click', () => {
+                const command = button.dataset.command;
+                chatInput.value = command;
+                sendChatMessage();
+            });
+        });
+
+        // Clear Chat
+        clearChat.addEventListener('click', () => {
+            const messages = chatMessages.querySelectorAll('.slide-up');
+            messages.forEach((msg, index) => {
+                if (index > 0) { // Keep the welcome message
+                    msg.remove();
+                }
+            });
+        });
+
+        // Export Chat
+        exportChat.addEventListener('click', () => {
+            const messages = Array.from(chatMessages.querySelectorAll('.slide-up')).map(msg => {
+                const sender = msg.querySelector('.text-sm.font-medium').textContent;
+                const time = msg.querySelector('.text-xs').textContent;
+                const content = msg.querySelector('.whitespace-pre-wrap').textContent;
+                return `[${time}] ${sender}: ${content}`;
+            }).join('\n\n');
+            
+            const blob = new Blob([messages], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `claude-flutter-chat-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Copy Setup Command
+        copySetup.addEventListener('click', () => {
+            const setupText = `git clone https://github.com/zrottmann/enhanced-tech-lead-orchestrator.git
+cd enhanced-tech-lead-orchestrator
+npm install
+cd flutter-apps/remote
+flutter build web
+# Deploy to remote.appwrite.network`;
+            
+            navigator.clipboard.writeText(setupText).then(() => {
+                copySetup.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    copySetup.innerHTML = '<i class="fas fa-copy"></i> Copy Setup';
+                }, 2000);
+            });
+        });
+
+        // Flutter Integration Buttons
+        document.getElementById('flutterIntegration').addEventListener('click', () => {
+            switchMode('flutter');
+        });
+
+        document.getElementById('fullscreenFlutter')?.addEventListener('click', () => {
+            addMessage('🖥️ Fullscreen mode would expand the Flutter app to cover the entire viewport in a real implementation.', false, true);
+        });
+
+        document.getElementById('reloadFlutter')?.addEventListener('click', () => {
+            addMessage('🔄 Reloading Flutter app... In production this would reload the Flutter web build.', false, true);
+            simulateFlutterLoad();
+        });
+
+        // Initial focus
+        chatInput.focus();
+    </script>
+</body>
+</html>

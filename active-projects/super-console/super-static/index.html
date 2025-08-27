@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Console Appwrite Grok - LIVE</title>
+    
+    <!-- MOBILE LOADING FIX -->
+    <script>
+      (function() {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        // Clear service workers that might cache old content
+        if (isMobile && 'serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then(regs => {
+            regs.forEach(reg => reg.unregister());
+          });
+        }
+        // iOS private mode fix
+        try {
+          localStorage.setItem('test', '1');
+          localStorage.removeItem('test');
+        } catch (e) {
+          window.localStorage = window.sessionStorage;
+        }
+      })();
+    </script>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-blue-900 to-gray-900 min-h-screen">
+    <div class="container mx-auto px-4 py-16">
+        <div class="text-center">
+            <h1 class="text-6xl font-bold text-white mb-8 animate-pulse">
+                🚀 Console Appwrite Grok
+            </h1>
+            
+            <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-3xl mx-auto">
+                <div class="text-green-400 text-2xl mb-6 font-bold">
+                    ✅ Deployment Successful!
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-green-500/20 rounded-lg p-4">
+                        <h2 class="text-2xl font-bold text-green-300 mb-2">
+                            🤖 Grok API Status: ACTIVE
+                        </h2>
+                        <p class="text-white/80">
+                            AI-powered responses with xAI Grok model
+                        </p>
+                    </div>
+                    
+                    <div class="text-left bg-black/30 rounded-lg p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">API Endpoints:</h3>
+                        <div class="space-y-2 font-mono text-sm">
+                            <div class="text-blue-300">
+                                POST https://nyc.cloud.appwrite.io/v1/functions/grok-api/executions
+                            </div>
+                            <div class="text-gray-400">
+                                {"async": false, "body": "{\"prompt\": \"Your question here\"}"}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-500/20 rounded-lg p-4">
+                            <div class="text-3xl mb-2">⚡</div>
+                            <div class="text-white font-bold">Ultra Fast</div>
+                            <div class="text-white/60 text-sm">< 2s response time</div>
+                        </div>
+                        <div class="bg-purple-500/20 rounded-lg p-4">
+                            <div class="text-3xl mb-2">🧠</div>
+                            <div class="text-white font-bold">Smart AI</div>
+                            <div class="text-white/60 text-sm">Powered by Grok</div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-white/60 text-sm">
+                        Last deployed: 2025-08-23T11:15:31.470Z
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test API connection
+        fetch('https://nyc.cloud.appwrite.io/v1/functions/grok-api/executions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Appwrite-Project': '68a4e3da0022f3e129d0'
+            },
+            body: JSON.stringify({
+                async: true,
+                body: JSON.stringify({ prompt: 'Health check' })
+            })
+        }).then(r => r.json()).then(data => {
+            console.log('API Health Check:', data);
+        }).catch(err => {
+            console.error('API Error:', err);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+{
+  "name": "recursion-chat-flutter",
+  "version": "1.0.0",
+  "description": "Flutter chat application with Appwrite backend - stable alternative to React version",
+  "scripts": {
+    "build": "node build-static.js",
+    "build:root": "node build-root.js",
+    "build:flutter": "flutter build web --release --web-renderer canvaskit",
+    "serve": "cd build/web && python -m http.server 8080 || cd static && python -m http.server 8080",
+    "clean": "flutter clean",
+    "install": "echo 'Flutter project - see FLUTTER_SETUP.md for installation instructions'",
+    "deploy": "flutter build web --release --web-renderer canvaskit --base-href /",
+    "postinstall": "echo 'This is a Flutter project. Install Flutter SDK and run: flutter pub get'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zrottmann/recursion-chat-flutter.git"
+  },
+  "keywords": [
+    "flutter",
+    "chat",
+    "appwrite",
+    "realtime",
+    "web",
+    "mobile",
+    "dart"
+  ],
+  "author": "Claude Code Assistant",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  },
+  "buildCommand": "flutter build web --release",
+  "outputDirectory": "build/web",
+  "installCommand": "flutter pub get"
+}

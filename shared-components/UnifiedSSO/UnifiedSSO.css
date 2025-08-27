@@ -1,0 +1,635 @@
+/**
+ * Unified SSO Mobile-Optimized Styles
+ * Combines best patterns from MobileAuth.css and responsive design
+ */
+
+/* Base styles for all devices */
+.unified-auth-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.unified-auth-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+
+.bg-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  opacity: 0.9;
+}
+
+.bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255,255,255,0.05) 0%, transparent 50%);
+  background-size: 200px 200px;
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+.unified-auth-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  margin: 0 auto;
+}
+
+.unified-auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+}
+
+.unified-auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.unified-auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.unified-auth-subtitle {
+  font-size: 1rem;
+  color: #718096;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.unified-auth-message {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.unified-auth-message.success {
+  background-color: rgba(72, 187, 120, 0.1);
+  border: 1px solid rgba(72, 187, 120, 0.2);
+  color: #2f855a;
+}
+
+.unified-auth-message.error {
+  background-color: rgba(245, 101, 101, 0.1);
+  border: 1px solid rgba(245, 101, 101, 0.2);
+  color: #c53030;
+}
+
+.unified-auth-message.info {
+  background-color: rgba(66, 153, 225, 0.1);
+  border: 1px solid rgba(66, 153, 225, 0.2);
+  color: #2b6cb0;
+}
+
+.message-icon {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.unified-auth-form {
+  margin-bottom: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  font-size: 16px; /* Prevents zoom on iOS */
+  padding: 14px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #2d3748;
+  transition: all 0.2s ease;
+  min-height: 48px; /* Touch target size */
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input:disabled {
+  background-color: #f7fafc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.password-input-wrapper {
+  position: relative;
+}
+
+.form-input.with-toggle {
+  padding-right: 50px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  min-height: 32px;
+  min-width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.form-hint {
+  font-size: 0.8rem;
+  color: #718096;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.spinner-large {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.unified-auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  gap: 12px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.divider-text {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.unified-social-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.unified-sso-button {
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: center;
+  text-decoration: none;
+}
+
+.unified-sso-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.unified-sso-button:active {
+  transform: translateY(0);
+}
+
+.sso-button-spacing {
+  margin-bottom: 8px;
+}
+
+.sso-button-spacing:last-child {
+  margin-bottom: 0;
+}
+
+.unified-auth-footer {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.auth-switch-text {
+  font-size: 0.9rem;
+  color: #718096;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.auth-switch-btn {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 6px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: inherit;
+}
+
+.auth-switch-btn:hover:not(:disabled) {
+  background-color: rgba(102, 126, 234, 0.1);
+  color: #5a67d8;
+}
+
+.auth-switch-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.unified-auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.unified-auth-loading-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  max-width: 280px;
+  margin: 20px;
+}
+
+.loading-hint {
+  font-size: 0.9rem;
+  color: #718096;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  .unified-auth-wrapper {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    align-items: flex-start;
+    padding-top: max(env(safe-area-inset-top), 20px);
+    padding-bottom: max(env(safe-area-inset-bottom), 20px);
+  }
+
+  .unified-auth-container {
+    padding: 16px;
+    max-width: none;
+  }
+
+  .unified-auth-card {
+    padding: 30px 24px;
+    border-radius: 16px;
+    margin: 0;
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.1),
+      0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .unified-auth-title {
+    font-size: 1.75rem;
+  }
+
+  .unified-auth-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-input {
+    font-size: 16px; /* Critical: prevents zoom on iOS */
+    padding: 12px 14px;
+    min-height: 48px;
+  }
+
+  .form-input.with-toggle {
+    padding-right: 48px;
+  }
+
+  .btn {
+    min-height: 48px;
+    font-size: 1rem;
+    padding: 12px 18px;
+  }
+
+  .unified-auth-message {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+
+  .unified-social-auth {
+    gap: 10px;
+  }
+
+  .sso-button-spacing {
+    margin-bottom: 6px;
+  }
+}
+
+/* Very small screens (iPhone SE, etc.) */
+@media (max-width: 380px) {
+  .unified-auth-container {
+    padding: 12px;
+  }
+
+  .unified-auth-card {
+    padding: 24px 20px;
+    border-radius: 12px;
+  }
+
+  .unified-auth-title {
+    font-size: 1.6rem;
+  }
+
+  .unified-auth-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .form-input {
+    padding: 10px 12px;
+    min-height: 46px;
+  }
+
+  .btn {
+    min-height: 46px;
+    padding: 10px 16px;
+  }
+}
+
+/* Keyboard handling - when virtual keyboard is open */
+@media (max-height: 600px) {
+  .unified-auth-wrapper {
+    align-items: flex-start;
+    padding-top: 10px;
+  }
+  
+  .unified-auth-card {
+    padding: 20px;
+  }
+  
+  .unified-auth-title {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+  
+  .unified-auth-subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+  }
+
+  .unified-auth-header {
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .unified-auth-card {
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .form-input {
+    border-width: 1px;
+  }
+  
+  .form-input:focus {
+    border-width: 2px;
+  }
+}
+
+/* Native app specific fixes */
+.unified-auth-wrapper.native-app {
+  height: 100vh;
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Prevent blinking/flickering */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Disable animations on native apps to prevent blinking */
+.native-app * {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Re-enable only essential hover effects */
+.native-app .btn:active,
+.native-app .unified-sso-button:active {
+  transform: translateY(1px);
+  transition: transform 0.1s ease;
+}
+
+/* Capacitor-specific fixes */
+.capacitor-android .unified-auth-wrapper,
+.capacitor-ios .unified-auth-wrapper {
+  height: 100vh;
+  min-height: 100vh;
+}
+
+/* Fix status bar overlap on Android */
+.capacitor-android .unified-auth-wrapper {
+  padding-top: env(safe-area-inset-top, 24px);
+}
+
+/* Fix home indicator area on iOS */
+.capacitor-ios .unified-auth-wrapper {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+/* SSO Group specific styles */
+.unified-sso-group {
+  width: 100%;
+}
+
+.unified-sso-group.horizontal {
+  flex-wrap: wrap;
+}
+
+.unified-sso-group.horizontal .unified-sso-button {
+  flex: 1;
+  min-width: 120px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .unified-auth-card {
+    background: rgba(26, 32, 44, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .unified-auth-title {
+    color: #f7fafc;
+  }
+
+  .unified-auth-subtitle {
+    color: #a0aec0;
+  }
+
+  .form-label {
+    color: #e2e8f0;
+  }
+
+  .form-input {
+    background: rgba(45, 55, 72, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f7fafc;
+  }
+
+  .form-input:focus {
+    border-color: #667eea;
+    background: rgba(45, 55, 72, 0.8);
+  }
+
+  .divider-line {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .auth-switch-text {
+    color: #a0aec0;
+  }
+
+  .unified-auth-loading-modal {
+    background: #2d3748;
+    color: #f7fafc;
+  }
+}

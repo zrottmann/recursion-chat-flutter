@@ -1,0 +1,89 @@
+name: Deploy to Appwrite
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  APPWRITE_PROJECT_ID: 68a4e3da0022f3e129d0
+  APPWRITE_SITE_ID: 68aa1b51000a9c3a9c36
+  APPWRITE_ENDPOINT: https://nyc.cloud.appwrite.io/v1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+        
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_URL: https://chat.appwrite.network
+        
+      - name: Create deployment archive
+        run: |
+          cd build
+          tar -czf ../deploy.tar.gz .
+          cd ..
+        
+      - name: Deploy to Appwrite Sites
+        run: |
+          cat > deploy.cjs << 'EOF'
+          const https = require('https');
+          const fs = require('fs');
+          const FormData = require('form-data');
+
+          const form = new FormData();
+          form.append('code', fs.createReadStream('deploy.tar.gz'));
+          form.append('activate', 'true');
+
+          const options = {
+            hostname: 'nyc.cloud.appwrite.io',
+            path: '/v1/sites/${process.env.APPWRITE_SITE_ID}/deployments',
+            method: 'POST',
+            headers: {
+              'X-Appwrite-Project': process.env.APPWRITE_PROJECT_ID,
+              'X-Appwrite-Key': process.env.APPWRITE_API_KEY,
+              ...form.getHeaders()
+            }
+          };
+
+          const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk) => data += chunk);
+            res.on('end', () => {
+              if (res.statusCode === 201 || res.statusCode === 200) {
+                console.log('✅ Deployment successful!');
+                console.log('🌐 Site URL: https://chat.appwrite.network');
+                const result = JSON.parse(data);
+                console.log('📋 Deployment ID:', result.$id);
+              } else {
+                console.log('❌ Deployment failed:', res.statusCode);
+                console.log('Response:', data);
+                process.exit(1);
+              }
+            });
+          });
+
+          req.on('error', (e) => {
+            console.error('❌ Error:', e.message);
+            process.exit(1);
+          });
+
+          form.pipe(req);
+          EOF
+          
+          npm install form-data
+          node deploy.cjs
+        env:
+          APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}

@@ -1,0 +1,87 @@
+name: trading_post_flutter
+description: Beautiful Flutter marketplace app with stunning visuals and animations
+publish_to: 'none'
+version: 1.0.0+2
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Core UI & Theming
+  flutter_animate: ^4.5.0        # Declarative animations
+  google_fonts: ^6.1.0           # Beautiful typography
+  
+  # Visual Effects & Animations
+  rive: ^0.12.4                  # Complex vector animations
+  lottie: ^3.0.0                 # After Effects animations
+  shimmer: ^3.0.0                # Loading shimmer effects
+  blurrycontainer: ^2.0.0       # Blur effects
+  gradient_borders: ^1.0.0       # Gradient borders
+  
+  # 3D & Advanced Graphics
+  flutter_cube: ^0.1.1           # 3D rendering
+  parallax_rain: ^1.1.0          # Parallax effects
+  
+  # Navigation & Layout
+  auto_route: ^7.8.4             # Advanced routing
+  card_swiper: ^3.0.1            # Tinder-style card swiping
+  
+  # State Management
+  flutter_riverpod: ^2.4.10      # State management
+  riverpod_annotation: ^2.3.4    # Code generation
+  
+  # Backend & Services
+  appwrite: ^12.0.0              # Backend services
+  dio: ^5.4.0                    # HTTP client
+  web_socket_channel: ^2.4.0     # Real-time updates
+  
+  # Storage & Offline
+  hive_flutter: ^1.1.0           # Local database
+  cached_network_image: ^3.3.1   # Image caching
+  flutter_cache_manager: ^3.3.1  # General caching
+  
+  # Charts & Data Visualization
+  fl_chart: ^0.66.0              # Beautiful charts
+  syncfusion_flutter_charts: ^24.2.4  # Advanced charts
+  
+  # Maps
+  flutter_map: ^6.1.0            # OpenStreetMap
+  latlong2: ^0.9.0               # Coordinates
+  
+  # Platform Features
+  flutter_local_notifications: ^16.3.0  # Push notifications
+  local_auth: ^2.1.7             # Biometric auth
+  permission_handler: ^11.1.0     # Permissions
+  share_plus: ^7.2.1             # Sharing
+  
+  # Media & Camera
+  image_picker: ^1.0.5           # Photo selection
+  camera: ^0.10.5                # Camera integration
+  
+  # Forms & Input
+  flutter_form_builder: ^9.1.1   # Form management
+  form_builder_validators: ^9.1.0  # Validation
+  
+  # Utilities
+  intl: ^0.18.1                  # Internationalization
+  timeago: ^3.6.0                # Time formatting
+  collection: ^1.18.0            # Collections utilities
+  
+  # Icons & Assets
+  flutter_vector_icons: ^2.0.0   # Icon packs
+  cupertino_icons: ^1.0.6        # iOS icons
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.7
+  riverpod_generator: ^2.3.11
+  json_serializable: ^6.7.1
+  hive_generator: ^2.0.1
+
+flutter:
+  uses-material-design: true

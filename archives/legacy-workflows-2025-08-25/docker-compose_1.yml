@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  shard-manager:
+    build:
+      context: ./shard-manager
+      dockerfile: Dockerfile
+    container_name: shard-manager
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SHARD_MAX_PLAYERS=150
+      - HEARTBEAT_TIMEOUT=30000
+      - APPWRITE_ENDPOINT=${APPWRITE_ENDPOINT:-https://cloud.appwrite.io/v1}
+      - APPWRITE_PROJECT_ID=${APPWRITE_PROJECT_ID}
+      - APPWRITE_API_KEY=${APPWRITE_API_KEY}
+      - APPWRITE_DATABASE_ID=${APPWRITE_DATABASE_ID:-game_db}
+      - APPWRITE_PLAYER_COLLECTION_ID=${APPWRITE_PLAYER_COLLECTION_ID:-players}
+      - CORS_ORIGIN=*
+      - LOG_LEVEL=info
+    networks:
+      - game-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  game-shard-1:
+    build:
+      context: ./game-shard
+      dockerfile: Dockerfile
+    container_name: game-shard-1
+    ports:
+      - "4001:4001"
+    environment:
+      - NODE_ENV=production
+      - PORT=4001
+      - SHARD_ID=shard-1
+      - SHARD_HOST=game-shard-1
+      - MANAGER_URL=http://shard-manager:3000
+      - SHARD_MAX_PLAYERS=150
+      - TICK_RATE=15
+      - SHARD_REGION=us-east
+      - APPWRITE_ENDPOINT=${APPWRITE_ENDPOINT:-https://cloud.appwrite.io/v1}
+      - APPWRITE_PROJECT_ID=${APPWRITE_PROJECT_ID}
+      - APPWRITE_API_KEY=${APPWRITE_API_KEY}
+      - APPWRITE_DATABASE_ID=${APPWRITE_DATABASE_ID:-game_db}
+      - APPWRITE_PLAYER_COLLECTION_ID=${APPWRITE_PLAYER_COLLECTION_ID:-players}
+      - LOG_LEVEL=info
+    networks:
+      - game-network
+    depends_on:
+      - shard-manager
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  game-shard-2:
+    build:
+      context: ./game-shard
+      dockerfile: Dockerfile
+    container_name: game-shard-2
+    ports:
+      - "4002:4002"
+    environment:
+      - NODE_ENV=production
+      - PORT=4002
+      - SHARD_ID=shard-2
+      - SHARD_HOST=game-shard-2
+      - MANAGER_URL=http://shard-manager:3000
+      - SHARD_MAX_PLAYERS=150
+      - TICK_RATE=15
+      - SHARD_REGION=us-east
+      - APPWRITE_ENDPOINT=${APPWRITE_ENDPOINT:-https://cloud.appwrite.io/v1}
+      - APPWRITE_PROJECT_ID=${APPWRITE_PROJECT_ID}
+      - APPWRITE_API_KEY=${APPWRITE_API_KEY}
+      - APPWRITE_DATABASE_ID=${APPWRITE_DATABASE_ID:-game_db}
+      - APPWRITE_PLAYER_COLLECTION_ID=${APPWRITE_PLAYER_COLLECTION_ID:-players}
+      - LOG_LEVEL=info
+    networks:
+      - game-network
+    depends_on:
+      - shard-manager
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  game-network:
+    driver: bridge

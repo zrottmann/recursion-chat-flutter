@@ -1,0 +1,29 @@
+name = "email-service-worker"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+vars = { }
+
+# Secrets (set via wrangler secret put)
+# EMAIL_API_KEY
+# DKIM_PRIVATE_KEY
+# DEFAULT_FROM_EMAIL
+# DEFAULT_FROM_NAME
+# DKIM_DOMAIN
+# DKIM_SELECTOR
+
+[[kv_namespaces]]
+binding = "EMAIL_LOGS"
+id = "your_kv_namespace_id"
+preview_id = "your_preview_kv_namespace_id"
+
+[triggers]
+crons = ["0 0 * * *"]  # Daily cleanup
+
+[build]
+command = "echo 'No build step required'"
+
+[limits]
+cpu_ms = 50000

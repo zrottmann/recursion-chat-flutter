@@ -1,0 +1,165 @@
+name: Deploy Claude Remote UI to remote.appwrite.network
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'claude-remote-ui.html'
+      - '.github/workflows/deploy-remote.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install form-data
+        
+    - name: Deploy Enhanced Claude Remote UI
+      env:
+        APPWRITE_API_KEY: ${{ secrets.APPWRITE_API_KEY }}
+        APPWRITE_PROJECT_ID: 68a4e3da0022f3e129d0
+        APPWRITE_ENDPOINT: https://nyc.cloud.appwrite.io/v1
+      run: |
+        echo "🚀 Deploying Enhanced Claude Remote UI to remote.appwrite.network..."
+        
+        # Copy the enhanced UI as index.html
+        cp claude-remote-ui.html index.html
+        
+        # Create package.json for deployment
+        cat > package.json << 'EOF'
+        {
+          "name": "claude-remote-ui",
+          "version": "1.0.0",
+          "description": "Enhanced Claude Code Remote UI",
+          "main": "index.html"
+        }
+        EOF
+        
+        # Create deployment archive
+        tar -czf remote-ui.tar.gz index.html package.json
+        
+        # Create deployment script
+        cat > deploy-remote.cjs << 'EOF'
+        const https = require('https');
+        const fs = require('fs');
+        const FormData = require('form-data');
+        
+        const projectId = process.env.APPWRITE_PROJECT_ID;
+        const apiKey = process.env.APPWRITE_API_KEY;
+        
+        console.log('🔍 Looking up sites...');
+        
+        // Get sites list to find remote site ID
+        const listOptions = {
+          hostname: 'nyc.cloud.appwrite.io',
+          path: '/v1/sites',
+          method: 'GET',
+          headers: {
+            'X-Appwrite-Project': projectId,
+            'X-Appwrite-Key': apiKey
+          }
+        };
+        
+        const listReq = https.request(listOptions, (listRes) => {
+          let listData = '';
+          listRes.on('data', (chunk) => { listData += chunk; });
+          listRes.on('end', () => {
+            if (listRes.statusCode === 200) {
+              try {
+                const sites = JSON.parse(listData);
+                console.log('📋 Available sites:');
+                sites.sites.forEach(site => {
+                  console.log(`  - ${site.name} (${site.$id}): ${site.hostname}`);
+                });
+                
+                // Find the remote site
+                const remoteSite = sites.sites.find(site => 
+                  site.hostname === 'remote.appwrite.network' || 
+                  site.name === 'remote'
+                );
+                
+                if (!remoteSite) {
+                  console.error('❌ Could not find remote.appwrite.network site');
+                  process.exit(1);
+                }
+                
+                console.log(`✅ Found remote site: ${remoteSite.$id} (${remoteSite.hostname})`);
+                
+                // Create form data for deployment
+                const form = new FormData();
+                form.append('code', fs.createReadStream('remote-ui.tar.gz'));
+                form.append('activate', 'true');
+                
+                // Deploy to the site
+                const deployOptions = {
+                  hostname: 'nyc.cloud.appwrite.io',
+                  path: `/v1/sites/${remoteSite.$id}/deployments`,
+                  method: 'POST',
+                  headers: {
+                    'X-Appwrite-Project': projectId,
+                    'X-Appwrite-Key': apiKey,
+                    ...form.getHeaders()
+                  }
+                };
+                
+                console.log('🌐 Deploying to remote.appwrite.network...');
+                
+                const deployReq = https.request(deployOptions, (deployRes) => {
+                  let deployData = '';
+                  deployRes.on('data', (chunk) => { deployData += chunk; });
+                  deployRes.on('end', () => {
+                    console.log('Deploy Status:', deployRes.statusCode);
+                    if (deployRes.statusCode >= 200 && deployRes.statusCode < 300) {
+                      console.log('✅ Enhanced Claude Remote UI deployed successfully!');
+                      console.log('🌐 Live at: https://remote.appwrite.network');
+                      console.log('🎉 Features deployed:');
+                      console.log('   - Dual-mode interface (Chat + Remote Control)');
+                      console.log('   - Interactive task management');
+                      console.log('   - Real-time status monitoring');
+                      console.log('   - Mobile-responsive design');
+                    } else {
+                      console.log('❌ Deployment failed:', deployData);
+                      process.exit(1);
+                    }
+                  });
+                });
+                
+                deployReq.on('error', (error) => {
+                  console.error('❌ Deployment error:', error.message);
+                  process.exit(1);
+                });
+                
+                form.pipe(deployReq);
+                
+              } catch (parseError) {
+                console.error('❌ Failed to parse sites response:', parseError);
+                process.exit(1);
+              }
+            } else {
+              console.error(`❌ Failed to list sites: ${listRes.statusCode}`);
+              console.error('Response:', listData);
+              process.exit(1);
+            }
+          });
+        });
+        
+        listReq.on('error', (error) => {
+          console.error('❌ Sites list error:', error.message);
+          process.exit(1);
+        });
+        
+        listReq.end();
+        EOF
+        
+        # Execute deployment
+        node deploy-remote.cjs

@@ -1,0 +1,73 @@
+{
+  "timestamp": "2025-08-23T22:31:36.512Z",
+  "viewport": "390x844",
+  "sites": {
+    "Slumlord RPG": {
+      "site": "Slumlord RPG",
+      "url": "https://slumlord.appwrite.network",
+      "timestamp": "2025-08-23T22:31:36.677Z",
+      "loadTime": 469,
+      "errors": [
+        "❌ Equipment panel not found"
+      ],
+      "responsive": true,
+      "issues": [
+        "15 elements with text < 14px",
+        "1 touch targets < 44px",
+        "Shows keyboard instructions (not mobile-friendly)",
+        "Touch interaction failed"
+      ],
+      "functionality": {
+        "canvas": true,
+        "gameControls": 0,
+        "touchWorking": false
+      }
+    },
+    "Trading Post": {
+      "site": "Trading Post",
+      "url": "https://tradingpost.appwrite.network",
+      "timestamp": "2025-08-23T22:32:09.381Z",
+      "loadTime": 730,
+      "errors": [
+        "Cannot use import statement outside a module",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "❌ Diagnostics failed: AppwriteException: User (role: guests) missing scope (account)\n    at Client.<anonymous> (https://tradingpost.appwrite.network/index-BFcgq16O.js:69:116176)\n    at Generator.next (<anonymous>)\n    at d (https://tradingpost.appwrite.network/index-BFcgq16O.js:69:107000)",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()"
+      ],
+      "responsive": false,
+      "issues": [
+        "Content too wide: 962px > 390px",
+        "1 elements with text < 14px",
+        "10 touch targets < 44px"
+      ],
+      "functionality": {
+        "authElements": 16,
+        "search": false,
+        "touchWorking": true
+      }
+    },
+    "Recursion Chat": {
+      "site": "Recursion Chat",
+      "url": "https://chat.recursionsystems.com",
+      "timestamp": "2025-08-23T22:32:12.399Z",
+      "loadTime": 0,
+      "errors": [
+        "Failed to load resource: the server responded with a status of 404 ()",
+        "HTTP 404: "
+      ],
+      "responsive": true,
+      "issues": [],
+      "functionality": {}
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "timestamp": "2025-08-25T13:55:15.292Z",
+  "summary": {
+    "filesConsolidated": 4,
+    "knowledgeDocumentsCreated": 0,
+    "errors": 0,
+    "totalSpaceSaved": 28
+  },
+  "consolidated": [
+    {
+      "output": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\knowledge\\DEPLOYMENT_KNOWLEDGE.md",
+      "sources": [
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\appwrite-env-deployment-guide.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\deployment-guide.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\deployment-guide_1.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\DEPLOYMENT_INSTRUCTIONS.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\INDEX.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\MANUAL_DEPLOYMENT.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\MANUAL_DEPLOYMENT_GUIDE.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\MANUAL_DEPLOYMENT_INSTRUCTIONS.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\QUICK_DEPLOY_REFERENCE.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\deployment\\REMOTE_DEPLOYMENT_INSTRUCTIONS.md"
+      ],
+      "size": 44929
+    },
+    {
+      "output": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\knowledge\\MOBILE_KNOWLEDGE.md",
+      "sources": [
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\comprehensive-mobile-sso-test-report.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\easy-sso-mobile-test-results.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\final-mobile-compatibility-report.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\INDEX.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\mobile-compatibility-assessment-summary.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\mobile-compatibility-assessment-summary_1.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\mobile-fixes-action-plan.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\mobile-sso-final-report.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\mobile-sso-remediation-plan.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\mobile-test-summary.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\MOBILE_AUTHENTICATION_AUDIT_AND_REMEDIATION_REPORT.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\MOBILE_FIX_READY.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\MOBILE_OAUTH_FIX_SUMMARY.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\MOBILE_SSO_FIXES_SUMMARY.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\MOBILE_WHITE_SCREEN_EMERGENCY_FIX_INSTRUCTIONS.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\mobile\\unified-sso-mobile-compatibility-report.md"
+      ],
+      "size": 112961
+    },
+    {
+      "output": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\knowledge\\fixes\\ERROR_FIXES.md",
+      "sources": [
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\fixes\\INDEX.md"
+      ],
+      "size": 399
+    },
+    {
+      "output": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\knowledge\\TESTING_KNOWLEDGE.md",
+      "sources": [
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\tests\\actual-test-results.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\tests\\comprehensive-sso-test-report.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\tests\\easy-sso-test-report.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\tests\\sso-test-action-plan.md",
+        "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\docs\\tests\\sso-testing-final-summary.md"
+      ],
+      "size": 40392
+    }
+  ],
+  "knowledgeExtracted": [],
+  "errors": []
+}

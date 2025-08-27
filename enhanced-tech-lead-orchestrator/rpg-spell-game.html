@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 SlumLord ARPG - Spell System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .game-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .game-area {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 2px solid #333;
+        }
+        
+        .canvas {
+            display: block;
+            background: #1a1a1a;
+            cursor: crosshair;
+        }
+        
+        .ui-panel {
+            width: 300px;
+            background: rgba(0, 0, 0, 0.9);
+            border-left: 2px solid #333;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .spell-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #444;
+        }
+        
+        .spell-slot {
+            width: 50px;
+            height: 50px;
+            background: rgba(40, 40, 40, 0.9);
+            border: 2px solid #666;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .spell-slot:hover {
+            border-color: #0ff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .spell-slot.active {
+            border-color: #ff0;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.5);
+            background: rgba(60, 60, 0, 0.9);
+        }
+        
+        .spell-slot.cooldown {
+            border-color: #f00;
+            background: rgba(60, 0, 0, 0.9);
+            cursor: not-allowed;
+        }
+        
+        .spell-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        
+        .spell-key {
+            font-size: 10px;
+            color: #ccc;
+        }
+        
+        .cooldown-timer {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 8px;
+            color: #f00;
+            font-weight: bold;
+        }
+        
+        .health-bar {
+            width: 100%;
+            height: 20px;
+            background: #333;
+            border: 1px solid #666;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000 0%, #ffff00 50%, #00ff00 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .mana-bar {
+            width: 100%;
+            height: 15px;
+            background: #333;
+            border: 1px solid #666;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        
+        .mana-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0066ff 0%, #00ccff 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .entity {
+            position: absolute;
+            font-size: 20px;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        
+        .player {
+            color: #0ff;
+            text-shadow: 0 0 5px #0ff;
+        }
+        
+        .npc {
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+            cursor: pointer;
+        }
+        
+        .enemy {
+            color: #f00;
+            text-shadow: 0 0 5px #f00;
+            cursor: pointer;
+        }
+        
+        .spell-projectile {
+            position: absolute;
+            font-size: 16px;
+            z-index: 15;
+            pointer-events: none;
+        }
+        
+        .damage-number {
+            position: absolute;
+            font-weight: bold;
+            font-size: 14px;
+            color: #ff0;
+            text-shadow: 0 0 3px #000;
+            z-index: 20;
+            pointer-events: none;
+            animation: damage-float 1s ease-out forwards;
+        }
+        
+        @keyframes damage-float {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+        }
+        
+        .spell-effect {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .fireball-effect {
+            background: radial-gradient(circle, #ff6600 0%, #ff0000 50%, transparent 100%);
+            animation: spell-expand 0.5s ease-out forwards;
+        }
+        
+        .ice-effect {
+            background: radial-gradient(circle, #00ffff 0%, #0066ff 50%, transparent 100%);
+            animation: spell-expand 0.5s ease-out forwards;
+        }
+        
+        .lightning-effect {
+            background: radial-gradient(circle, #ffff00 0%, #ff00ff 50%, transparent 100%);
+            animation: spell-expand 0.3s ease-out forwards;
+        }
+        
+        @keyframes spell-expand {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+        
+        .stats {
+            background: rgba(40, 40, 40, 0.9);
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .combat-log {
+            background: rgba(40, 40, 40, 0.9);
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px;
+        }
+        
+        .log-damage { color: #ff6666; }
+        .log-cast { color: #66ccff; }
+        .log-info { color: #cccccc; }
+        
+        .instructions {
+            background: rgba(40, 40, 40, 0.9);
+            border: 1px solid #666;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-area">
+            <canvas id="gameCanvas" class="canvas" width="800" height="600"></canvas>
+            
+            <!-- Spell Bar -->
+            <div class="spell-bar">
+                <div class="spell-slot" data-spell="fireball" data-key="1">
+                    <div class="spell-icon">🔥</div>
+                    <div class="spell-key">1</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+                <div class="spell-slot" data-spell="icebolt" data-key="2">
+                    <div class="spell-icon">❄️</div>
+                    <div class="spell-key">2</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+                <div class="spell-slot" data-spell="lightning" data-key="3">
+                    <div class="spell-icon">⚡</div>
+                    <div class="spell-key">3</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+                <div class="spell-slot" data-spell="heal" data-key="4">
+                    <div class="spell-icon">💚</div>
+                    <div class="spell-key">4</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+                <div class="spell-slot" data-spell="shield" data-key="5">
+                    <div class="spell-icon">🛡️</div>
+                    <div class="spell-key">5</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+                <div class="spell-slot" data-spell="teleport" data-key="6">
+                    <div class="spell-icon">🌀</div>
+                    <div class="spell-key">6</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+                <div class="spell-slot" data-spell="meteor" data-key="7">
+                    <div class="spell-icon">☄️</div>
+                    <div class="spell-key">7</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+                <div class="spell-slot" data-spell="curse" data-key="8">
+                    <div class="spell-icon">💀</div>
+                    <div class="spell-key">8</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+                <div class="spell-slot" data-spell="blessing" data-key="9">
+                    <div class="spell-icon">✨</div>
+                    <div class="spell-key">9</div>
+                    <div class="cooldown-timer" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ui-panel">
+            <div class="stats">
+                <h3>🧙‍♂️ Player Stats</h3>
+                <div>Level: <span id="player-level">1</span></div>
+                <div>
+                    Health: <span id="player-health">100</span>/<span id="player-max-health">100</span>
+                    <div class="health-bar">
+                        <div class="health-fill" id="player-health-bar" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div>
+                    Mana: <span id="player-mana">50</span>/<span id="player-max-mana">50</span>
+                    <div class="mana-bar">
+                        <div class="mana-fill" id="player-mana-bar" style="width: 100%;"></div>
+                    </div>
+                </div>
+                <div>Experience: <span id="player-exp">0</span>/<span id="player-exp-needed">100</span></div>
+            </div>
+            
+            <div class="stats">
+                <h3>🎯 Selected Target</h3>
+                <div id="target-info">No target selected</div>
+                <div id="target-health-container" style="display: none;">
+                    Health: <span id="target-health">0</span>/<span id="target-max-health">0</span>
+                    <div class="health-bar">
+                        <div class="health-fill" id="target-health-bar" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="combat-log">
+                <h4>⚔️ Combat Log</h4>
+                <div id="log-entries"></div>
+            </div>
+            
+            <div class="instructions">
+                <h4>🎮 Controls</h4>
+                <div>• WASD or Arrow Keys: Move</div>
+                <div>• 1-9: Cast Spells</div>
+                <div>• Click: Target Enemy/NPC</div>
+                <div>• Space: Auto-attack target</div>
+                <div>• R: Regenerate mana</div>
+                <br>
+                <h4>🔮 Spells</h4>
+                <div>• Fireball (1): 25 damage, 15 mana</div>
+                <div>• Ice Bolt (2): 20 damage + slow</div>
+                <div>• Lightning (3): 30 damage, instant</div>
+                <div>• Heal (4): +40 health</div>
+                <div>• Shield (5): Damage reduction</div>
+                <div>• Teleport (6): Move instantly</div>
+                <div>• Meteor (7): 50 damage, AoE</div>
+                <div>• Curse (8): DoT effect</div>
+                <div>• Blessing (9): Buff effects</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class RPGGame {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.gameWidth = 800;
+                this.gameHeight = 600;
+                
+                // Game state
+                this.gameLoop = null;
+                this.lastTime = 0;
+                this.targetEntity = null;
+                
+                // Player data
+                this.player = {
+                    x: 400,
+                    y: 300,
+                    health: 100,
+                    maxHealth: 100,
+                    mana: 50,
+                    maxMana: 50,
+                    level: 1,
+                    exp: 0,
+                    expNeeded: 100,
+                    shield: 0,
+                    symbol: '🧙‍♂️'
+                };
+                
+                // Entities
+                this.entities = [];
+                this.projectiles = [];
+                this.effects = [];
+                
+                // Input
+                this.keys = {};
+                this.mousePos = { x: 0, y: 0 };
+                
+                // Spells system
+                this.spells = {
+                    fireball: { 
+                        name: 'Fireball', 
+                        damage: 25, 
+                        manaCost: 15, 
+                        cooldown: 2000, 
+                        lastCast: 0, 
+                        type: 'projectile',
+                        icon: '🔥',
+                        color: '#ff6600'
+                    },
+                    icebolt: { 
+                        name: 'Ice Bolt', 
+                        damage: 20, 
+                        manaCost: 12, 
+                        cooldown: 1800, 
+                        lastCast: 0, 
+                        type: 'projectile',
+                        icon: '❄️',
+                        color: '#00ffff'
+                    },
+                    lightning: { 
+                        name: 'Lightning', 
+                        damage: 30, 
+                        manaCost: 20, 
+                        cooldown: 3000, 
+                        lastCast: 0, 
+                        type: 'instant',
+                        icon: '⚡',
+                        color: '#ffff00'
+                    },
+                    heal: { 
+                        name: 'Heal', 
+                        healing: 40, 
+                        manaCost: 25, 
+                        cooldown: 5000, 
+                        lastCast: 0, 
+                        type: 'self',
+                        icon: '💚',
+                        color: '#00ff00'
+                    },
+                    shield: { 
+                        name: 'Shield', 
+                        shield: 30, 
+                        manaCost: 30, 
+                        cooldown: 8000, 
+                        lastCast: 0, 
+                        type: 'self',
+                        icon: '🛡️',
+                        color: '#cccccc'
+                    },
+                    teleport: { 
+                        name: 'Teleport', 
+                        range: 150, 
+                        manaCost: 35, 
+                        cooldown: 6000, 
+                        lastCast: 0, 
+                        type: 'movement',
+                        icon: '🌀',
+                        color: '#9900ff'
+                    },
+                    meteor: { 
+                        name: 'Meteor', 
+                        damage: 50, 
+                        manaCost: 45, 
+                        cooldown: 10000, 
+                        lastCast: 0, 
+                        type: 'aoe',
+                        icon: '☄️',
+                        color: '#ff3300'
+                    },
+                    curse: { 
+                        name: 'Curse', 
+                        damage: 5, 
+                        manaCost: 20, 
+                        cooldown: 4000, 
+                        lastCast: 0, 
+                        type: 'dot',
+                        icon: '💀',
+                        color: '#660066'
+                    },
+                    blessing: { 
+                        name: 'Blessing', 
+                        buff: 'regen', 
+                        manaCost: 40, 
+                        cooldown: 12000, 
+                        lastCast: 0, 
+                        type: 'buff',
+                        icon: '✨',
+                        color: '#ffdd00'
+                    }
+                };
+                
+                this.initializeGame();
+                this.setupEventListeners();
+                this.startGame();
+            }
+            
+            initializeGame() {
+                // Create some NPCs and enemies
+                this.entities = [
+                    { x: 200, y: 150, health: 80, maxHealth: 80, type: 'enemy', symbol: '👹', name: 'Orc' },
+                    { x: 600, y: 200, health: 60, maxHealth: 60, type: 'enemy', symbol: '🐺', name: 'Wolf' },
+                    { x: 150, y: 400, health: 100, maxHealth: 100, type: 'npc', symbol: '👨', name: 'Villager' },
+                    { x: 650, y: 450, health: 120, maxHealth: 120, type: 'enemy', symbol: '🧟', name: 'Zombie' },
+                    { x: 400, y: 100, health: 150, maxHealth: 150, type: 'enemy', symbol: '🐉', name: 'Dragon' },
+                    { x: 100, y: 300, health: 50, maxHealth: 50, type: 'npc', symbol: '🧙‍♀️', name: 'Witch' }
+                ];
+                
+                this.updateUI();
+                this.logMessage('Welcome to SlumLord ARPG! Cast spells with keys 1-9.', 'info');
+            }
+            
+            setupEventListeners() {
+                // Keyboard events
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.code] = true;
+                    this.handleSpellCast(e.key);
+                    
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.autoAttack();
+                    }
+                    if (e.key.toLowerCase() === 'r') {
+                        this.regenerateMana();
+                    }
+                });
+                
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.code] = false;
+                });
+                
+                // Mouse events
+                this.canvas.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.mousePos.x = e.clientX - rect.left;
+                    this.mousePos.y = e.clientY - rect.top;
+                });
+                
+                this.canvas.addEventListener('click', (e) => {
+                    this.handleTargeting(e);
+                });
+                
+                // Spell slot clicks
+                document.querySelectorAll('.spell-slot').forEach((slot, index) => {
+                    slot.addEventListener('click', () => {
+                        this.handleSpellCast((index + 1).toString());
+                    });
+                });
+            }
+            
+            handleSpellCast(key) {
+                const spellKeys = {
+                    '1': 'fireball',
+                    '2': 'icebolt', 
+                    '3': 'lightning',
+                    '4': 'heal',
+                    '5': 'shield',
+                    '6': 'teleport',
+                    '7': 'meteor',
+                    '8': 'curse',
+                    '9': 'blessing'
+                };
+                
+                const spellName = spellKeys[key];
+                if (spellName) {
+                    this.castSpell(spellName);
+                }
+            }
+            
+            castSpell(spellName) {
+                const spell = this.spells[spellName];
+                const now = Date.now();
+                
+                // Check cooldown
+                if (now - spell.lastCast < spell.cooldown) {
+                    this.logMessage(`${spell.name} is on cooldown!`, 'info');
+                    return false;
+                }
+                
+                // Check mana
+                if (this.player.mana < spell.manaCost) {
+                    this.logMessage('Not enough mana!', 'info');
+                    return false;
+                }
+                
+                // Cast spell
+                this.player.mana -= spell.manaCost;
+                spell.lastCast = now;
+                
+                this.logMessage(`Cast ${spell.name}!`, 'cast');
+                
+                // Execute spell effect
+                switch (spell.type) {
+                    case 'projectile':
+                        this.createProjectile(spellName);
+                        break;
+                    case 'instant':
+                        this.instantSpell(spellName);
+                        break;
+                    case 'self':
+                        this.selfSpell(spellName);
+                        break;
+                    case 'movement':
+                        this.movementSpell(spellName);
+                        break;
+                    case 'aoe':
+                        this.aoeSpell(spellName);
+                        break;
+                    case 'dot':
+                        this.dotSpell(spellName);
+                        break;
+                    case 'buff':
+                        this.buffSpell(spellName);
+                        break;
+                }
+                
+                this.updateUI();
+                this.updateSpellUI();
+                return true;
+            }
+            
+            createProjectile(spellName) {
+                if (!this.targetEntity) {
+                    this.logMessage('No target selected!', 'info');
+                    return;
+                }
+                
+                const spell = this.spells[spellName];
+                const projectile = {
+                    x: this.player.x,
+                    y: this.player.y,
+                    targetX: this.targetEntity.x,
+                    targetY: this.targetEntity.y,
+                    speed: 5,
+                    spell: spellName,
+                    damage: spell.damage,
+                    symbol: spell.icon,
+                    color: spell.color
+                };
+                
+                this.projectiles.push(projectile);
+            }
+            
+            instantSpell(spellName) {
+                if (!this.targetEntity) {
+                    this.logMessage('No target selected!', 'info');
+                    return;
+                }
+                
+                const spell = this.spells[spellName];
+                this.dealDamage(this.targetEntity, spell.damage);
+                this.createSpellEffect(this.targetEntity.x, this.targetEntity.y, 'lightning-effect', 40);
+            }
+            
+            selfSpell(spellName) {
+                const spell = this.spells[spellName];
+                
+                if (spellName === 'heal') {
+                    const healAmount = Math.min(spell.healing, this.player.maxHealth - this.player.health);
+                    this.player.health += healAmount;
+                    this.logMessage(`Healed for ${healAmount} health!`, 'info');
+                    this.createSpellEffect(this.player.x, this.player.y, 'heal-effect', 30);
+                } else if (spellName === 'shield') {
+                    this.player.shield += spell.shield;
+                    this.logMessage(`Shield increased by ${spell.shield}!`, 'info');
+                    this.createSpellEffect(this.player.x, this.player.y, 'shield-effect', 35);
+                }
+            }
+            
+            movementSpell(spellName) {
+                if (spellName === 'teleport') {
+                    const spell = this.spells[spellName];
+                    const dx = this.mousePos.x - this.player.x;
+                    const dy = this.mousePos.y - this.player.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance <= spell.range) {
+                        this.createSpellEffect(this.player.x, this.player.y, 'teleport-effect', 30);
+                        this.player.x = this.mousePos.x;
+                        this.player.y = this.mousePos.y;
+                        this.createSpellEffect(this.player.x, this.player.y, 'teleport-effect', 30);
+                        this.logMessage('Teleported!', 'cast');
+                    } else {
+                        this.logMessage('Target too far for teleport!', 'info');
+                    }
+                }
+            }
+            
+            aoeSpell(spellName) {
+                if (spellName === 'meteor') {
+                    const spell = this.spells[spellName];
+                    const targetX = this.mousePos.x;
+                    const targetY = this.mousePos.y;
+                    
+                    // Damage all entities within range
+                    this.entities.forEach(entity => {
+                        const dx = entity.x - targetX;
+                        const dy = entity.y - targetY;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance <= 80 && (entity.type === 'enemy' || entity.type === 'npc')) {
+                            this.dealDamage(entity, spell.damage);
+                        }
+                    });
+                    
+                    this.createSpellEffect(targetX, targetY, 'meteor-effect', 80);
+                    this.logMessage(`Meteor strikes for ${spell.damage} damage!`, 'cast');
+                }
+            }
+            
+            dotSpell(spellName) {
+                if (!this.targetEntity) {
+                    this.logMessage('No target selected!', 'info');
+                    return;
+                }
+                
+                const spell = this.spells[spellName];
+                // Apply DoT effect (simplified - would normally track over time)
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        if (this.targetEntity.health > 0) {
+                            this.dealDamage(this.targetEntity, spell.damage);
+                        }
+                    }, i * 1000);
+                }
+                
+                this.createSpellEffect(this.targetEntity.x, this.targetEntity.y, 'curse-effect', 35);
+                this.logMessage(`Cursed ${this.targetEntity.name}!`, 'cast');
+            }
+            
+            buffSpell(spellName) {
+                if (spellName === 'blessing') {
+                    // Apply blessing effect (simplified)
+                    this.player.maxHealth += 20;
+                    this.player.health += 20;
+                    this.player.maxMana += 10;
+                    this.player.mana += 10;
+                    
+                    this.createSpellEffect(this.player.x, this.player.y, 'blessing-effect', 40);
+                    this.logMessage('Blessed with increased power!', 'cast');
+                    
+                    // Remove blessing after 30 seconds
+                    setTimeout(() => {
+                        this.player.maxHealth -= 20;
+                        this.player.health = Math.min(this.player.health, this.player.maxHealth);
+                        this.player.maxMana -= 10;
+                        this.player.mana = Math.min(this.player.mana, this.player.maxMana);
+                        this.logMessage('Blessing effect ended.', 'info');
+                        this.updateUI();
+                    }, 30000);
+                }
+            }
+            
+            createSpellEffect(x, y, effectClass, size) {
+                const effect = document.createElement('div');
+                effect.className = `spell-effect ${effectClass}`;
+                effect.style.left = (x - size/2) + 'px';
+                effect.style.top = (y - size/2) + 'px';
+                effect.style.width = size + 'px';
+                effect.style.height = size + 'px';
+                
+                document.body.appendChild(effect);
+                
+                setTimeout(() => {
+                    effect.remove();
+                }, 500);
+            }
+            
+            dealDamage(entity, damage) {
+                // Apply shield reduction for player
+                if (entity === this.player && this.player.shield > 0) {
+                    const absorbed = Math.min(damage, this.player.shield);
+                    this.player.shield -= absorbed;
+                    damage -= absorbed;
+                    this.logMessage(`Shield absorbed ${absorbed} damage!`, 'info');
+                }
+                
+                entity.health -= damage;
+                entity.health = Math.max(0, entity.health);
+                
+                // Show damage number
+                this.showDamageNumber(entity.x, entity.y, damage);
+                
+                if (entity.type === 'enemy' || entity.type === 'npc') {
+                    this.logMessage(`${entity.name} takes ${damage} damage!`, 'damage');
+                    
+                    if (entity.health <= 0) {
+                        this.logMessage(`${entity.name} is defeated!`, 'info');
+                        this.gainExperience(entity.maxHealth);
+                        
+                        // Remove dead entity
+                        const index = this.entities.indexOf(entity);
+                        if (index > -1) {
+                            this.entities.splice(index, 1);
+                        }
+                        
+                        if (this.targetEntity === entity) {
+                            this.targetEntity = null;
+                            this.updateTargetUI();
+                        }
+                    }
+                } else if (entity === this.player) {
+                    this.logMessage(`You take ${damage} damage!`, 'damage');
+                    
+                    if (this.player.health <= 0) {
+                        this.logMessage('You have been defeated!', 'damage');
+                        this.gameOver();
+                    }
+                }
+                
+                this.updateUI();
+                this.updateTargetUI();
+            }
+            
+            showDamageNumber(x, y, damage) {
+                const damageEl = document.createElement('div');
+                damageEl.className = 'damage-number';
+                damageEl.textContent = `-${damage}`;
+                damageEl.style.left = x + 'px';
+                damageEl.style.top = y + 'px';
+                
+                document.body.appendChild(damageEl);
+                
+                setTimeout(() => {
+                    damageEl.remove();
+                }, 1000);
+            }
+            
+            gainExperience(exp) {
+                this.player.exp += exp;
+                
+                if (this.player.exp >= this.player.expNeeded) {
+                    this.levelUp();
+                }
+                
+                this.updateUI();
+            }
+            
+            levelUp() {
+                this.player.level++;
+                this.player.exp -= this.player.expNeeded;
+                this.player.expNeeded = Math.floor(this.player.expNeeded * 1.5);
+                
+                // Increase stats
+                this.player.maxHealth += 20;
+                this.player.health = this.player.maxHealth;
+                this.player.maxMana += 10;
+                this.player.mana = this.player.maxMana;
+                
+                this.logMessage(`Level up! You are now level ${this.player.level}!`, 'cast');
+                this.createSpellEffect(this.player.x, this.player.y, 'blessing-effect', 50);
+            }
+            
+            autoAttack() {
+                if (!this.targetEntity) {
+                    this.logMessage('No target selected!', 'info');
+                    return;
+                }
+                
+                const damage = 10 + this.player.level * 2;
+                this.dealDamage(this.targetEntity, damage);
+                this.logMessage(`Auto-attack for ${damage} damage!`, 'damage');
+            }
+            
+            regenerateMana() {
+                const regen = 10;
+                this.player.mana = Math.min(this.player.maxMana, this.player.mana + regen);
+                this.logMessage(`Regenerated ${regen} mana!`, 'info');
+                this.updateUI();
+            }
+            
+            handleTargeting(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+                
+                // Find closest entity to click
+                let closestEntity = null;
+                let closestDistance = Infinity;
+                
+                this.entities.forEach(entity => {
+                    const dx = entity.x - clickX;
+                    const dy = entity.y - clickY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 30 && distance < closestDistance) {
+                        closestEntity = entity;
+                        closestDistance = distance;
+                    }
+                });
+                
+                if (closestEntity) {
+                    this.targetEntity = closestEntity;
+                    this.logMessage(`Targeted ${closestEntity.name}!`, 'info');
+                    this.updateTargetUI();
+                } else {
+                    this.targetEntity = null;
+                    this.updateTargetUI();
+                }
+            }
+            
+            updateMovement() {
+                const speed = 3;
+                
+                if (this.keys['KeyW'] || this.keys['ArrowUp']) {
+                    this.player.y = Math.max(20, this.player.y - speed);
+                }
+                if (this.keys['KeyS'] || this.keys['ArrowDown']) {
+                    this.player.y = Math.min(this.gameHeight - 20, this.player.y + speed);
+                }
+                if (this.keys['KeyA'] || this.keys['ArrowLeft']) {
+                    this.player.x = Math.max(20, this.player.x - speed);
+                }
+                if (this.keys['KeyD'] || this.keys['ArrowRight']) {
+                    this.player.x = Math.min(this.gameWidth - 20, this.player.x + speed);
+                }
+            }
+            
+            updateProjectiles() {
+                for (let i = this.projectiles.length - 1; i >= 0; i--) {
+                    const proj = this.projectiles[i];
+                    
+                    // Move projectile towards target
+                    const dx = proj.targetX - proj.x;
+                    const dy = proj.targetY - proj.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < proj.speed) {
+                        // Hit target
+                        const target = this.entities.find(e => 
+                            Math.sqrt((e.x - proj.targetX) ** 2 + (e.y - proj.targetY) ** 2) < 30
+                        );
+                        
+                        if (target) {
+                            this.dealDamage(target, proj.damage);
+                            
+                            // Create hit effect
+                            const effectClass = proj.spell === 'fireball' ? 'fireball-effect' : 
+                                               proj.spell === 'icebolt' ? 'ice-effect' : 'fireball-effect';
+                            this.createSpellEffect(proj.targetX, proj.targetY, effectClass, 40);
+                        }
+                        
+                        this.projectiles.splice(i, 1);
+                    } else {
+                        // Move projectile
+                        proj.x += (dx / distance) * proj.speed;
+                        proj.y += (dy / distance) * proj.speed;
+                    }
+                }
+            }
+            
+            render() {
+                // Clear canvas
+                this.ctx.fillStyle = '#1a1a1a';
+                this.ctx.fillRect(0, 0, this.gameWidth, this.gameHeight);
+                
+                // Draw grid
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 1;
+                for (let x = 0; x < this.gameWidth; x += 50) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x, 0);
+                    this.ctx.lineTo(x, this.gameHeight);
+                    this.ctx.stroke();
+                }
+                for (let y = 0; y < this.gameHeight; y += 50) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.gameWidth, y);
+                    this.ctx.stroke();
+                }
+                
+                // Draw entities
+                this.entities.forEach(entity => {
+                    this.drawEntity(entity);
+                    this.drawHealthBar(entity);
+                });
+                
+                // Draw player
+                this.drawPlayer();
+                
+                // Draw projectiles
+                this.projectiles.forEach(proj => {
+                    this.ctx.font = '16px monospace';
+                    this.ctx.fillStyle = proj.color;
+                    this.ctx.fillText(proj.symbol, proj.x - 8, proj.y + 6);
+                });
+                
+                // Draw target indicator
+                if (this.targetEntity) {
+                    this.ctx.strokeStyle = '#ff0';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    this.ctx.arc(this.targetEntity.x, this.targetEntity.y, 25, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                }
+            }
+            
+            drawEntity(entity) {
+                this.ctx.font = '20px monospace';
+                this.ctx.fillStyle = entity.type === 'enemy' ? '#f00' : '#0f0';
+                this.ctx.fillText(entity.symbol, entity.x - 10, entity.y + 7);
+                
+                // Draw name
+                this.ctx.font = '10px monospace';
+                this.ctx.fillStyle = '#fff';
+                this.ctx.fillText(entity.name, entity.x - entity.name.length * 3, entity.y - 15);
+            }
+            
+            drawPlayer() {
+                this.ctx.font = '20px monospace';
+                this.ctx.fillStyle = '#0ff';
+                this.ctx.fillText(this.player.symbol, this.player.x - 10, this.player.y + 7);
+                
+                // Draw shield effect
+                if (this.player.shield > 0) {
+                    this.ctx.strokeStyle = '#ccc';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    this.ctx.arc(this.player.x, this.player.y, 20, 0, Math.PI * 2);
+                    this.ctx.stroke();
+                }
+            }
+            
+            drawHealthBar(entity) {
+                const barWidth = 30;
+                const barHeight = 4;
+                const x = entity.x - barWidth / 2;
+                const y = entity.y - 25;
+                
+                // Background
+                this.ctx.fillStyle = '#333';
+                this.ctx.fillRect(x, y, barWidth, barHeight);
+                
+                // Health
+                const healthPercent = entity.health / entity.maxHealth;
+                this.ctx.fillStyle = healthPercent > 0.6 ? '#0f0' : healthPercent > 0.3 ? '#ff0' : '#f00';
+                this.ctx.fillRect(x, y, barWidth * healthPercent, barHeight);
+            }
+            
+            updateUI() {
+                document.getElementById('player-level').textContent = this.player.level;
+                document.getElementById('player-health').textContent = this.player.health;
+                document.getElementById('player-max-health').textContent = this.player.maxHealth;
+                document.getElementById('player-mana').textContent = this.player.mana;
+                document.getElementById('player-max-mana').textContent = this.player.maxMana;
+                document.getElementById('player-exp').textContent = this.player.exp;
+                document.getElementById('player-exp-needed').textContent = this.player.expNeeded;
+                
+                const healthPercent = (this.player.health / this.player.maxHealth) * 100;
+                const manaPercent = (this.player.mana / this.player.maxMana) * 100;
+                
+                document.getElementById('player-health-bar').style.width = healthPercent + '%';
+                document.getElementById('player-mana-bar').style.width = manaPercent + '%';
+            }
+            
+            updateTargetUI() {
+                const targetInfo = document.getElementById('target-info');
+                const targetHealthContainer = document.getElementById('target-health-container');
+                
+                if (this.targetEntity) {
+                    targetInfo.textContent = `${this.targetEntity.name} (${this.targetEntity.type})`;
+                    targetHealthContainer.style.display = 'block';
+                    
+                    document.getElementById('target-health').textContent = this.targetEntity.health;
+                    document.getElementById('target-max-health').textContent = this.targetEntity.maxHealth;
+                    
+                    const healthPercent = (this.targetEntity.health / this.targetEntity.maxHealth) * 100;
+                    document.getElementById('target-health-bar').style.width = healthPercent + '%';
+                } else {
+                    targetInfo.textContent = 'No target selected';
+                    targetHealthContainer.style.display = 'none';
+                }
+            }
+            
+            updateSpellUI() {
+                const now = Date.now();
+                
+                Object.keys(this.spells).forEach((spellName, index) => {
+                    const spell = this.spells[spellName];
+                    const slot = document.querySelector(`[data-spell="${spellName}"]`);
+                    const cooldownTimer = slot.querySelector('.cooldown-timer');
+                    
+                    const timeLeft = Math.max(0, spell.cooldown - (now - spell.lastCast));
+                    
+                    if (timeLeft > 0) {
+                        slot.classList.add('cooldown');
+                        cooldownTimer.style.display = 'block';
+                        cooldownTimer.textContent = Math.ceil(timeLeft / 1000);
+                    } else {
+                        slot.classList.remove('cooldown');
+                        cooldownTimer.style.display = 'none';
+                    }
+                    
+                    // Check mana
+                    if (this.player.mana < spell.manaCost) {
+                        slot.style.opacity = '0.5';
+                    } else {
+                        slot.style.opacity = '1';
+                    }
+                });
+            }
+            
+            logMessage(message, type) {
+                const logEntries = document.getElementById('log-entries');
+                const entry = document.createElement('div');
+                entry.className = `log-entry log-${type}`;
+                entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                
+                logEntries.appendChild(entry);
+                logEntries.scrollTop = logEntries.scrollHeight;
+                
+                // Keep only last 50 entries
+                while (logEntries.children.length > 50) {
+                    logEntries.removeChild(logEntries.firstChild);
+                }
+            }
+            
+            gameOver() {
+                this.stopGame();
+                alert('Game Over! Refresh to play again.');
+            }
+            
+            update(deltaTime) {
+                this.updateMovement();
+                this.updateProjectiles();
+                this.updateSpellUI();
+                
+                // Passive mana regeneration
+                if (Date.now() % 100 === 0) {
+                    this.player.mana = Math.min(this.player.maxMana, this.player.mana + 0.1);
+                    this.updateUI();
+                }
+            }
+            
+            gameLoop(timestamp) {
+                const deltaTime = timestamp - this.lastTime;
+                this.lastTime = timestamp;
+                
+                this.update(deltaTime);
+                this.render();
+                
+                this.gameLoop = requestAnimationFrame((t) => this.gameLoop(t));
+            }
+            
+            startGame() {
+                this.lastTime = performance.now();
+                this.gameLoop = requestAnimationFrame((t) => this.gameLoop(t));
+            }
+            
+            stopGame() {
+                if (this.gameLoop) {
+                    cancelAnimationFrame(this.gameLoop);
+                    this.gameLoop = null;
+                }
+            }
+        }
+        
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new RPGGame();
+        });
+    </script>
+</body>
+</html>

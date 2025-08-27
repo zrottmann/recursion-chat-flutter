@@ -1,0 +1,37 @@
+{
+  "name": "multiplayer-sharded-game",
+  "version": "1.0.0",
+  "description": "Cost-optimized sharded multiplayer game backend with Appwrite integration",
+  "private": true,
+  "workspaces": [
+    "shard-manager",
+    "game-shard",
+    "client-example"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm run install:manager && npm run install:shard && npm run install:client",
+    "install:manager": "cd shard-manager && npm install",
+    "install:shard": "cd game-shard && npm install",
+    "install:client": "cd client-example && npm install",
+    "dev": "concurrently \"npm run dev:manager\" \"npm run dev:shard\"",
+    "dev:manager": "cd shard-manager && npm run dev",
+    "dev:shard": "cd game-shard && npm run dev",
+    "demo": "npm run demo:setup && concurrently \"npm run demo:manager\" \"npm run demo:shard1\" \"npm run demo:shard2\"",
+    "demo:setup": "node scripts/demo-setup.js",
+    "demo:manager": "cd shard-manager && PORT=3000 npm run dev",
+    "demo:shard1": "cd game-shard && SHARD_ID=shard-1 PORT=4001 MANAGER_URL=http://localhost:3000 npm run dev",
+    "demo:shard2": "cd game-shard && SHARD_ID=shard-2 PORT=4002 MANAGER_URL=http://localhost:3000 npm run dev",
+    "test": "npm run test:manager && npm run test:shard",
+    "test:manager": "cd shard-manager && npm test",
+    "test:shard": "cd game-shard && npm test",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

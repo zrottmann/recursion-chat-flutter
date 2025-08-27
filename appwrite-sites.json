@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "settings": {
+    "framework": "static",
+    "buildCommand": "npm run build",
+    "installCommand": "npm install", 
+    "outputDirectory": "dist",
+    "rootDirectory": "/"
+  }
+}

@@ -1,0 +1,1367 @@
+{
+  "summary": {
+    "totalTests": 40,
+    "passed": 25,
+    "failed": 15,
+    "averageLoadTime": 138.675,
+    "averageUsabilityScore": 71.125,
+    "testDuration": 119665,
+    "timestamp": "2025-08-24T03:02:11.085Z"
+  },
+  "testCriteria": {
+    "maxLoadTime": 5000,
+    "minUsabilityScore": 70,
+    "maxErrors": 2,
+    "requiredElements": [
+      "title",
+      "meta[name=\"viewport\"]"
+    ],
+    "touchFriendlyMinSize": 44
+  },
+  "results": [
+    {
+      "siteName": "Enhanced Tech-Lead Orchestrator - Main",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:00:11.573Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 68,
+        "firstContentfulPaint": 128,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 1,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 51.80000001192093,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Enhanced_Tech_Lead_Orchestrator___Main-iPhone_SE.png"
+    },
+    {
+      "siteName": "Enhanced Tech-Lead Orchestrator - Main",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:00:14.580Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 56,
+        "firstContentfulPaint": 88,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 1,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 46.19999998807907,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Enhanced_Tech_Lead_Orchestrator___Main-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Enhanced Tech-Lead Orchestrator - Main",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:00:17.479Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 59,
+        "firstContentfulPaint": 88,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 1,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 47.5,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Enhanced_Tech_Lead_Orchestrator___Main-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Enhanced Tech-Lead Orchestrator - Main",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:00:20.343Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 75,
+        "firstContentfulPaint": 88,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 1,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 49.799999952316284,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Enhanced_Tech_Lead_Orchestrator___Main-iPad_Mini.png"
+    },
+    {
+      "siteName": "Tech-Lead Operations Center - Demo",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:00:23.272Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 280,
+        "firstContentfulPaint": 312,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 13,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Tech_Lead_Operations_Center___Demo-iPhone_SE.png"
+    },
+    {
+      "siteName": "Tech-Lead Operations Center - Demo",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:00:26.404Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 284,
+        "firstContentfulPaint": 272,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 8.599999964237213,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Tech_Lead_Operations_Center___Demo-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Tech-Lead Operations Center - Demo",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:00:29.546Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 245,
+        "firstContentfulPaint": 248,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 8.800000011920929,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Tech_Lead_Operations_Center___Demo-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Tech-Lead Operations Center - Demo",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:00:32.663Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 234,
+        "firstContentfulPaint": 252,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 8,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Tech_Lead_Operations_Center___Demo-iPad_Mini.png"
+    },
+    {
+      "siteName": "Operations Center - Enhanced",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:00:35.803Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 275,
+        "firstContentfulPaint": 436,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 19.099999964237213,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Operations_Center___Enhanced-iPhone_SE.png"
+    },
+    {
+      "siteName": "Operations Center - Enhanced",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:00:38.993Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 276,
+        "firstContentfulPaint": 288,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 21.400000035762787,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Operations_Center___Enhanced-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Operations Center - Enhanced",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:00:42.193Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 326,
+        "firstContentfulPaint": 336,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 22,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Operations_Center___Enhanced-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Operations Center - Enhanced",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:00:45.415Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 291,
+        "firstContentfulPaint": 320,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 19.599999964237213,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Operations_Center___Enhanced-iPad_Mini.png"
+    },
+    {
+      "siteName": "Operations Center - Mobile Fixed",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:00:48.723Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 259,
+        "firstContentfulPaint": 256,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 8.399999976158142,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Operations_Center___Mobile_Fixed-iPhone_SE.png"
+    },
+    {
+      "siteName": "Operations Center - Mobile Fixed",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:00:51.833Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 262,
+        "firstContentfulPaint": 256,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 8.200000047683716,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Operations_Center___Mobile_Fixed-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Operations Center - Mobile Fixed",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:00:54.925Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 278,
+        "firstContentfulPaint": 284,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 9.5,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Operations_Center___Mobile_Fixed-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Operations Center - Mobile Fixed",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:00:58.038Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 255,
+        "firstContentfulPaint": 264,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 100
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 5,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 8.099999964237213,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Operations_Center___Mobile_Fixed-iPad_Mini.png"
+    },
+    {
+      "siteName": "Grok Console",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:01:01.199Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 281,
+        "firstContentfulPaint": 296,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 2,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Grok_Console-iPhone_SE.png"
+    },
+    {
+      "siteName": "Grok Console",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:01:04.336Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 260,
+        "firstContentfulPaint": 264,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 2,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0.10000002384185791,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Grok_Console-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Grok Console",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:01:07.458Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 239,
+        "firstContentfulPaint": 256,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 2,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Grok_Console-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Grok Console",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:01:10.526Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 230,
+        "firstContentfulPaint": 252,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 2,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Grok_Console-iPad_Mini.png"
+    },
+    {
+      "siteName": "Claude Code UI",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:01:13.695Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 45 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/src/main.jsx - [object Object]",
+        "Network error: file:///C:/favicon.png - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 12,
+        "firstContentfulPaint": 0,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 45
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 3,
+        "networkFailures": 3
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Claude_Code_UI-iPhone_SE.png"
+    },
+    {
+      "siteName": "Claude Code UI",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:01:16.452Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 45 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/src/main.jsx - [object Object]",
+        "Network error: file:///C:/favicon.png - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 14,
+        "firstContentfulPaint": 0,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 45
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 3,
+        "networkFailures": 3
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Claude_Code_UI-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Claude Code UI",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:01:19.238Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 45 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/src/main.jsx - [object Object]",
+        "Network error: file:///C:/favicon.png - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 14,
+        "firstContentfulPaint": 0,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 45
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 3,
+        "networkFailures": 3
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Claude_Code_UI-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Claude Code UI",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:01:22.023Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 45 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/src/main.jsx - [object Object]",
+        "Network error: file:///C:/favicon.png - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 18,
+        "firstContentfulPaint": 0,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 45
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 3,
+        "networkFailures": 3
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Claude_Code_UI-iPad_Mini.png"
+    },
+    {
+      "siteName": "Trading Post",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:01:24.852Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 40 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/module-fix.js - [object Object]",
+        "Network error: file:///C:/index-BNhnxLMX.js - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 180,
+        "firstContentfulPaint": 196,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 40
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 4,
+        "networkFailures": 3
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Trading_Post-iPhone_SE.png"
+    },
+    {
+      "siteName": "Trading Post",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:01:27.818Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 40 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/module-fix.js - [object Object]",
+        "Network error: file:///C:/index-BNhnxLMX.js - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 119,
+        "firstContentfulPaint": 140,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 40
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0.09999996423721313,
+        "networkIdle": null,
+        "javascriptErrors": 4,
+        "networkFailures": 3
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Trading_Post-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Trading Post",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:01:30.743Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 40 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/module-fix.js - [object Object]",
+        "Network error: file:///C:/index-k9fKsC9O.css - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 148,
+        "firstContentfulPaint": 140,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 40
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 4,
+        "networkFailures": 3
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Trading_Post-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Trading Post",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:01:33.686Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 40 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/module-fix.js - [object Object]",
+        "Network error: file:///C:/index-BNhnxLMX.js - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 131,
+        "firstContentfulPaint": 152,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 40
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0.10000002384185791,
+        "networkIdle": null,
+        "javascriptErrors": 4,
+        "networkFailures": 3
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Trading_Post-iPad_Mini.png"
+    },
+    {
+      "siteName": "Recursion Chat",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:01:36.639Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 0 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/assets/index.CvRldvNM.css - [object Object]",
+        "Network error: file:///C:/selective-error-handler.js - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 43,
+        "firstContentfulPaint": 0,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 0
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 10,
+        "networkFailures": 9
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Recursion_Chat-iPhone_SE.png"
+    },
+    {
+      "siteName": "Recursion Chat",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:01:39.427Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 0 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/assets/index.CvRldvNM.css - [object Object]",
+        "Network error: file:///C:/selective-error-handler.js - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 18,
+        "firstContentfulPaint": 0,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 0
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 10,
+        "networkFailures": 9
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Recursion_Chat-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Recursion Chat",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:01:42.223Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 0 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/selective-error-handler.js - [object Object]",
+        "Network error: file:///C:/js/index.D8bF4m1K.js - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 13,
+        "firstContentfulPaint": 36,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 0
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0.10000002384185791,
+        "networkIdle": null,
+        "javascriptErrors": 10,
+        "networkFailures": 9
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Recursion_Chat-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Recursion Chat",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:01:45.013Z",
+      "status": "FAIL",
+      "errors": [
+        "Usability score 0 below minimum 70",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Console error: Failed to load resource: net::ERR_FILE_NOT_FOUND",
+        "Network error: file:///C:/selective-error-handler.js - [object Object]",
+        "Network error: file:///C:/js/index.D8bF4m1K.js - [object Object]"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 19,
+        "firstContentfulPaint": 0,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 0
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0,
+        "networkIdle": null,
+        "javascriptErrors": 10,
+        "networkFailures": 9
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Recursion_Chat-iPad_Mini.png"
+    },
+    {
+      "siteName": "Archon Knowledge Engine",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:01:47.805Z",
+      "status": "PASS",
+      "errors": [
+        "Console error: Failed to load resource: the server responded with a status of 404 ()",
+        "Console error: ❌ Appwrite Function call failed: 404 ",
+        "Console error: 💥 API Gateway error: Error: Function call failed: 404 \n    at window.fetch (file:///C:/Users/Zrott/OneDrive/Desktop/Claude/active-projects/archon/dist/api-gateway.js:78:27)\n    at async file:///C:/Users/Zrott/OneDrive/Desktop/Claude/active-projects/archon/dist/api-gateway.js:144:36"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 67,
+        "firstContentfulPaint": 84,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 75
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0.8999999761581421,
+        "networkIdle": null,
+        "javascriptErrors": 3,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Archon_Knowledge_Engine-iPhone_SE.png"
+    },
+    {
+      "siteName": "Archon Knowledge Engine",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:01:50.797Z",
+      "status": "PASS",
+      "errors": [
+        "Console error: Failed to load resource: the server responded with a status of 404 ()",
+        "Console error: ❌ Appwrite Function call failed: 404 ",
+        "Console error: 💥 API Gateway error: Error: Function call failed: 404 \n    at window.fetch (file:///C:/Users/Zrott/OneDrive/Desktop/Claude/active-projects/archon/dist/api-gateway.js:78:27)\n    at async file:///C:/Users/Zrott/OneDrive/Desktop/Claude/active-projects/archon/dist/api-gateway.js:144:36"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 35,
+        "firstContentfulPaint": 64,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 75
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0.9000000357627869,
+        "networkIdle": null,
+        "javascriptErrors": 3,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Archon_Knowledge_Engine-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Archon Knowledge Engine",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:01:53.727Z",
+      "status": "PASS",
+      "errors": [
+        "Console error: Failed to load resource: the server responded with a status of 404 ()",
+        "Console error: ❌ Appwrite Function call failed: 404 ",
+        "Console error: 💥 API Gateway error: Error: Function call failed: 404 \n    at window.fetch (file:///C:/Users/Zrott/OneDrive/Desktop/Claude/active-projects/archon/dist/api-gateway.js:78:27)\n    at async file:///C:/Users/Zrott/OneDrive/Desktop/Claude/active-projects/archon/dist/api-gateway.js:144:36"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 15,
+        "firstContentfulPaint": 68,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 75
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 1,
+        "networkIdle": null,
+        "javascriptErrors": 3,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Archon_Knowledge_Engine-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Archon Knowledge Engine",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:01:56.675Z",
+      "status": "PASS",
+      "errors": [
+        "Console error: Failed to load resource: the server responded with a status of 404 ()",
+        "Console error: ❌ Appwrite Function call failed: 404 ",
+        "Console error: 💥 API Gateway error: Error: Function call failed: 404 \n    at window.fetch (file:///C:/Users/Zrott/OneDrive/Desktop/Claude/active-projects/archon/dist/api-gateway.js:78:27)\n    at async file:///C:/Users/Zrott/OneDrive/Desktop/Claude/active-projects/archon/dist/api-gateway.js:144:36"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 11,
+        "firstContentfulPaint": 72,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 75
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0.800000011920929,
+        "networkIdle": null,
+        "javascriptErrors": 3,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Archon_Knowledge_Engine-iPad_Mini.png"
+    },
+    {
+      "siteName": "Slumlord RPG",
+      "viewport": "iPhone SE",
+      "testStart": "2025-08-24T03:01:59.656Z",
+      "status": "FAIL",
+      "errors": [
+        "Page has horizontal scrolling on mobile viewport",
+        "Usability score 65 below minimum 70"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 68,
+        "firstContentfulPaint": 68,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 65
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 0.9000000357627869,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Slumlord_RPG-iPhone_SE.png"
+    },
+    {
+      "siteName": "Slumlord RPG",
+      "viewport": "iPhone 12 Pro",
+      "testStart": "2025-08-24T03:02:02.501Z",
+      "status": "FAIL",
+      "errors": [
+        "Page has horizontal scrolling on mobile viewport",
+        "Usability score 65 below minimum 70"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 27,
+        "firstContentfulPaint": 52,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 65
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 14.099999964237213,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Slumlord_RPG-iPhone_12_Pro.png"
+    },
+    {
+      "siteName": "Slumlord RPG",
+      "viewport": "Samsung Galaxy S21",
+      "testStart": "2025-08-24T03:02:05.350Z",
+      "status": "FAIL",
+      "errors": [
+        "Page has horizontal scrolling on mobile viewport",
+        "Usability score 65 below minimum 70"
+      ],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 32,
+        "firstContentfulPaint": 36,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 65
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 15.5,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Slumlord_RPG-Samsung_Galaxy_S21.png"
+    },
+    {
+      "siteName": "Slumlord RPG",
+      "viewport": "iPad Mini",
+      "testStart": "2025-08-24T03:02:08.190Z",
+      "status": "PASS",
+      "errors": [],
+      "warnings": [],
+      "metrics": {
+        "loadTime": 30,
+        "firstContentfulPaint": 36,
+        "largestContentfulPaint": null,
+        "cumulativeLayoutShift": null,
+        "usabilityScore": 90
+      },
+      "accessibility": {
+        "hasViewportMeta": true,
+        "touchFriendlyElements": 0,
+        "keyboardAccessible": false
+      },
+      "performance": {
+        "domContentLoaded": 14.5,
+        "networkIdle": null,
+        "javascriptErrors": 0,
+        "networkFailures": 0
+      },
+      "screenshotPath": "C:\\Users\\Zrott\\OneDrive\\Desktop\\Claude\\mobile-test-Slumlord_RPG-iPad_Mini.png"
+    }
+  ],
+  "sitesSummary": [
+    {
+      "siteName": "Enhanced Tech-Lead Orchestrator - Main",
+      "totalTests": 4,
+      "passed": 4,
+      "failed": 0,
+      "passRate": 1,
+      "averageLoadTime": 65,
+      "averageUsabilityScore": 90,
+      "commonIssues": []
+    },
+    {
+      "siteName": "Tech-Lead Operations Center - Demo",
+      "totalTests": 4,
+      "passed": 4,
+      "failed": 0,
+      "passRate": 1,
+      "averageLoadTime": 261,
+      "averageUsabilityScore": 100,
+      "commonIssues": []
+    },
+    {
+      "siteName": "Operations Center - Enhanced",
+      "totalTests": 4,
+      "passed": 4,
+      "failed": 0,
+      "passRate": 1,
+      "averageLoadTime": 292,
+      "averageUsabilityScore": 100,
+      "commonIssues": []
+    },
+    {
+      "siteName": "Operations Center - Mobile Fixed",
+      "totalTests": 4,
+      "passed": 4,
+      "failed": 0,
+      "passRate": 1,
+      "averageLoadTime": 264,
+      "averageUsabilityScore": 100,
+      "commonIssues": []
+    },
+    {
+      "siteName": "Grok Console",
+      "totalTests": 4,
+      "passed": 4,
+      "failed": 0,
+      "passRate": 1,
+      "averageLoadTime": 253,
+      "averageUsabilityScore": 90,
+      "commonIssues": []
+    },
+    {
+      "siteName": "Claude Code UI",
+      "totalTests": 4,
+      "passed": 0,
+      "failed": 4,
+      "passRate": 0,
+      "averageLoadTime": 15,
+      "averageUsabilityScore": 45,
+      "commonIssues": [
+        {
+          "category": "JavaScript",
+          "count": 12
+        },
+        {
+          "category": "Network",
+          "count": 8
+        },
+        {
+          "category": "Other",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "siteName": "Trading Post",
+      "totalTests": 4,
+      "passed": 0,
+      "failed": 4,
+      "passRate": 0,
+      "averageLoadTime": 145,
+      "averageUsabilityScore": 40,
+      "commonIssues": [
+        {
+          "category": "JavaScript",
+          "count": 12
+        },
+        {
+          "category": "Network",
+          "count": 8
+        },
+        {
+          "category": "Other",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "siteName": "Recursion Chat",
+      "totalTests": 4,
+      "passed": 0,
+      "failed": 4,
+      "passRate": 0,
+      "averageLoadTime": 23,
+      "averageUsabilityScore": 0,
+      "commonIssues": [
+        {
+          "category": "JavaScript",
+          "count": 12
+        },
+        {
+          "category": "Network",
+          "count": 8
+        },
+        {
+          "category": "Other",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "siteName": "Archon Knowledge Engine",
+      "totalTests": 4,
+      "passed": 4,
+      "failed": 0,
+      "passRate": 1,
+      "averageLoadTime": 32,
+      "averageUsabilityScore": 75,
+      "commonIssues": [
+        {
+          "category": "JavaScript",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "siteName": "Slumlord RPG",
+      "totalTests": 4,
+      "passed": 1,
+      "failed": 3,
+      "passRate": 0.25,
+      "averageLoadTime": 39,
+      "averageUsabilityScore": 71,
+      "commonIssues": [
+        {
+          "category": "Viewport",
+          "count": 3
+        },
+        {
+          "category": "Other",
+          "count": 3
+        }
+      ]
+    }
+  ]
+}
