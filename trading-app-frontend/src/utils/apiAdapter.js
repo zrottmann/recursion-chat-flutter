@@ -234,7 +234,11 @@ const apiHandlers = {
     }
   },
   
-  // Individual item endpoint  
+  // Individual item endpoint - TEMPORARILY DISABLED to prevent recursion
+  // The /items/ endpoint was causing infinite recursion by calling itemsService.getItem
+  // which makes another fetch call that gets intercepted again.
+  // Items will be fetched directly from Appwrite instead.
+  /*
   '/items/': async (options) => {
     try {
       const url = new URL(options.url || options.path, window.location.origin);
@@ -299,6 +303,7 @@ const apiHandlers = {
       return { ok: false, status: 500, data: { error: error.message } };
     }
   },
+  */
 
   // Listings save/unsave endpoints
   '/api/listings/save': async (options) => {
@@ -339,10 +344,11 @@ function matchesEndpoint(url, endpoint) {
     // Handle exact matches first
     if (pathname === endpoint) return true;
     
+    // DISABLED: /items/ endpoint to prevent recursion
     // Handle parameterized endpoints like /items/{id}
-    if (endpoint === '/items/' && pathname.startsWith('/items/') && pathname.split('/').length === 3) {
-      return true;
-    }
+    // if (endpoint === '/items/' && pathname.startsWith('/items/') && pathname.split('/').length === 3) {
+    //   return true;
+    // }
     
     // Handle other includes-based matches for backwards compatibility
     return pathname.includes(endpoint);
@@ -352,15 +358,31 @@ function matchesEndpoint(url, endpoint) {
   }
 }
 
-// Intercept fetch calls
+// Intercept fetch calls with recursion prevention
 window.fetch = async function(...args) {
   const [url, options = {}] = args;
   const urlString = typeof url === 'string' ? url : url.toString();
+  
+  // CRITICAL: Prevent recursion - skip interception if:
+  // 1. We're already inside an API handler
+  // 2. This is an Appwrite API call
+  // 3. This is a direct database/storage call
+  if (window.__insideApiHandler || 
+      urlString.includes('nyc.cloud.appwrite.io') || 
+      urlString.includes('api.appwrite.io') ||
+      urlString.includes('/v1/databases') ||
+      urlString.includes('/v1/storage') ||
+      urlString.includes('/v1/account')) {
+    return originalFetch.apply(this, args);
+  }
   
   // Check if this is an API call we should handle
   for (const [endpoint, handler] of Object.entries(apiHandlers)) {
     if (matchesEndpoint(urlString, endpoint)) {
       DEBUG.log('info', `📡 Intercepting API call: ${endpoint}`, options);
+      
+      // Set flag to prevent re-interception of nested calls
+      window.__insideApiHandler = true;
       
       try {
         const result = await handler({
@@ -393,6 +415,9 @@ window.fetch = async function(...args) {
             'Content-Type': 'application/json'
           }
         });
+      } finally {
+        // Always reset the flag
+        window.__insideApiHandler = false;
       }
     }
   }
