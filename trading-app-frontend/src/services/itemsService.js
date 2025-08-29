@@ -62,9 +62,21 @@ class ItemsService {
       
       if (itemData.images && itemData.images.length > 0) {
         debug.debug('Uploading images', { count: itemData.images.length });
-        imageUrls = await this.uploadImages(itemData.images);
-        primaryImageUrl = imageUrls[0];
-        debug.success('Images uploaded', { count: imageUrls.length });
+        try {
+          imageUrls = await this.uploadImages(itemData.images);
+          primaryImageUrl = imageUrls.length > 0 ? imageUrls[0] : null;
+          debug.success('Images processed', { 
+            originalCount: itemData.images.length,
+            uploadedCount: imageUrls.length,
+            hasUrls: imageUrls.length > 0
+          });
+        } catch (error) {
+          console.warn('⚠️ [ItemsService] Image upload failed, continuing without images:', error.message);
+          debug.warn('Image upload failed, continuing without images', { error: error.message });
+          // Continue creating the item without images rather than failing completely
+          imageUrls = [];
+          primaryImageUrl = null;
+        }
       }
 
       // Prepare base item data first
@@ -543,10 +555,50 @@ class ItemsService {
    * Upload images to storage
    */
   async uploadImages(images) {
-    const uploadedUrls = [];
+    if (!images || !Array.isArray(images) || images.length === 0) {
+      console.warn('🚨 [ItemsService] No valid images provided for upload');
+      return [];
+    }
 
+    const uploadedUrls = [];
+    const validImages = [];
+
+    // Filter and validate images first
     for (const image of images) {
+      // Skip if already a URL string (from mock data)
+      if (typeof image === 'string' && image.startsWith('http')) {
+        uploadedUrls.push(image);
+        continue;
+      }
+
+      // Validate if it's a proper File object
+      if (image instanceof File) {
+        // Additional validation for File objects
+        if (image.size > 0 && image.type.startsWith('image/')) {
+          validImages.push(image);
+        } else {
+          console.warn('🚨 [ItemsService] Invalid file object:', { 
+            name: image.name, 
+            size: image.size, 
+            type: image.type 
+          });
+        }
+      } else {
+        console.warn('🚨 [ItemsService] Skipping invalid image object:', typeof image, image);
+      }
+    }
+
+    console.log('📸 [ItemsService] Processing uploads:', {
+      totalProvided: images.length,
+      urlStrings: uploadedUrls.length,
+      validFiles: validImages.length
+    });
+
+    // Upload valid File objects
+    for (const image of validImages) {
       try {
+        console.log('🔄 [ItemsService] Uploading file:', image.name, image.size, 'bytes');
+        
         const file = await storage.createFile(
           BUCKETS.itemImages,
           ID.unique(),
@@ -556,11 +608,28 @@ class ItemsService {
         // Get the file URL
         const url = storage.getFileView(BUCKETS.itemImages, file.$id);
         uploadedUrls.push(url.href);
+        
+        console.log('✅ [ItemsService] Image uploaded successfully:', file.$id);
 
       } catch (error) {
-        console.error('Failed to upload image:', error);
+        console.error('❌ [ItemsService] Failed to upload image:', {
+          filename: image.name,
+          error: error.message,
+          code: error.code,
+          type: error.type
+        });
+        
+        // Don't throw error for individual file failures, just log and continue
+        if (error.message && error.message.includes('File not found in payload')) {
+          console.error('🚨 [ItemsService] File upload error - possible invalid File object or empty file');
+        }
       }
     }
+
+    console.log('✅ [ItemsService] Upload complete:', {
+      totalUploaded: uploadedUrls.length,
+      requested: images.length
+    });
 
     return uploadedUrls;
   }

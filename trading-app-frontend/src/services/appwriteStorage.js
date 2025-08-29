@@ -11,6 +11,19 @@ class AppwriteStorageService {
     try {
       console.log('📸 Uploading item image...');
       
+      // Validate file object first
+      if (!file) {
+        throw new Error('No file provided for upload');
+      }
+      
+      if (!(file instanceof File)) {
+        throw new Error('Invalid file object - must be a File instance');
+      }
+      
+      if (file.size === 0) {
+        throw new Error('File is empty - no content to upload');
+      }
+      
       // Validate file type
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) {

@@ -105,23 +105,65 @@ class FeatureImplementationService {
   async uploadImages(files) {
     await this.initialize();
     
+    if (!files || !Array.isArray(files) || files.length === 0) {
+      console.warn('⚠️ [FeatureService] No valid files provided for upload');
+      return { success: true, images: [] };
+    }
+    
     try {
-      const uploadPromises = files.map(async (file) => {
-        const response = await storage.createFile(
-          BUCKETS.itemImages,
-          ID.unique(),
-          file
-        );
+      // Filter and validate files first
+      const validFiles = files.filter(file => {
+        if (!(file instanceof File)) {
+          console.warn('⚠️ [FeatureService] Skipping non-File object:', typeof file);
+          return false;
+        }
         
-        return {
-          id: response.$id,
-          url: storage.getFileView(BUCKETS.itemImages, response.$id),
-          preview: storage.getFilePreview(BUCKETS.itemImages, response.$id, 400, 300)
-        };
+        if (file.size === 0) {
+          console.warn('⚠️ [FeatureService] Skipping empty file:', file.name);
+          return false;
+        }
+        
+        if (!file.type.startsWith('image/')) {
+          console.warn('⚠️ [FeatureService] Skipping non-image file:', file.name, file.type);
+          return false;
+        }
+        
+        return true;
       });
 
-      const uploadedImages = await Promise.all(uploadPromises);
-      toast.success(`📸 ${uploadedImages.length} images uploaded successfully!`);
+      if (validFiles.length === 0) {
+        console.warn('⚠️ [FeatureService] No valid image files to upload');
+        return { success: true, images: [] };
+      }
+
+      const uploadPromises = validFiles.map(async (file) => {
+        try {
+          const response = await storage.createFile(
+            BUCKETS.itemImages,
+            ID.unique(),
+            file
+          );
+          
+          return {
+            id: response.$id,
+            url: storage.getFileView(BUCKETS.itemImages, response.$id),
+            preview: storage.getFilePreview(BUCKETS.itemImages, response.$id, 400, 300)
+          };
+        } catch (error) {
+          console.error('❌ [FeatureService] Failed to upload individual file:', file.name, error);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(uploadPromises);
+      const uploadedImages = results.filter(result => result !== null);
+      
+      if (uploadedImages.length > 0) {
+        toast.success(`📸 ${uploadedImages.length} images uploaded successfully!`);
+      } else {
+        toast.warning('⚠️ No images could be uploaded. Please check file types and sizes.');
+      }
+      
       return { success: true, images: uploadedImages };
     } catch (error) {
       console.error('❌ Failed to upload images:', error);
