@@ -1,4 +1,5 @@
 /* Build: 2025-08-15 - Fixed errors and OAuth redirect */
+import './utils/recursionFix'; // MUST be first - prevents stack overflow
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';

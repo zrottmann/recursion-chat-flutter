@@ -76,6 +76,8 @@
         to { transform: rotate(360deg); }
       }
     </style>
+    <!-- Critical: Recursion Fix - Must load before anything else -->
+    <script src="/recursion-fix.js"></script>
     <!-- Extension Compatibility Fixes -->
     <script>
       // Enhanced MutationObserver protection for browser extensions
