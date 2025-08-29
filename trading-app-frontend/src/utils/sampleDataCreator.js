@@ -279,7 +279,8 @@ class SampleDataCreator {
           ID.unique(),
           {
             ...wantData,
-            user_id: this.currentUser.$id,
+            userId: this.currentUser.$id,
+            user_id: this.currentUser.$id, // Keep both for compatibility
             created_at: new Date().toISOString(),
             is_active: true,
             location_preference: 'New York, NY',

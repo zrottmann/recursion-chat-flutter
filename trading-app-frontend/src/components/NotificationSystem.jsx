@@ -520,13 +520,15 @@ const NotificationSystem = () => {
 export const createNotification = async (userId, title, content, type = NOTIFICATION_TYPES.INFO, metadata = {}) => {
   try {
     const notificationData = {
-      user_id: userId,
+      userId: userId,
+      user_id: userId, // Keep both for compatibility
       title,
       content,
       type,
       is_read: false,
       metadata: JSON.stringify(metadata),
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString() // Keep both for compatibility
     };
 
     const response = await databases.createDocument(

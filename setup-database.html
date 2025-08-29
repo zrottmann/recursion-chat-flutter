@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Post - Database Setup</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin: 0 0 20px 0;
+            font-size: 28px;
+            text-align: center;
+        }
+        .status {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+        .warning { color: #ffc107; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .config-form {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .config-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .config-form label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        .config-info {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Trading Post Database Setup</h1>
+        
+        <div class="config-info">
+            ℹ️ This tool will check and create all necessary Appwrite databases and collections for Trading Post.
+        </div>
+
+        <div class="config-form">
+            <label for="endpoint">Appwrite Endpoint:</label>
+            <input type="text" id="endpoint" value="https://nyc.cloud.appwrite.io/v1" />
+            
+            <label for="projectId">Project ID:</label>
+            <input type="text" id="projectId" value="689bdee000098bd9d55c" />
+            
+            <label for="apiKey">API Key (Admin):</label>
+            <input type="password" id="apiKey" placeholder="Enter your Appwrite API key with admin permissions" />
+            
+            <label for="databaseId">Database ID:</label>
+            <input type="text" id="databaseId" value="trading_post_db" />
+        </div>
+
+        <button id="setupBtn" onclick="runSetup()">Start Database Setup</button>
+
+        <div class="status" id="status">
+            <div class="log-entry info">Ready to set up database. Click the button above to start.</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@18.2.0"></script>
+    <script>
+        const { Client, Databases, ID, Permission, Role } = Appwrite;
+        
+        function addLog(message, type = 'info') {
+            const status = document.getElementById('status');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            status.appendChild(entry);
+            status.scrollTop = status.scrollHeight;
+        }
+
+        // Collection schemas
+        const COLLECTIONS_SCHEMA = {
+            items: {
+                name: 'Items',
+                attributes: [
+                    { key: 'title', type: 'string', size: 255, required: true },
+                    { key: 'description', type: 'string', size: 5000, required: false },
+                    { key: 'category', type: 'string', size: 100, required: true },
+                    { key: 'condition', type: 'string', size: 50, required: true },
+                    { key: 'price', type: 'float', required: false, min: 0, max: 1000000 },
+                    { key: 'estimated_value', type: 'float', required: false, min: 0, max: 1000000 },
+                    { key: 'ai_estimated_value', type: 'float', required: false, min: 0, max: 1000000 },
+                    { key: 'trade_preferences', type: 'string', size: 1000, required: false },
+                    { key: 'location_lat', type: 'float', required: false, min: -90, max: 90 },
+                    { key: 'location_lng', type: 'float', required: false, min: -180, max: 180 },
+                    { key: 'city', type: 'string', size: 100, required: false },
+                    { key: 'state', type: 'string', size: 50, required: false },
+                    { key: 'zipcode', type: 'string', size: 20, required: false },
+                    { key: 'images', type: 'string', size: 5000, required: false },
+                    { key: 'primary_image_url', type: 'string', size: 500, required: false },
+                    { key: 'status', type: 'string', size: 50, required: false, default: 'active' },
+                    { key: 'is_featured', type: 'boolean', required: false, default: false },
+                    { key: 'views', type: 'integer', required: false, min: 0, default: 0 },
+                    { key: 'likes', type: 'integer', required: false, min: 0, default: 0 },
+                    { key: 'ai_tags', type: 'string', size: 2000, required: false },
+                    { key: 'ai_analysis', type: 'string', size: 5000, required: false },
+                    { key: 'userId', type: 'string', size: 36, required: true },
+                    { key: 'user_id', type: 'string', size: 36, required: false },
+                    { key: 'created_at', type: 'datetime', required: false },
+                    { key: 'updated_at', type: 'datetime', required: false }
+                ]
+            },
+            users: {
+                name: 'Users',
+                attributes: [
+                    { key: 'userId', type: 'string', size: 36, required: true },
+                    { key: 'email', type: 'email', required: true },
+                    { key: 'username', type: 'string', size: 100, required: false },
+                    { key: 'name', type: 'string', size: 255, required: false },
+                    { key: 'avatar', type: 'string', size: 500, required: false },
+                    { key: 'bio', type: 'string', size: 1000, required: false },
+                    { key: 'location', type: 'string', size: 255, required: false },
+                    { key: 'phone', type: 'string', size: 20, required: false },
+                    { key: 'rating', type: 'float', required: false, min: 0, max: 5, default: 0 },
+                    { key: 'totalTrades', type: 'integer', required: false, min: 0, default: 0 },
+                    { key: 'verifiedSeller', type: 'boolean', required: false, default: false },
+                    { key: 'preferences', type: 'string', size: 2000, required: false },
+                    { key: 'joinedAt', type: 'datetime', required: false }
+                ]
+            },
+            wants: {
+                name: 'Wants',
+                attributes: [
+                    { key: 'title', type: 'string', size: 255, required: true },
+                    { key: 'description', type: 'string', size: 2000, required: false },
+                    { key: 'category', type: 'string', size: 100, required: false },
+                    { key: 'maxBudget', type: 'float', required: false, min: 0 },
+                    { key: 'userId', type: 'string', size: 36, required: true },
+                    { key: 'status', type: 'string', size: 50, required: false, default: 'active' },
+                    { key: 'created_at', type: 'datetime', required: false }
+                ]
+            },
+            trades: {
+                name: 'Trades',
+                attributes: [
+                    { key: 'initiatorId', type: 'string', size: 36, required: true },
+                    { key: 'recipientId', type: 'string', size: 36, required: true },
+                    { key: 'initiatorItems', type: 'string', size: 1000, required: false },
+                    { key: 'recipientItems', type: 'string', size: 1000, required: false },
+                    { key: 'status', type: 'string', size: 50, required: true },
+                    { key: 'message', type: 'string', size: 2000, required: false },
+                    { key: 'completedAt', type: 'datetime', required: false }
+                ]
+            },
+            messages: {
+                name: 'Messages',
+                attributes: [
+                    { key: 'senderId', type: 'string', size: 36, required: true },
+                    { key: 'recipientId', type: 'string', size: 36, required: true },
+                    { key: 'conversationId', type: 'string', size: 100, required: false },
+                    { key: 'content', type: 'string', size: 5000, required: true },
+                    { key: 'read', type: 'boolean', required: false, default: false },
+                    { key: 'attachments', type: 'string', size: 2000, required: false }
+                ]
+            },
+            matches: {
+                name: 'Matches',
+                attributes: [
+                    { key: 'userId', type: 'string', size: 36, required: true },
+                    { key: 'matchedUserId', type: 'string', size: 36, required: true },
+                    { key: 'userItemId', type: 'string', size: 36, required: true },
+                    { key: 'matchedItemId', type: 'string', size: 36, required: true },
+                    { key: 'score', type: 'float', required: false, min: 0, max: 100 },
+                    { key: 'status', type: 'string', size: 50, required: false }
+                ]
+            }
+        };
+
+        async function createAttribute(databases, databaseId, collectionId, attr) {
+            try {
+                addLog(`Creating attribute: ${attr.key} (${attr.type})`);
+                
+                switch (attr.type) {
+                    case 'string':
+                        await databases.createStringAttribute(
+                            databaseId,
+                            collectionId,
+                            attr.key,
+                            attr.size,
+                            attr.required,
+                            attr.default,
+                            attr.array
+                        );
+                        break;
+                    case 'integer':
+                        await databases.createIntegerAttribute(
+                            databaseId,
+                            collectionId,
+                            attr.key,
+                            attr.required,
+                            attr.min,
+                            attr.max,
+                            attr.default,
+                            attr.array
+                        );
+                        break;
+                    case 'float':
+                        await databases.createFloatAttribute(
+                            databaseId,
+                            collectionId,
+                            attr.key,
+                            attr.required,
+                            attr.min,
+                            attr.max,
+                            attr.default,
+                            attr.array
+                        );
+                        break;
+                    case 'boolean':
+                        await databases.createBooleanAttribute(
+                            databaseId,
+                            collectionId,
+                            attr.key,
+                            attr.required,
+                            attr.default,
+                            attr.array
+                        );
+                        break;
+                    case 'datetime':
+                        await databases.createDatetimeAttribute(
+                            databaseId,
+                            collectionId,
+                            attr.key,
+                            attr.required,
+                            attr.default,
+                            attr.array
+                        );
+                        break;
+                    case 'email':
+                        await databases.createEmailAttribute(
+                            databaseId,
+                            collectionId,
+                            attr.key,
+                            attr.required,
+                            attr.default,
+                            attr.array
+                        );
+                        break;
+                    case 'url':
+                        await databases.createUrlAttribute(
+                            databaseId,
+                            collectionId,
+                            attr.key,
+                            attr.required,
+                            attr.default,
+                            attr.array
+                        );
+                        break;
+                    default:
+                        addLog(`Unknown attribute type: ${attr.type}`, 'warning');
+                }
+                
+                addLog(`✅ Created attribute: ${attr.key}`, 'success');
+            } catch (error) {
+                if (error.code === 409) {
+                    addLog(`Attribute ${attr.key} already exists`, 'warning');
+                } else {
+                    addLog(`Failed to create attribute ${attr.key}: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        async function runSetup() {
+            const btn = document.getElementById('setupBtn');
+            const endpoint = document.getElementById('endpoint').value;
+            const projectId = document.getElementById('projectId').value;
+            const apiKey = document.getElementById('apiKey').value;
+            const databaseId = document.getElementById('databaseId').value;
+
+            if (!apiKey) {
+                addLog('Please enter your Appwrite API key', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Setting up database...';
+            
+            // Clear previous logs
+            document.getElementById('status').innerHTML = '';
+            
+            try {
+                // Initialize client with API key
+                const client = new Client()
+                    .setEndpoint(endpoint)
+                    .setProject(projectId)
+                    .setKey(apiKey); // Use API key for server-side operations
+
+                const databases = new Databases(client);
+                
+                addLog('Connected to Appwrite', 'success');
+                addLog(`Endpoint: ${endpoint}`, 'info');
+                addLog(`Project: ${projectId}`, 'info');
+                addLog(`Database: ${databaseId}`, 'info');
+
+                // Check and create database
+                addLog('Checking database...', 'info');
+                try {
+                    const db = await databases.get(databaseId);
+                    addLog(`Database exists: ${db.name}`, 'success');
+                } catch (error) {
+                    if (error.code === 404) {
+                        addLog('Database not found, creating...', 'warning');
+                        try {
+                            const db = await databases.create(
+                                databaseId,
+                                'Trading Post Database'
+                            );
+                            addLog(`Database created: ${db.name}`, 'success');
+                        } catch (createError) {
+                            addLog(`Failed to create database: ${createError.message}`, 'error');
+                            throw createError;
+                        }
+                    } else {
+                        throw error;
+                    }
+                }
+
+                // Create collections
+                for (const [collectionId, schema] of Object.entries(COLLECTIONS_SCHEMA)) {
+                    addLog(`\nProcessing collection: ${collectionId}`, 'info');
+                    
+                    try {
+                        const collection = await databases.getCollection(databaseId, collectionId);
+                        addLog(`Collection exists: ${collection.name}`, 'success');
+                    } catch (error) {
+                        if (error.code === 404) {
+                            addLog(`Creating collection: ${collectionId}`, 'warning');
+                            try {
+                                const collection = await databases.createCollection(
+                                    databaseId,
+                                    collectionId,
+                                    schema.name,
+                                    [
+                                        Permission.read(Role.any()),
+                                        Permission.create(Role.users()),
+                                        Permission.update(Role.users()),
+                                        Permission.delete(Role.users())
+                                    ]
+                                );
+                                addLog(`Collection created: ${collection.name}`, 'success');
+                                
+                                // Add attributes
+                                for (const attr of schema.attributes) {
+                                    await createAttribute(databases, databaseId, collectionId, attr);
+                                }
+                                
+                            } catch (createError) {
+                                addLog(`Failed to create collection ${collectionId}: ${createError.message}`, 'error');
+                            }
+                        } else {
+                            addLog(`Error checking collection ${collectionId}: ${error.message}`, 'error');
+                        }
+                    }
+                }
+
+                addLog('\n✅ Database setup completed successfully!', 'success');
+                addLog('You can now use Trading Post with all required collections.', 'info');
+                
+            } catch (error) {
+                addLog(`Setup failed: ${error.message}`, 'error');
+                console.error('Setup error:', error);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Start Database Setup';
+            }
+        }
+    </script>
+</body>
+</html>

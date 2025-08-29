@@ -619,7 +619,8 @@ Total records created: ${summary.total}
             max_distance: 25 + Math.floor(Math.random() * 25),
             created_at: new Date(Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000).toISOString(),
             is_active: true,
-            user_id: user.$id
+            userId: user.$id,
+            user_id: user.$id // Keep both for compatibility
           };
 
           const want = await db.createDocument(DATABASE_ID, COLLECTIONS.wants, ID.unique(), wantData);
@@ -758,7 +759,8 @@ Total records created: ${summary.total}
         const matchedUser = this.createdData.users[i % this.createdData.users.length];
 
         const matchData = {
-          user_id: this.currentUser.$id,
+          userId: this.currentUser.$id,
+          user_id: this.currentUser.$id, // Keep both for compatibility
           matched_item_id: item.$id,
           matched_user_id: matchedUser.$id,
           confidence_score: 0.65 + Math.random() * 0.35,
@@ -771,6 +773,7 @@ Total records created: ${summary.total}
           ai_explanation: `High compatibility match based on trading history and preferences`,
           status: 'active',
           created_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(), // Keep both for compatibility
           expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
         };
 
@@ -820,12 +823,14 @@ Total records created: ${summary.total}
     for (const notifType of notificationTypes) {
       try {
         const notificationData = {
-          user_id: this.currentUser.$id,
+          userId: this.currentUser.$id,
+          user_id: this.currentUser.$id, // Keep both for compatibility
           type: notifType.type,
           title: notifType.title,
           message: notifType.message,
           priority: notifType.priority,
           created_at: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(), // Keep both for compatibility
           is_read: Math.random() > 0.7, // 30% read
           action_url: '/trades',
           metadata: {
@@ -854,11 +859,13 @@ Total records created: ${summary.total}
     for (const item of itemsToSave) {
       try {
         const savedItemData = {
-          user_id: this.currentUser.$id,
+          userId: this.currentUser.$id,
+          user_id: this.currentUser.$id, // Keep both for compatibility
           item_id: item.$id,
           item_title: item.title,
           item_owner_id: item.user_id,
           saved_at: new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString(),
+          createdAt: new Date(Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString(), // Keep both for compatibility
           notes: 'Interesting trading opportunity',
           priority: ['high', 'medium', 'low'][Math.floor(Math.random() * 3)]
         };

@@ -109,8 +109,10 @@ class UserProfileService {
       const profileData = {
         email: user.email,
         username: username,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(), // Keep both for compatibility
+        updated_at: new Date().toISOString(),
+        updatedAt: new Date().toISOString() // Keep both for compatibility
       };
 
       // Add optional fields only if they likely exist in schema
@@ -196,8 +198,10 @@ class UserProfileService {
           const minimalData = {
             email: user.email,
             username: await this.ensureUniqueUsername(retryUsername),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            createdAt: new Date().toISOString(), // Keep both for compatibility
+            updated_at: new Date().toISOString(),
+            updatedAt: new Date().toISOString() // Keep both for compatibility
           };
           
           console.log('🔄 [UserProfile] Retrying with minimal data:', minimalData);

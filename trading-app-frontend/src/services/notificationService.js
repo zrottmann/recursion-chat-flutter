@@ -117,7 +117,8 @@ class NotificationService {
           message: notification.message,
           type: notification.type || 'info',
           read: false,
-          createdAt: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          createdAt: new Date().toISOString(), // Keep both for compatibility
           metadata: notification.metadata || {}
         }
       );
