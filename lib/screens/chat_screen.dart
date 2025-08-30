@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
-import '../services/appwrite_service.dart';
+import '../services/simple_appwrite_service.dart';
 
 class ChatScreen extends StatefulWidget {
   final ChatRoom room;
@@ -47,7 +47,7 @@ class _ChatScreenState extends State<ChatScreen> {
         _errorMessage = '';
       });
 
-      final appwriteService = context.read<AppwriteService>();
+      final appwriteService = context.read<SimpleAppwriteService>();
       final messages = await appwriteService.getRoomMessages(widget.room.id);
       
       setState(() {
@@ -70,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
     if (content.isEmpty || _isSending) return;
 
     final authService = context.read<AuthService>();
-    final appwriteService = context.read<AppwriteService>();
+    final appwriteService = context.read<SimpleAppwriteService>();
 
     setState(() {
       _isSending = true;

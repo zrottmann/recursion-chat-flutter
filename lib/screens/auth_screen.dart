@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/enhanced_sso_service.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -76,13 +77,19 @@ class _AuthScreenState extends State<AuthScreen> {
       _errorMessage = '';
     });
 
-    final authService = context.read<AuthService>();
+    final ssoService = context.read<EnhancedSSOService>();
     
     try {
-      final success = await authService.signInWithOAuth(provider);
-      if (!success) {
+      final result = await ssoService.signInWithProvider(provider);
+      
+      if (result.success && result.user != null) {
+        // Update the auth service with the SSO user
+        final authService = context.read<AuthService>();
+        // Note: You might need to add a method to AuthService to handle SSO users
+        debugPrint('SSO sign-in successful for ${result.user!.email}');
+      } else {
         setState(() {
-          _errorMessage = 'OAuth sign in failed. Please try again.';
+          _errorMessage = result.error ?? 'OAuth sign in failed. Please try again.';
         });
       }
     } catch (e) {
@@ -243,31 +250,84 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // OAuth buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _isLoading ? null : () => _signInWithOAuth('google'),
-                                icon: const Icon(Icons.g_mobiledata, size: 24),
-                                label: const Text('Google'),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                        // Enhanced OAuth buttons with provider styling
+                        Consumer<EnhancedSSOService>(
+                          builder: (context, ssoService, child) {
+                            return Column(
+                              children: [
+                                // Google Sign-in Button
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton.icon(
+                                    onPressed: _isLoading ? null : () => _signInWithOAuth('google'),
+                                    icon: Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                      child: const Text('G', 
+                                        style: TextStyle(
+                                          fontSize: 16, 
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF4285F4),
+                                        )
+                                      ),
+                                    ),
+                                    label: const Text(
+                                      'Continue with Google',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                      side: const BorderSide(color: Color(0xFF4285F4)),
+                                      foregroundColor: Color(0xFF4285F4),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _isLoading ? null : () => _signInWithOAuth('github'),
-                                icon: const Icon(Icons.code, size: 20),
-                                label: const Text('GitHub'),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                const SizedBox(height: 12),
+                                
+                                // GitHub Sign-in Button
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: OutlinedButton.icon(
+                                    onPressed: _isLoading ? null : () => _signInWithOAuth('github'),
+                                    icon: const Icon(Icons.code, size: 20, color: Color(0xFF333333)),
+                                    label: const Text(
+                                      'Continue with GitHub',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                      side: const BorderSide(color: Color(0xFF333333)),
+                                      foregroundColor: Color(0xFF333333),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                                
+                                // Apple Sign-in Button (iOS only)
+                                if (Theme.of(context).platform == TargetPlatform.iOS) ...[
+                                  const SizedBox(height: 12),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: OutlinedButton.icon(
+                                      onPressed: _isLoading ? null : () => _signInWithOAuth('apple'),
+                                      icon: const Icon(Icons.apple, size: 20, color: Colors.black),
+                                      label: const Text(
+                                        'Continue with Apple',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      style: OutlinedButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                        side: const BorderSide(color: Colors.black),
+                                        foregroundColor: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            );
+                          },
                         ),
                         const SizedBox(height: 24),
 

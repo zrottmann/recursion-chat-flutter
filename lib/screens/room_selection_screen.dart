@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/user_model.dart';
-import '../services/appwrite_service.dart';
+import '../services/simple_appwrite_service.dart';
 
 class RoomSelectionScreen extends StatefulWidget {
   final Function(ChatRoom) onRoomSelected;
@@ -33,7 +33,7 @@ class _RoomSelectionScreenState extends State<RoomSelectionScreen> {
         _errorMessage = '';
       });
 
-      final appwriteService = context.read<AppwriteService>();
+      final appwriteService = context.read<SimpleAppwriteService>();
       final rooms = await appwriteService.getRooms();
       
       setState(() {

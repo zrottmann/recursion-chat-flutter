@@ -3,6 +3,7 @@ class UserModel {
   final String email;
   final String? username;
   final String? name;
+  final String? avatar;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -11,6 +12,7 @@ class UserModel {
     required this.email,
     this.username,
     this.name,
+    this.avatar,
     this.createdAt,
     this.updatedAt,
   });
@@ -21,6 +23,7 @@ class UserModel {
       email: json['email'] ?? '',
       username: json['username'] ?? json['name']?.toString().split('@')[0],
       name: json['name'],
+      avatar: json['avatar'],
       createdAt: json['\$createdAt'] != null 
         ? DateTime.tryParse(json['\$createdAt']) 
         : null,
@@ -30,12 +33,25 @@ class UserModel {
     );
   }
 
+  factory UserModel.fromAppwriteUser(dynamic appwriteUser) {
+    return UserModel(
+      id: appwriteUser.id,
+      email: appwriteUser.email,
+      username: appwriteUser.name ?? appwriteUser.email.split('@')[0],
+      name: appwriteUser.name ?? appwriteUser.email,
+      avatar: appwriteUser.prefs?['avatar'] ?? '',
+      createdAt: DateTime.tryParse(appwriteUser.createdAt ?? ''),
+      updatedAt: DateTime.tryParse(appwriteUser.updatedAt ?? ''),
+    );
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'email': email,
       'username': username,
       'name': name,
+      'avatar': avatar,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };

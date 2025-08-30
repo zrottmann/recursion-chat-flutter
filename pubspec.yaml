@@ -17,6 +17,9 @@ dependencies:
   appwrite: ^12.0.3
   web_socket_channel: ^2.4.0
   flutter_secure_storage: ^9.2.2
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.1
+  url_launcher: ^6.2.5
 
 dev_dependencies:
   flutter_test:

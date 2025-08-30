@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
-import 'services/appwrite_service.dart';
+import 'services/simple_appwrite_service.dart';
+import 'services/enhanced_sso_service.dart';
 import 'screens/auth_screen.dart';
 import 'screens/home_screen.dart';
-import 'models/user_model.dart';
 
 void main() {
   runApp(const RecursionChatApp());
@@ -18,7 +18,8 @@ class RecursionChatApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
-        ChangeNotifierProvider(create: (_) => AppwriteService()),
+        ChangeNotifierProvider(create: (_) => SimpleAppwriteService()),
+        ChangeNotifierProvider(create: (_) => EnhancedSSOService()),
       ],
       child: MaterialApp(
         title: 'Recursion Chat',
