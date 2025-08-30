@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/user_model.dart';
-import 'simple_simple_appwrite_service.dart';
+import 'simple_appwrite_service.dart';
 
 class AuthService extends ChangeNotifier {
   UserModel? _currentUser;
   bool _isLoading = true;
   String? _token;
-  final SimpleSimpleAppwriteService _appwriteService = SimpleSimpleAppwriteService();
+  final SimpleAppwriteService _appwriteService = SimpleAppwriteService();
 
   // Getters
   UserModel? get currentUser => _currentUser;

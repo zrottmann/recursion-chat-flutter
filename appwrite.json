@@ -1,0 +1,12 @@
+{
+  "projectId": "689bdaf500072795b0f6",
+  "projectName": "recursion-chat-flutter",
+  "sites": [
+    {
+      "$id": "689cb6a9003b47a75929",
+      "name": "recursion-chat-flutter",
+      "path": "build/web",
+      "entrypoint": "index.html"
+    }
+  ]
+}

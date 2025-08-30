@@ -1,0 +1,10 @@
+{
+  "name": "recursion-chat-flutter-web",
+  "version": "1.0.0",
+  "description": "Flutter Web App with SSO for Recursion Chat",
+  "scripts": {
+    "build": "echo 'Flutter web app already built'",
+    "start": "echo 'Static files ready to serve'"
+  },
+  "dependencies": {}
+}

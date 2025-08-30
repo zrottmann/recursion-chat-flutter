@@ -1,0 +1,14 @@
+{
+  "name": "recursion-chat-appwrite",
+  "version": "1.0.0",
+  "description": "Recursion Chat Client Build for Appwrite Sites",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Build complete - static files ready'",
+    "dev": "echo 'Development server not needed for static files'", 
+    "preview": "echo 'Preview not needed for static files'",
+    "postinstall": "npm run build",
+    "start": "echo 'Static files ready to serve'"
+  },
+  "dependencies": {}
+}

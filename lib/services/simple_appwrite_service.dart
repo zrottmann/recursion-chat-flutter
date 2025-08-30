@@ -3,7 +3,7 @@ import 'package:appwrite/appwrite.dart';
 import '../models/user_model.dart';
 
 /// Simplified Appwrite Service compatible with v12.0.3
-class SimpleSimpleAppwriteService extends ChangeNotifier {
+class SimpleAppwriteService extends ChangeNotifier {
   static const String endpoint = 'https://nyc.cloud.appwrite.io/v1';
   static const String projectId = '689bdaf500072795b0f6';
   static const String databaseId = '689bdaf500072795b0f6';
@@ -22,7 +22,7 @@ class SimpleSimpleAppwriteService extends ChangeNotifier {
   bool get isConnected => _isConnected;
   String get connectionStatus => _connectionStatus;
 
-  SimpleSimpleAppwriteService() {
+  SimpleAppwriteService() {
     _initializeAppwrite();
   }
 
