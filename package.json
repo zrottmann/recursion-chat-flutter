@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Flutter Web App with SSO for Recursion Chat",
   "scripts": {
-    "build": "echo 'Flutter web app already built'",
-    "start": "echo 'Static files ready to serve'"
+    "build": "flutter build web && mkdir -p dist && cp -r build/web/* dist/",
+    "start": "echo 'Static files ready to serve from dist/'"
   },
   "dependencies": {}
 }
