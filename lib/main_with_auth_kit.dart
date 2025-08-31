@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:appwrite_auth_kit/appwrite_auth_kit.dart';
-import 'package:appwrite/appwrite.dart';
-import 'package:appwrite/enums.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -13,13 +11,11 @@ class RecursionChatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Create Appwrite client
-    final client = Client()
-      ..setEndpoint('https://nyc.cloud.appwrite.io/v1')
-      ..setProject('689bdaf500072795b0f6');
-
     return AppwriteAuthKit(
-      client: client,
+      client: AppwriteClient(
+        endPoint: 'https://nyc.cloud.appwrite.io/v1',
+        projectId: '689bdaf500072795b0f6',
+      ),
       child: MaterialApp(
         title: 'Recursion Chat',
         theme: ThemeData(
@@ -125,7 +121,7 @@ class SimpleAuthScreen extends StatelessWidget {
                           onPressed: () async {
                             try {
                               await authNotifier.createOAuth2Session(
-                                provider: OAuthProvider.google,
+                                provider: 'google',
                               );
                             } catch (e) {
                               if (context.mounted) {
@@ -157,7 +153,7 @@ class SimpleAuthScreen extends StatelessWidget {
                           onPressed: () async {
                             try {
                               await authNotifier.createOAuth2Session(
-                                provider: OAuthProvider.github,
+                                provider: 'github',
                               );
                             } catch (e) {
                               if (context.mounted) {

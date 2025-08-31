@@ -19,6 +19,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   sign_in_with_apple: ^6.1.1
   url_launcher: ^6.2.5
+  appwrite_auth_kit: ^0.10.0
 
 dev_dependencies:
   flutter_test:

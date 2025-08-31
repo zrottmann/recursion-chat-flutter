@@ -147,6 +147,21 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Update auth state with SSO user
+  Future<void> updateWithSSOUser(UserModel user, {String? sessionId}) async {
+    try {
+      _currentUser = user;
+      _token = sessionId ?? 'sso_session_${DateTime.now().millisecondsSinceEpoch}';
+      
+      // Store credentials
+      await _storeCredentials();
+      
+      notifyListeners();
+    } catch (e) {
+      debugPrint('SSO user update error: $e');
+    }
+  }
+
   /// Sign out and clear stored credentials
   Future<void> signOut() async {
     try {

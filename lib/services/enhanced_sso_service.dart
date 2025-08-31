@@ -243,10 +243,28 @@ class EnhancedSSOService extends ChangeNotifier {
 
   /// Get current session status
   Future<SSOResult?> getCurrentSession() async {
-    if (_currentUser != null) {
-      return SSOResult.success(_currentUser!, 'session');
+    try {
+      // Try to get the current account from Appwrite
+      final accountDetails = await _account.get();
+      
+      // If we have an account, create a user from it
+      final user = UserModel(
+        id: accountDetails.$id,
+        email: accountDetails.email,
+        username: accountDetails.name.isNotEmpty ? accountDetails.name : accountDetails.email.split('@')[0],
+        name: accountDetails.name.isNotEmpty ? accountDetails.name : accountDetails.email,
+        avatar: '',
+      );
+      
+      _currentUser = user;
+      notifyListeners();
+      
+      return SSOResult.success(user, 'session');
+    } catch (e) {
+      debugPrint('[SSO] No current session: $e');
+      _currentUser = null;
+      return null;
     }
-    return null;
   }
 }
 
