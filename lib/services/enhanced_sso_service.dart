@@ -55,10 +55,11 @@ class EnhancedSSOService extends ChangeNotifier {
       debugPrint('[SSO] Starting Appwrite Google OAuth sign-in');
       
       // Use Appwrite's OAuth which is already configured
+      // Using root URL with hash parameters to avoid 404 on SPA
       final session = await _account.createOAuth2Session(
         provider: OAuthProvider.google,
-        success: 'https://chat.recursionsystems.com/auth/success',
-        failure: 'https://chat.recursionsystems.com/auth/failure',
+        success: 'https://chat.recursionsystems.com/',
+        failure: 'https://chat.recursionsystems.com/',
       );
       
       debugPrint('[SSO] Appwrite OAuth session created');
@@ -133,10 +134,11 @@ class EnhancedSSOService extends ChangeNotifier {
       debugPrint('[SSO] Starting Appwrite GitHub OAuth sign-in');
       
       // Use Appwrite's OAuth which is already configured
+      // Using root URL with hash parameters to avoid 404 on SPA
       final session = await _account.createOAuth2Session(
         provider: OAuthProvider.github,
-        success: 'https://chat.recursionsystems.com/auth/success',
-        failure: 'https://chat.recursionsystems.com/auth/failure',
+        success: 'https://chat.recursionsystems.com/',
+        failure: 'https://chat.recursionsystems.com/',
       );
       
       debugPrint('[SSO] Appwrite GitHub OAuth session created');

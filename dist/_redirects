@@ -1,0 +1,5 @@
+# Netlify-style redirects for SPA routing
+# This tells the web server to serve index.html for all routes
+# so Flutter can handle routing internally
+
+/*    /index.html   200

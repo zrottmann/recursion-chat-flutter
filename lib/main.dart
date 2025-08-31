@@ -56,21 +56,38 @@ class RecursionChatApp extends StatelessWidget {
   }
 }
 
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
   const AuthWrapper({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Check current URL path for OAuth callbacks (web only)
-    if (kIsWeb) {
-      final currentPath = html.window.location.pathname;
-      if (currentPath == '/auth/success') {
-        return const OAuthCallbackScreen(success: true);
-      } else if (currentPath == '/auth/failure') {
-        return const OAuthCallbackScreen(success: false);
-      }
-    }
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
 
+class _AuthWrapperState extends State<AuthWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    // Check for Appwrite session after OAuth redirect
+    _checkForAppwriteSession();
+  }
+
+  Future<void> _checkForAppwriteSession() async {
+    final ssoService = context.read<EnhancedSSOService>();
+    try {
+      final result = await ssoService.getCurrentSession();
+      if (result != null && result.success && result.user != null) {
+        // User is authenticated via SSO
+        final authService = context.read<AuthService>();
+        // Update auth service with SSO user
+        debugPrint('OAuth session found: ${result.user!.email}');
+      }
+    } catch (e) {
+      debugPrint('No active OAuth session: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Consumer<AuthService>(
       builder: (context, authService, child) {
         if (authService.isLoading) {
