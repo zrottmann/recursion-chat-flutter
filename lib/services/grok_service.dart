@@ -32,6 +32,11 @@ class GrokService extends ChangeNotifier {
         'content': message
       });
 
+      // Debug API configuration
+      debugPrint('Grok API Endpoint: ${Environment.grokApiEndpoint}');
+      debugPrint('Grok API Key (masked): ${Environment.grokApiKey.substring(0, 8)}...');
+      debugPrint('Grok Model: ${Environment.grokModel}');
+
       // Prepare the request
       final response = await http.post(
         Uri.parse(Environment.grokApiEndpoint),
@@ -48,6 +53,9 @@ class GrokService extends ChangeNotifier {
         }),
       );
 
+      debugPrint('Grok API Response Status: ${response.statusCode}');
+      debugPrint('Grok API Response Body: ${response.body}');
+      
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final grokResponse = data['choices'][0]['message']['content'];
@@ -68,7 +76,9 @@ class GrokService extends ChangeNotifier {
         notifyListeners();
         return grokResponse;
       } else {
-        throw Exception('Failed to get response from Grok: ${response.statusCode}');
+        final errorBody = response.body;
+        debugPrint('Grok API Error Response: $errorBody');
+        throw Exception('Failed to get response from Grok: ${response.statusCode} - $errorBody');
       }
     } catch (e) {
       _lastError = e.toString();
@@ -99,14 +109,16 @@ class GrokService extends ChangeNotifier {
   String getErrorMessage() {
     if (_lastError == null) return '';
     
-    if (_lastError!.contains('401')) {
-      return 'Authentication failed. Please check API key.';
+    if (_lastError!.contains('Incorrect API key') || _lastError!.contains('401')) {
+      return 'Invalid Grok API key. Please update the API key in environment configuration.';
     } else if (_lastError!.contains('429')) {
       return 'Rate limit exceeded. Please wait a moment.';
     } else if (_lastError!.contains('SocketException')) {
       return 'Network error. Please check your connection.';
+    } else if (_lastError!.contains('YOUR_GROK_API_KEY_HERE')) {
+      return 'Grok API key not configured. Please set the GROK_API_KEY environment variable.';
     } else {
-      return 'Failed to get response. Please try again.';
+      return 'Failed to get response. Please try again. Error: ${_lastError}';
     }
   }
 }
