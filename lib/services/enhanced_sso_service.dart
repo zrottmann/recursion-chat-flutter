@@ -53,23 +53,54 @@ class EnhancedSSOService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Check if Google Sign-In is properly configured
+  bool _isGoogleSignInAvailable() {
+    try {
+      // For web, we need the client ID to be configured
+      if (kIsWeb) {
+        // In a real implementation, you'd check if the client ID is set
+        // For now, we'll assume it might not be configured and handle gracefully
+        return true; // Let the actual sign-in attempt handle the error
+      }
+      return true;
+    } catch (e) {
+      debugPrint('[SSO] Google Sign-In availability check failed: $e');
+      return false;
+    }
+  }
+
   /// Sign in with Google using native Google Sign-In
   Future<SSOResult> signInWithGoogle() async {
     try {
       debugPrint('[SSO] Starting Google OAuth sign-in');
       
+      // Check if Google Sign-In is available
+      if (!_isGoogleSignInAvailable()) {
+        return SSOResult.error('Google Sign-In not properly configured for web. Please configure OAuth client ID.');
+      }
+      
       // Sign out any existing Google account first
-      await _googleSignIn.signOut();
+      try {
+        await _googleSignIn.signOut();
+      } catch (e) {
+        debugPrint('[SSO] Warning: Google sign-out failed: $e');
+      }
       
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       
       if (googleUser == null) {
-        return SSOResult.error('Google sign-in was cancelled');
+        return SSOResult.error('Google sign-in was cancelled by user');
       }
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      GoogleSignInAuthentication? googleAuth;
+      try {
+        googleAuth = await googleUser.authentication;
+      } catch (e) {
+        debugPrint('[SSO] Failed to get Google authentication: $e');
+        return SSOResult.error('Failed to authenticate with Google: ${e.toString()}');
+      }
       
-      if (googleAuth.accessToken == null) {
+      if (googleAuth == null || googleAuth.accessToken == null) {
         return SSOResult.error('Failed to get Google access token');
       }
 

@@ -31,6 +31,10 @@
 
   <title>Recursion Chat</title>
   <link rel="manifest" href="manifest.json">
+  
+  <!-- Google Sign-In for Web -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <meta name="google-signin-client_id" content="YOUR_GOOGLE_CLIENT_ID_HERE">
 
   <style>
     /* Loading screen */
@@ -102,7 +106,7 @@
 
   <!-- This script installs service_worker.js to provide PWA functionality -->
   <script>
-    const serviceWorkerVersion = "2760700221";
+    const serviceWorkerVersion = "3386855492";
     var scriptLoaded = false;
     function loadMainDartJs() {
       if (scriptLoaded) {
