@@ -37,11 +37,25 @@ class AuthService extends ChangeNotifier {
       _errorMessage = null;
       notifyListeners();
 
+      // Test Appwrite connection first
+      debugPrint('Testing Appwrite connection...');
+      debugPrint('Endpoint: https://nyc.cloud.appwrite.io/v1');
+      debugPrint('Project: 689bdaf500072795b0f6');
+      
       _currentUser = await _account.get();
       
       debugPrint('Found existing session for user: ${_currentUser?.name}');
     } catch (e) {
-      debugPrint('No existing session found: $e');
+      debugPrint('Session check failed: $e');
+      if (e.toString().contains('401')) {
+        debugPrint('No existing session (expected)');
+      } else if (e.toString().contains('404')) {
+        _errorMessage = 'Appwrite project not found. Check project ID and endpoint.';
+      } else if (e.toString().contains('403')) {
+        _errorMessage = 'Domain not whitelisted. Check Appwrite platform configuration.';
+      } else {
+        _errorMessage = 'Connection failed: ${e.toString()}';
+      }
       _currentUser = null;
     } finally {
       _isLoading = false;

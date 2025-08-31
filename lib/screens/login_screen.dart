@@ -49,6 +49,16 @@ class LoginScreen extends StatelessWidget {
                         ),
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Project: 689bdaf500072795b0f6',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 10,
+                          fontFamily: 'monospace',
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                       const SizedBox(height: 32),
 
                       // Login Buttons
