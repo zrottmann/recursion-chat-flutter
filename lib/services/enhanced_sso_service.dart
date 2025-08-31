@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/models.dart';
+import 'package:appwrite/enums.dart';
 import '../models/user_model.dart';
 
 /// Enhanced SSO Service for Flutter Recursion Chat
@@ -17,11 +17,6 @@ class EnhancedSSOService extends ChangeNotifier {
   late Client _client;
   late Account _account;
   late Databases _databases;
-
-  // Google Sign-In configuration
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    scopes: ['email', 'profile'],
-  );
 
   // Session management
   UserModel? _currentUser;
@@ -53,79 +48,44 @@ class EnhancedSSOService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Check if Google Sign-In is properly configured
-  bool _isGoogleSignInAvailable() {
-    try {
-      // For web, we need the client ID to be configured
-      if (kIsWeb) {
-        // In a real implementation, you'd check if the client ID is set
-        // For now, we'll assume it might not be configured and handle gracefully
-        return true; // Let the actual sign-in attempt handle the error
-      }
-      return true;
-    } catch (e) {
-      debugPrint('[SSO] Google Sign-In availability check failed: $e');
-      return false;
-    }
-  }
 
-  /// Sign in with Google using native Google Sign-In
+  /// Sign in with Google using Appwrite OAuth
   Future<SSOResult> signInWithGoogle() async {
     try {
-      debugPrint('[SSO] Starting Google OAuth sign-in');
+      debugPrint('[SSO] Starting Appwrite Google OAuth sign-in');
       
-      // Check if Google Sign-In is available
-      if (!_isGoogleSignInAvailable()) {
-        return SSOResult.error('Google Sign-In not properly configured for web. Please configure OAuth client ID.');
-      }
+      // Use Appwrite's OAuth which is already configured
+      final session = await _account.createOAuth2Session(
+        provider: OAuthProvider.google,
+        success: '${Uri.base.origin}/auth/success',
+        failure: '${Uri.base.origin}/auth/failure',
+      );
       
-      // Sign out any existing Google account first
-      try {
-        await _googleSignIn.signOut();
-      } catch (e) {
-        debugPrint('[SSO] Warning: Google sign-out failed: $e');
-      }
+      debugPrint('[SSO] Appwrite OAuth session created');
       
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      // Get current account details
+      final accountDetails = await _account.get();
       
-      if (googleUser == null) {
-        return SSOResult.error('Google sign-in was cancelled by user');
-      }
-
-      GoogleSignInAuthentication? googleAuth;
-      try {
-        googleAuth = await googleUser.authentication;
-      } catch (e) {
-        debugPrint('[SSO] Failed to get Google authentication: $e');
-        return SSOResult.error('Failed to authenticate with Google: ${e.toString()}');
-      }
-      
-      if (googleAuth == null || googleAuth.accessToken == null) {
-        return SSOResult.error('Failed to get Google access token');
-      }
-
-      debugPrint('[SSO] Google OAuth successful, creating user');
-
-      // Create UserModel from Google account info
+      // Create UserModel from Appwrite account info
       final user = UserModel(
-        id: 'google_${googleUser.id}',
-        email: googleUser.email,
-        username: googleUser.displayName ?? googleUser.email.split('@')[0],
-        name: googleUser.displayName ?? googleUser.email,
-        avatar: googleUser.photoUrl ?? '',
+        id: accountDetails.$id,
+        email: accountDetails.email,
+        username: accountDetails.name.isNotEmpty ? accountDetails.name : accountDetails.email.split('@')[0],
+        name: accountDetails.name.isNotEmpty ? accountDetails.name : accountDetails.email,
+        avatar: '',
       );
 
       _currentUser = user;
       await _syncUserToDatabase(user, 'google');
       
-      debugPrint('[SSO] Google OAuth completed successfully');
+      debugPrint('[SSO] Appwrite Google OAuth completed successfully');
       notifyListeners();
       
       return SSOResult.success(user, 'google');
       
     } catch (e) {
-      debugPrint('[SSO] Google sign-in error: $e');
-      return SSOResult.error('Google sign-in failed: $e');
+      debugPrint('[SSO] Appwrite Google OAuth error: $e');
+      return SSOResult.error('Google sign-in failed: ${e.toString()}');
     }
   }
 
@@ -167,32 +127,43 @@ class EnhancedSSOService extends ChangeNotifier {
     }
   }
 
-  /// Sign in with GitHub (simplified version)
+  /// Sign in with GitHub using Appwrite OAuth
   Future<SSOResult> signInWithGitHub() async {
     try {
-      debugPrint('[SSO] GitHub OAuth not fully implemented - using mock user');
+      debugPrint('[SSO] Starting Appwrite GitHub OAuth sign-in');
       
-      // For now, create a mock user for GitHub
-      // In production, you'd implement proper OAuth flow
+      // Use Appwrite's OAuth which is already configured
+      final session = await _account.createOAuth2Session(
+        provider: OAuthProvider.github,
+        success: '${Uri.base.origin}/auth/success',
+        failure: '${Uri.base.origin}/auth/failure',
+      );
+      
+      debugPrint('[SSO] Appwrite GitHub OAuth session created');
+      
+      // Get current account details
+      final accountDetails = await _account.get();
+      
+      // Create UserModel from Appwrite account info
       final user = UserModel(
-        id: 'github_mock_user',
-        email: 'github.user@example.com',
-        username: 'GitHub User',
-        name: 'GitHub User',
+        id: accountDetails.$id,
+        email: accountDetails.email,
+        username: accountDetails.name.isNotEmpty ? accountDetails.name : accountDetails.email.split('@')[0],
+        name: accountDetails.name.isNotEmpty ? accountDetails.name : accountDetails.email,
         avatar: '',
       );
 
       _currentUser = user;
       await _syncUserToDatabase(user, 'github');
       
-      debugPrint('[SSO] GitHub OAuth completed successfully');
+      debugPrint('[SSO] Appwrite GitHub OAuth completed successfully');
       notifyListeners();
       
       return SSOResult.success(user, 'github');
       
     } catch (e) {
-      debugPrint('[SSO] GitHub sign-in error: $e');
-      return SSOResult.error('GitHub sign-in failed: $e');
+      debugPrint('[SSO] Appwrite GitHub OAuth error: $e');
+      return SSOResult.error('GitHub sign-in failed: ${e.toString()}');
     }
   }
 
@@ -248,13 +219,13 @@ class EnhancedSSOService extends ChangeNotifier {
   /// Sign out from all SSO providers
   Future<void> signOut() async {
     try {
-      debugPrint('[SSO] Signing out from all providers');
+      debugPrint('[SSO] Signing out from Appwrite');
 
-      // Sign out from Google
+      // Sign out from Appwrite account
       try {
-        await _googleSignIn.signOut();
+        await _account.deleteSession(sessionId: 'current');
       } catch (e) {
-        debugPrint('[SSO] Google sign-out error: $e');
+        debugPrint('[SSO] Appwrite sign-out error: $e');
       }
 
       // Clear local state
