@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/grok_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final List<ChatMessage> _messages = [];
   final TextEditingController _messageController = TextEditingController();
+  bool _isGrokTyping = false;
 
   @override
   void dispose() {
@@ -19,12 +21,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
     
     final authService = context.read<AuthService>();
+    final grokService = context.read<GrokService>();
+    final userMessage = _messageController.text.trim();
+    
+    // Add user message
     final message = ChatMessage(
-      text: _messageController.text.trim(),
+      text: userMessage,
       sender: authService.currentUser?.name ?? 'You',
       timestamp: DateTime.now(),
       isMe: true,
@@ -36,20 +42,44 @@ class _HomeScreenState extends State<HomeScreen> {
     
     _messageController.clear();
     
-    // Simulate a response after a delay
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
+    // Show typing indicator
+    setState(() {
+      _isGrokTyping = true;
+    });
+    
+    // Get Grok AI response
+    final grokResponse = await grokService.sendMessage(userMessage);
+    
+    // Hide typing indicator
+    setState(() {
+      _isGrokTyping = false;
+    });
+    
+    if (mounted) {
+      if (grokResponse != null) {
         final response = ChatMessage(
-          text: "Thanks for your message! This is a Flutter demo chat.",
-          sender: "Chat Bot",
+          text: grokResponse,
+          sender: "Grok AI",
           timestamp: DateTime.now(),
           isMe: false,
+          isGrok: true,
         );
         setState(() {
           _messages.insert(0, response);
         });
+      } else {
+        // Show error message
+        final errorMessage = grokService.getErrorMessage();
+        if (errorMessage.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
       }
-    });
+    }
   }
 
   @override
@@ -138,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Text(
-                        'Powered by Flutter & Appwrite',
+                        'Powered by Grok AI & Appwrite',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],
@@ -153,44 +183,52 @@ class _HomeScreenState extends State<HomeScreen> {
           
           // Chat Messages
           Expanded(
-            child: _messages.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.chat_bubble_outline,
-                          size: 64,
-                          color: Colors.grey,
+            child: Stack(
+              children: [
+                _messages.isEmpty
+                    ? const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.chat_bubble_outline,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'Start a conversation with Grok AI!',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Ask anything - I\'m here to help.',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Start a conversation!',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Type a message below to begin chatting.',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : ListView.builder(
-                    reverse: true,
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _messages.length,
-                    itemBuilder: (context, index) {
-                      final message = _messages[index];
-                      return _buildMessageBubble(message);
-                    },
-                  ),
+                      )
+                    : ListView.builder(
+                        reverse: true,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _messages.length + (_isGrokTyping ? 1 : 0),
+                        itemBuilder: (context, index) {
+                          if (_isGrokTyping && index == 0) {
+                            return _buildTypingIndicator();
+                          }
+                          final messageIndex = _isGrokTyping ? index - 1 : index;
+                          final message = _messages[messageIndex];
+                          return _buildMessageBubble(message);
+                        },
+                      ),
+              ],
+            ),
           ),
           
           // Message Input
@@ -235,6 +273,63 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildTypingIndicator() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF9333EA).withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: const Color(0xFF9333EA).withValues(alpha: 0.3),
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.auto_awesome,
+              size: 14,
+              color: Color(0xFF9333EA),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'Grok AI',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: Color(0xFF9333EA),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 40,
+              child: Row(
+                children: List.generate(3, (index) {
+                  return AnimatedContainer(
+                    duration: Duration(milliseconds: 300 + (index * 100)),
+                    margin: const EdgeInsets.symmetric(horizontal: 2),
+                    height: 8,
+                    width: 8,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF9333EA).withValues(
+                        alpha: index == DateTime.now().second % 3 ? 0.8 : 0.3,
+                      ),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildMessageBubble(ChatMessage message) {
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -244,8 +339,13 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: BoxDecoration(
           color: message.isMe
               ? Theme.of(context).primaryColor
-              : Colors.grey[200],
+              : message.isGrok 
+                  ? const Color(0xFF9333EA).withValues(alpha: 0.1)
+                  : Colors.grey[200],
           borderRadius: BorderRadius.circular(18),
+          border: message.isGrok 
+              ? Border.all(color: const Color(0xFF9333EA).withValues(alpha: 0.3), width: 1)
+              : null,
         ),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
@@ -255,13 +355,25 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (!message.isMe)
-              Text(
-                message.sender,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: Colors.grey[700],
-                ),
+              Row(
+                children: [
+                  if (message.isGrok) ...[
+                    const Icon(
+                      Icons.auto_awesome,
+                      size: 14,
+                      color: Color(0xFF9333EA),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                  Text(
+                    message.sender,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: message.isGrok ? const Color(0xFF9333EA) : Colors.grey[700],
+                    ),
+                  ),
+                ],
               ),
             if (!message.isMe) const SizedBox(height: 4),
             Text(
@@ -318,11 +430,13 @@ class ChatMessage {
   final String sender;
   final DateTime timestamp;
   final bool isMe;
+  final bool isGrok;
 
   ChatMessage({
     required this.text,
     required this.sender,
     required this.timestamp,
     required this.isMe,
+    this.isGrok = false,
   });
 }
