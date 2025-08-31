@@ -5,6 +5,8 @@ import 'services/simple_appwrite_service.dart';
 import 'services/enhanced_sso_service.dart';
 import 'screens/auth_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/oauth_callback_screen.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(const RecursionChatApp());
@@ -41,7 +43,12 @@ class RecursionChatApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const AuthWrapper(),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const AuthWrapper(),
+          '/auth/success': (context) => const OAuthCallbackScreen(success: true),
+          '/auth/failure': (context) => const OAuthCallbackScreen(success: false),
+        },
         debugShowCheckedModeBanner: false,
       ),
     );

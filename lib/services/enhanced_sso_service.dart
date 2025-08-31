@@ -57,8 +57,8 @@ class EnhancedSSOService extends ChangeNotifier {
       // Use Appwrite's OAuth which is already configured
       final session = await _account.createOAuth2Session(
         provider: OAuthProvider.google,
-        success: '${Uri.base.origin}/auth/success',
-        failure: '${Uri.base.origin}/auth/failure',
+        success: 'https://chat.recursionsystems.com/auth/success',
+        failure: 'https://chat.recursionsystems.com/auth/failure',
       );
       
       debugPrint('[SSO] Appwrite OAuth session created');
@@ -135,8 +135,8 @@ class EnhancedSSOService extends ChangeNotifier {
       // Use Appwrite's OAuth which is already configured
       final session = await _account.createOAuth2Session(
         provider: OAuthProvider.github,
-        success: '${Uri.base.origin}/auth/success',
-        failure: '${Uri.base.origin}/auth/failure',
+        success: 'https://chat.recursionsystems.com/auth/success',
+        failure: 'https://chat.recursionsystems.com/auth/failure',
       );
       
       debugPrint('[SSO] Appwrite GitHub OAuth session created');
