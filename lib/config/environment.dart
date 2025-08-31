@@ -7,5 +7,5 @@ class Environment {
   static const String grokApiEndpoint = 'https://api.x.ai/v1/chat/completions';
   static const String grokApiKey = String.fromEnvironment('GROK_API_KEY', 
     defaultValue: 'YOUR_GROK_API_KEY_HERE'); // Set via environment variable
-  static const String grokModel = 'grok-beta';
+  static const String grokModel = 'grok-2-1212';
 }
