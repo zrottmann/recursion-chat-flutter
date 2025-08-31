@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
               border: Border(
                 bottom: BorderSide(color: Colors.grey[300]!),
               ),
@@ -276,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
               '${message.timestamp.hour.toString().padLeft(2, '0')}:${message.timestamp.minute.toString().padLeft(2, '0')}',
               style: TextStyle(
                 color: message.isMe
-                    ? Colors.white.withOpacity(0.7)
+                    ? Colors.white.withValues(alpha: 0.7)
                     : Colors.grey[500],
                 fontSize: 12,
               ),

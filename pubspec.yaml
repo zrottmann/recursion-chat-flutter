@@ -20,10 +20,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/
-  
-flutter_web:
-  plugins:
-    appwrite:
-      path: packages/appwrite

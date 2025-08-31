@@ -97,7 +97,7 @@ class LoginScreen extends StatelessWidget {
                                 onPressed: () async {
                                   await authService.signIn('Demo User', 'demo@recursionsystems.com');
                                 },
-                                icon: const Icon(Icons.demo_outlined, size: 20),
+                                icon: const Icon(Icons.play_arrow, size: 20),
                                 label: const Text('Quick Demo'),
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
