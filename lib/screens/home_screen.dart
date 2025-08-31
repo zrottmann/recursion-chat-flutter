@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final authService = context.read<AuthService>();
     final message = ChatMessage(
       text: _messageController.text.trim(),
-      sender: authService.userName ?? 'You',
+      sender: authService.currentUser?.name ?? 'You',
       timestamp: DateTime.now(),
       isMe: true,
     );
@@ -64,11 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: CircleAvatar(
                   backgroundColor: Colors.white24,
                   child: Text(
-                    authService.userName?.isNotEmpty == true
-                        ? authService.userName![0].toUpperCase()
-                        : (authService.userEmail?.isNotEmpty == true
-                            ? authService.userEmail![0].toUpperCase()
-                            : 'U'),
+                    (authService.currentUser?.name?.isNotEmpty == true)
+                        ? authService.currentUser!.name![0].toUpperCase()
+                        : (authService.currentUser?.email?.isNotEmpty == true)
+                            ? authService.currentUser!.email![0].toUpperCase()
+                            : 'U',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         const Icon(Icons.person, size: 20),
                         const SizedBox(width: 12),
-                        Text(authService.userName ?? authService.userEmail ?? 'User'),
+                        Text(authService.currentUser?.name ?? authService.currentUser?.email ?? 'User'),
                       ],
                     ),
                   ),
@@ -138,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Text(
-                        'Built with Flutter Framework',
+                        'Powered by Flutter & Appwrite',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],

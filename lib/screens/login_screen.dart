@@ -43,7 +43,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Built with Flutter Framework',
+                        'Sign in to continue',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: Colors.grey[600],
                         ),
@@ -62,13 +62,53 @@ class LoginScreen extends StatelessWidget {
 
                           return Column(
                             children: [
+                              // Error message
+                              if (authService.errorMessage != null) ...[
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red[50],
+                                    border: Border.all(color: Colors.red[300]!),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.error_outline, color: Colors.red[700], size: 20),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          authService.errorMessage!,
+                                          style: TextStyle(
+                                            color: Colors.red[700],
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: authService.clearError,
+                                        icon: const Icon(Icons.close, size: 18),
+                                        color: Colors.red[700],
+                                        padding: EdgeInsets.zero,
+                                        constraints: const BoxConstraints(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                              
                               // Google Sign-in Button
                               ElevatedButton.icon(
-                                onPressed: () async {
+                                onPressed: authService.isLoading ? null : () async {
                                   await authService.signInWithGoogle();
                                 },
-                                icon: const Icon(Icons.login, size: 20),
-                                label: const Text('Sign in with Google'),
+                                icon: const Text('G', 
+                                  style: TextStyle(
+                                    fontSize: 18, 
+                                    fontWeight: FontWeight.bold,
+                                  )
+                                ),
+                                label: const Text('Continue with Google'),
                                 style: ElevatedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   backgroundColor: const Color(0xFF4285F4),
@@ -79,28 +119,24 @@ class LoginScreen extends StatelessWidget {
                               
                               // GitHub Sign-in Button
                               ElevatedButton.icon(
-                                onPressed: () async {
+                                onPressed: authService.isLoading ? null : () async {
                                   await authService.signInWithGitHub();
                                 },
                                 icon: const Icon(Icons.code, size: 20),
-                                label: const Text('Sign in with GitHub'),
+                                label: const Text('Continue with GitHub'),
                                 style: ElevatedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
                                   backgroundColor: const Color(0xFF333333),
                                   foregroundColor: Colors.white,
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 16),
                               
-                              // Quick Demo Button
-                              OutlinedButton.icon(
-                                onPressed: () async {
-                                  await authService.signIn('Demo User', 'demo@recursionsystems.com');
-                                },
-                                icon: const Icon(Icons.play_arrow, size: 20),
-                                label: const Text('Quick Demo'),
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                              Text(
+                                'Powered by Appwrite',
+                                style: TextStyle(
+                                  color: Colors.grey[500],
+                                  fontSize: 12,
                                 ),
                               ),
                             ],
