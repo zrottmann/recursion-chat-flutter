@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 import '../services/auth_service.dart';
 import '../services/enhanced_sso_service.dart';
+import 'dart:html' as html;
 
 class OAuthCallbackScreen extends StatefulWidget {
   final bool success;
@@ -37,6 +39,10 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
         debugPrint('OAuth callback: User authenticated successfully');
         
         // Navigate to home
+        if (kIsWeb) {
+          // For web, change URL back to root
+          html.window.history.pushState(null, 'Recursion Chat', '/');
+        }
         if (mounted) {
           Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
         }
@@ -51,6 +57,10 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
   }
   
   void _goBackToAuth() {
+    if (kIsWeb) {
+      // For web, change URL back to root
+      html.window.history.pushState(null, 'Recursion Chat', '/');
+    }
     if (mounted) {
       Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
     }

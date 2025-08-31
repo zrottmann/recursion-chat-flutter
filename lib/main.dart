@@ -7,6 +7,7 @@ import 'screens/auth_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/oauth_callback_screen.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:html' as html;
 
 void main() {
   runApp(const RecursionChatApp());
@@ -60,6 +61,16 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check current URL path for OAuth callbacks (web only)
+    if (kIsWeb) {
+      final currentPath = html.window.location.pathname;
+      if (currentPath == '/auth/success') {
+        return const OAuthCallbackScreen(success: true);
+      } else if (currentPath == '/auth/failure') {
+        return const OAuthCallbackScreen(success: false);
+      }
+    }
+
     return Consumer<AuthService>(
       builder: (context, authService, child) {
         if (authService.isLoading) {
