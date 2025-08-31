@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../config/environment.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -51,7 +52,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Project: 689bdaf500072795b0f6',
+                        'Project: ${Environment.appwriteProjectId}',
                         style: TextStyle(
                           color: Colors.grey[400],
                           fontSize: 10,

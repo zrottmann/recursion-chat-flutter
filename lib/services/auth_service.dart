@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
+import '../config/environment.dart';
 
 class AuthService extends ChangeNotifier {
   late Client _client;
@@ -24,8 +25,8 @@ class AuthService extends ChangeNotifier {
 
   void _initializeAppwrite() {
     _client = Client()
-      ..setEndpoint('https://nyc.cloud.appwrite.io/v1')
-      ..setProject('689bdaf500072795b0f6')
+      ..setEndpoint(Environment.appwritePublicEndpoint)
+      ..setProject(Environment.appwriteProjectId)
       ..setSelfSigned(status: true);
     
     _account = Account(_client);
@@ -39,8 +40,8 @@ class AuthService extends ChangeNotifier {
 
       // Test Appwrite connection first
       debugPrint('Testing Appwrite connection...');
-      debugPrint('Endpoint: https://nyc.cloud.appwrite.io/v1');
-      debugPrint('Project: 689bdaf500072795b0f6');
+      debugPrint('Endpoint: ${Environment.appwritePublicEndpoint}');
+      debugPrint('Project: ${Environment.appwriteProjectId}');
       
       _currentUser = await _account.get();
       
