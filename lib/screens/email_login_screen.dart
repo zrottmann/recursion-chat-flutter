@@ -283,36 +283,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   ],
                                 ),
                                 
-                                // ULTRATHINK info for mobile
-                                if (!kIsWeb) ...[
-                                  const SizedBox(height: 12),
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.purple[50],
-                                      border: Border.all(color: Colors.purple[300]!),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.psychology, color: Colors.purple[700], size: 16),
-                                        const SizedBox(width: 6),
-                                        Expanded(
-                                          child: Text(
-                                            'ULTRATHINK OAuth: Multiple redirect strategies for maximum compatibility',
-                                            style: TextStyle(
-                                              color: Colors.purple[700],
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ] else ...[
-                                  const SizedBox(height: 12),
-                                ],
+                                const SizedBox(height: 12),
                                 
                                 Text(
                                   'Powered by Appwrite',
