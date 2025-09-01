@@ -237,8 +237,8 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   ),
                                 ),
                                 
-                                // OAuth options for mobile
-                                if (!kIsWeb) ...[
+                                // Show OAuth only on web platform
+                                if (kIsWeb) ...[
                                   const SizedBox(height: 16),
                                   const Divider(),
                                   const SizedBox(height: 16),
@@ -249,7 +249,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   ),
                                   const SizedBox(height: 12),
                                   
-                                  // OAuth buttons for mobile
+                                  // OAuth buttons for web only
                                   Row(
                                     children: [
                                       Expanded(
@@ -282,6 +282,32 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                         ),
                                       ),
                                     ],
+                                  ),
+                                ] else ...[
+                                  // Mobile-specific message
+                                  const SizedBox(height: 16),
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blue[50],
+                                      border: Border.all(color: Colors.blue[300]!),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            'Native mobile app - Use email/password for secure authentication',
+                                            style: TextStyle(
+                                              color: Colors.blue[700],
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ],
