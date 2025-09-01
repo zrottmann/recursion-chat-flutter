@@ -87,16 +87,26 @@ class AuthService extends ChangeNotifier {
         );
       } else {
         debugPrint('Using mobile OAuth flow');
-        // Mobile platforms - try with explicit redirect URLs
-        // Use the deep link scheme we configured in Android manifest
-        final redirectUrl = 'appwrite-callback-${Environment.appwriteProjectId}://oauth';
-        debugPrint('Using redirect URL: $redirectUrl');
-        
-        await _account.createOAuth2Session(
-          provider: provider,
-          success: redirectUrl,
-          failure: redirectUrl,
-        );
+        // Mobile platforms - try different approaches for better compatibility
+        try {
+          // First try: Use web-compatible URLs that might work better with mobile browsers
+          await _account.createOAuth2Session(
+            provider: provider,
+            success: 'https://chat.recursionsystems.com/auth/success',
+            failure: 'https://chat.recursionsystems.com/auth/failure',
+          );
+        } catch (e) {
+          debugPrint('Web-style URLs failed, trying deep links: $e');
+          // Fallback: Try deep link approach
+          final redirectUrl = 'appwrite-callback-${Environment.appwriteProjectId}://oauth';
+          debugPrint('Fallback to redirect URL: $redirectUrl');
+          
+          await _account.createOAuth2Session(
+            provider: provider,
+            success: redirectUrl,
+            failure: redirectUrl,
+          );
+        }
       }
 
       debugPrint('OAuth session created, checking user session...');
