@@ -71,22 +71,22 @@ class AuthService extends ChangeNotifier {
       _errorMessage = null;
       notifyListeners();
 
-      // Platform-specific redirect URLs
-      final String successUrl, failureUrl;
+      // Platform-specific OAuth handling
       if (kIsWeb) {
-        successUrl = 'https://chat.recursionsystems.com';
-        failureUrl = 'https://chat.recursionsystems.com';
+        // Web platform - use standard web URLs
+        await _account.createOAuth2Session(
+          provider: provider,
+          success: 'https://chat.recursionsystems.com',
+          failure: 'https://chat.recursionsystems.com',
+        );
       } else {
-        // Native mobile - use custom scheme
-        successUrl = 'recursionChat://success';
-        failureUrl = 'recursionChat://failure';
+        // Mobile platforms - use localhost for OAuth callback
+        await _account.createOAuth2Session(
+          provider: provider,
+          success: 'http://localhost',
+          failure: 'http://localhost',
+        );
       }
-      
-      await _account.createOAuth2Session(
-        provider: provider,
-        success: successUrl,
-        failure: failureUrl,
-      );
 
       // After OAuth redirect, check for user session
       _currentUser = await _account.get();
@@ -95,6 +95,57 @@ class AuthService extends ChangeNotifier {
     } catch (e) {
       debugPrint('OAuth sign-in error: $e');
       _errorMessage = 'Authentication failed. Please try again.';
+      _currentUser = null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Email/Password authentication for native apps
+  Future<void> signInWithEmail(String email, String password) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      await _account.createEmailPasswordSession(
+        email: email,
+        password: password,
+      );
+
+      _currentUser = await _account.get();
+      debugPrint('Email sign-in successful for user: ${_currentUser?.name}');
+      
+    } catch (e) {
+      debugPrint('Email sign-in error: $e');
+      _errorMessage = 'Login failed. Please check your credentials.';
+      _currentUser = null;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> signUpWithEmail(String email, String password, String name) async {
+    try {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+
+      await _account.create(
+        userId: ID.unique(),
+        email: email,
+        password: password,
+        name: name,
+      );
+
+      // Automatically sign in after registration
+      await signInWithEmail(email, password);
+      
+    } catch (e) {
+      debugPrint('Email sign-up error: $e');
+      _errorMessage = 'Registration failed. Please try again.';
       _currentUser = null;
     } finally {
       _isLoading = false;

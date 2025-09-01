@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
 import 'services/grok_service.dart';
-import 'screens/login_screen.dart';
+import 'screens/email_login_screen.dart';
 import 'screens/home_screen.dart';
 
 void main() {
@@ -58,7 +58,7 @@ class AuthWrapper extends StatelessWidget {
         if (authService.isAuthenticated) {
           return const HomeScreen();
         } else {
-          return const LoginScreen();
+          return const EmailLoginScreen();
         }
       },
     );
