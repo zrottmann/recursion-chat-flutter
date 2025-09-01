@@ -80,11 +80,11 @@ class AuthService extends ChangeNotifier {
           failure: 'https://chat.recursionsystems.com',
         );
       } else {
-        // Mobile platforms - use Appwrite's built-in mobile OAuth
-        // The SDK v18+ handles mobile OAuth redirects automatically
+        // Mobile platforms - use the deep link scheme from Android manifest
         await _account.createOAuth2Session(
           provider: provider,
-          // For mobile, we can omit success/failure URLs and let Appwrite handle it
+          success: 'appwrite-callback-${Environment.appwriteProjectId}://oauth',
+          failure: 'appwrite-callback-${Environment.appwriteProjectId}://oauth',
         );
       }
 
@@ -94,7 +94,12 @@ class AuthService extends ChangeNotifier {
       
     } catch (e) {
       debugPrint('OAuth sign-in error: $e');
-      _errorMessage = 'Authentication failed. Please try again.';
+      if (e.toString().contains('Invalid `success` param') || 
+          e.toString().contains('Invalid URI')) {
+        _errorMessage = 'OAuth not configured for mobile app. Please use email/password instead.';
+      } else {
+        _errorMessage = 'Authentication failed. Please try again.';
+      }
       _currentUser = null;
     } finally {
       _isLoading = false;

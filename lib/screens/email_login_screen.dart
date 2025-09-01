@@ -242,7 +242,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                 const Divider(),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'Or continue with',
+                                  kIsWeb ? 'Or continue with' : 'Or try SSO (may require browser)',
                                   style: TextStyle(color: Colors.grey[600]),
                                   textAlign: TextAlign.center,
                                 ),
