@@ -71,35 +71,27 @@ class AuthService extends ChangeNotifier {
       _errorMessage = null;
       notifyListeners();
 
-      // Platform-specific OAuth handling
+      // Modern Appwrite OAuth - works on both web and mobile
       if (kIsWeb) {
-        // Web platform - use standard web URLs
+        // Web platform
         await _account.createOAuth2Session(
           provider: provider,
           success: 'https://chat.recursionsystems.com',
           failure: 'https://chat.recursionsystems.com',
         );
       } else {
-        // Mobile platforms - use the deep link scheme from Android manifest
-        await _account.createOAuth2Session(
-          provider: provider,
-          success: 'appwrite-callback-${Environment.appwriteProjectId}://oauth',
-          failure: 'appwrite-callback-${Environment.appwriteProjectId}://oauth',
-        );
+        // Mobile platforms - let Appwrite SDK handle the OAuth flow automatically
+        // No redirect URLs needed - the SDK manages the entire flow
+        await _account.createOAuth2Session(provider: provider);
       }
 
-      // After OAuth redirect, check for user session
+      // After OAuth, check for user session
       _currentUser = await _account.get();
       debugPrint('OAuth sign-in successful for user: ${_currentUser?.name}');
       
     } catch (e) {
       debugPrint('OAuth sign-in error: $e');
-      if (e.toString().contains('Invalid `success` param') || 
-          e.toString().contains('Invalid URI')) {
-        _errorMessage = 'OAuth not configured for mobile app. Please use email/password instead.';
-      } else {
-        _errorMessage = 'Authentication failed. Please try again.';
-      }
+      _errorMessage = 'OAuth authentication failed. Please try email/password instead.';
       _currentUser = null;
     } finally {
       _isLoading = false;

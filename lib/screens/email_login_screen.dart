@@ -242,7 +242,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                 const Divider(),
                                 const SizedBox(height: 16),
                                 Text(
-                                  kIsWeb ? 'Or continue with' : 'Or try SSO (may require browser)',
+                                  'Or continue with',
                                   style: TextStyle(color: Colors.grey[600]),
                                   textAlign: TextAlign.center,
                                 ),
@@ -283,33 +283,16 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   ],
                                 ),
                                 
-                                // Native mobile info
-                                if (!kIsWeb) ...[
-                                  const SizedBox(height: 12),
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green[50],
-                                      border: Border.all(color: Colors.green[300]!),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.check_circle_outline, color: Colors.green[700], size: 16),
-                                        const SizedBox(width: 6),
-                                        Expanded(
-                                          child: Text(
-                                            'Native OAuth powered by Appwrite SDK v18',
-                                            style: TextStyle(
-                                              color: Colors.green[700],
-                                              fontSize: 11,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                // Info message for all platforms
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Powered by Appwrite',
+                                  style: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 12,
                                   ),
-                                ],
+                                  textAlign: TextAlign.center,
+                                ),
                               ],
                             ),
                           );
