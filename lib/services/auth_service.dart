@@ -71,8 +71,14 @@ class AuthService extends ChangeNotifier {
       _errorMessage = null;
       notifyListeners();
 
+      debugPrint('Starting OAuth with provider: $provider');
+      debugPrint('Platform: ${kIsWeb ? "Web" : "Mobile"}');
+      debugPrint('Appwrite endpoint: ${Environment.appwritePublicEndpoint}');
+      debugPrint('Appwrite project: ${Environment.appwriteProjectId}');
+
       // Modern Appwrite OAuth - works on both web and mobile
       if (kIsWeb) {
+        debugPrint('Using web OAuth flow');
         // Web platform
         await _account.createOAuth2Session(
           provider: provider,
@@ -80,18 +86,42 @@ class AuthService extends ChangeNotifier {
           failure: 'https://chat.recursionsystems.com',
         );
       } else {
-        // Mobile platforms - let Appwrite SDK handle the OAuth flow automatically
-        // No redirect URLs needed - the SDK manages the entire flow
-        await _account.createOAuth2Session(provider: provider);
+        debugPrint('Using mobile OAuth flow');
+        // Mobile platforms - try with explicit redirect URLs
+        // Use the deep link scheme we configured in Android manifest
+        final redirectUrl = 'appwrite-callback-${Environment.appwriteProjectId}://oauth';
+        debugPrint('Using redirect URL: $redirectUrl');
+        
+        await _account.createOAuth2Session(
+          provider: provider,
+          success: redirectUrl,
+          failure: redirectUrl,
+        );
       }
 
+      debugPrint('OAuth session created, checking user session...');
+      
       // After OAuth, check for user session
       _currentUser = await _account.get();
       debugPrint('OAuth sign-in successful for user: ${_currentUser?.name}');
       
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('OAuth sign-in error: $e');
-      _errorMessage = 'OAuth authentication failed. Please try email/password instead.';
+      debugPrint('Stack trace: $stackTrace');
+      
+      // More specific error handling
+      String errorMessage = 'OAuth authentication failed.';
+      if (e.toString().contains('network')) {
+        errorMessage = 'Network error during OAuth. Check your connection.';
+      } else if (e.toString().contains('cancelled')) {
+        errorMessage = 'OAuth cancelled by user.';
+      } else if (e.toString().contains('Invalid')) {
+        errorMessage = 'OAuth configuration error. Please try email/password.';
+      } else {
+        errorMessage = 'OAuth failed: ${e.toString().length > 100 ? e.toString().substring(0, 100) + "..." : e.toString()}';
+      }
+      
+      _errorMessage = errorMessage;
       _currentUser = null;
     } finally {
       _isLoading = false;
