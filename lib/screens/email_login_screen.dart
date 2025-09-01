@@ -237,79 +237,80 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   ),
                                 ),
                                 
-                                // OAuth only available on web platform (mobile has redirect issues)
-                                if (kIsWeb) ...[
-                                  const SizedBox(height: 16),
-                                  const Divider(),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'Or continue with',
-                                    style: TextStyle(color: Colors.grey[600]),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  const SizedBox(height: 12),
-                                  
-                                  // OAuth buttons for web only
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton.icon(
-                                          onPressed: authService.isLoading ? null : () async {
-                                            await authService.signInWithGoogle();
-                                          },
-                                          icon: const Text('G', style: TextStyle(fontWeight: FontWeight.bold)),
-                                          label: const Text('Google'),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF4285F4),
-                                            foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                          ),
+                                // ULTRATHINK OAuth - now available on all platforms
+                                const SizedBox(height: 16),
+                                const Divider(),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Or continue with',
+                                  style: TextStyle(color: Colors.grey[600]),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 12),
+                                
+                                // OAuth buttons for all platforms with ULTRATHINK
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        onPressed: authService.isLoading ? null : () async {
+                                          await authService.signInWithGoogle();
+                                        },
+                                        icon: const Text('G', style: TextStyle(fontWeight: FontWeight.bold)),
+                                        label: const Text('Google'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF4285F4),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: ElevatedButton.icon(
-                                          onPressed: authService.isLoading ? null : () async {
-                                            await authService.signInWithGitHub();
-                                          },
-                                          icon: const Icon(Icons.code, size: 18),
-                                          label: const Text('GitHub'),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF333333),
-                                            foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                          ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        onPressed: authService.isLoading ? null : () async {
+                                          await authService.signInWithGitHub();
+                                        },
+                                        icon: const Icon(Icons.code, size: 18),
+                                        label: const Text('GitHub'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF333333),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
+                                ),
+                                
+                                // ULTRATHINK info for mobile
+                                if (!kIsWeb) ...[
                                   const SizedBox(height: 12),
-                                ] else ...[
-                                  // Mobile-specific message
-                                  const SizedBox(height: 16),
                                   Container(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.amber[50],
-                                      border: Border.all(color: Colors.amber[300]!),
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.purple[50],
+                                      border: Border.all(color: Colors.purple[300]!),
+                                      borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.info_outline, color: Colors.amber[700], size: 20),
-                                        const SizedBox(width: 8),
+                                        Icon(Icons.psychology, color: Colors.purple[700], size: 16),
+                                        const SizedBox(width: 6),
                                         Expanded(
                                           child: Text(
-                                            'Native mobile app - OAuth has redirect issues. Email/password recommended for best experience.',
+                                            'ULTRATHINK OAuth: Multiple redirect strategies for maximum compatibility',
                                             style: TextStyle(
-                                              color: Colors.amber[700],
-                                              fontSize: 12,
+                                              color: Colors.purple[700],
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
                                             ),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
+                                ] else ...[
                                   const SizedBox(height: 12),
                                 ],
                                 

@@ -86,26 +86,67 @@ class AuthService extends ChangeNotifier {
           failure: 'https://chat.recursionsystems.com',
         );
       } else {
-        debugPrint('Using mobile OAuth flow');
-        // Mobile platforms - try different approaches for better compatibility
-        try {
-          // First try: Use web-compatible URLs that might work better with mobile browsers
-          await _account.createOAuth2Session(
-            provider: provider,
-            success: 'https://chat.recursionsystems.com/auth/success',
-            failure: 'https://chat.recursionsystems.com/auth/failure',
-          );
-        } catch (e) {
-          debugPrint('Web-style URLs failed, trying deep links: $e');
-          // Fallback: Try deep link approach
-          final redirectUrl = 'appwrite-callback-${Environment.appwriteProjectId}://oauth';
-          debugPrint('Fallback to redirect URL: $redirectUrl');
-          
-          await _account.createOAuth2Session(
-            provider: provider,
-            success: redirectUrl,
-            failure: redirectUrl,
-          );
+        debugPrint('Using ULTRATHINK mobile OAuth flow');
+        
+        // ULTRATHINK: Try multiple redirect strategies in order of likelihood to work
+        final strategies = [
+          // Strategy 1: Standard Appwrite mobile callback
+          {
+            'name': 'Appwrite Standard',
+            'success': 'appwrite-callback-${Environment.appwriteProjectId}://oauth',
+            'failure': 'appwrite-callback-${Environment.appwriteProjectId}://oauth'
+          },
+          // Strategy 2: Package-based scheme
+          {
+            'name': 'Package Scheme',
+            'success': 'com.recursionsystems.chat://oauth',
+            'failure': 'com.recursionsystems.chat://oauth'
+          },
+          // Strategy 3: Custom app scheme
+          {
+            'name': 'Custom Scheme',
+            'success': 'recursionchatsample://oauth',
+            'failure': 'recursionchatsample://oauth'
+          },
+          // Strategy 4: Simple format
+          {
+            'name': 'Simple Format',
+            'success': 'com.recursionsystems.chat://success',
+            'failure': 'com.recursionsystems.chat://failure'
+          },
+        ];
+
+        Exception? lastException;
+        
+        for (int i = 0; i < strategies.length; i++) {
+          final strategy = strategies[i];
+          try {
+            debugPrint('Trying strategy ${i + 1}: ${strategy['name']}');
+            debugPrint('Success URL: ${strategy['success']}');
+            debugPrint('Failure URL: ${strategy['failure']}');
+            
+            await _account.createOAuth2Session(
+              provider: provider,
+              success: strategy['success']!,
+              failure: strategy['failure']!,
+            );
+            
+            debugPrint('Strategy ${strategy['name']} succeeded!');
+            break; // Success! Exit the loop
+            
+          } catch (e) {
+            debugPrint('Strategy ${strategy['name']} failed: $e');
+            lastException = e as Exception;
+            
+            // If this isn't the last strategy, continue to next one
+            if (i < strategies.length - 1) {
+              debugPrint('Trying next strategy...');
+              continue;
+            } else {
+              // This was the last strategy, re-throw the exception
+              throw lastException;
+            }
+          }
         }
       }
 
