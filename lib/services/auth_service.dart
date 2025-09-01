@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
@@ -70,10 +71,21 @@ class AuthService extends ChangeNotifier {
       _errorMessage = null;
       notifyListeners();
 
+      // Platform-specific redirect URLs
+      final String successUrl, failureUrl;
+      if (kIsWeb) {
+        successUrl = 'https://chat.recursionsystems.com';
+        failureUrl = 'https://chat.recursionsystems.com';
+      } else {
+        // Native mobile - use custom scheme
+        successUrl = 'recursionChat://success';
+        failureUrl = 'recursionChat://failure';
+      }
+      
       await _account.createOAuth2Session(
         provider: provider,
-        success: 'https://chat.recursionsystems.com',
-        failure: 'https://chat.recursionsystems.com',
+        success: successUrl,
+        failure: failureUrl,
       );
 
       // After OAuth redirect, check for user session
