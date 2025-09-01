@@ -237,72 +237,72 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   ),
                                 ),
                                 
-                                // Show OAuth only on web platform
-                                if (kIsWeb) ...[
-                                  const SizedBox(height: 16),
-                                  const Divider(),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'Or continue with',
-                                    style: TextStyle(color: Colors.grey[600]),
-                                    textAlign: TextAlign.center,
-                                  ),
+                                // OAuth options available on all platforms
+                                const SizedBox(height: 16),
+                                const Divider(),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Or continue with',
+                                  style: TextStyle(color: Colors.grey[600]),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 12),
+                                
+                                // OAuth buttons for all platforms
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        onPressed: authService.isLoading ? null : () async {
+                                          await authService.signInWithGoogle();
+                                        },
+                                        icon: const Text('G', style: TextStyle(fontWeight: FontWeight.bold)),
+                                        label: const Text('Google'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF4285F4),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: ElevatedButton.icon(
+                                        onPressed: authService.isLoading ? null : () async {
+                                          await authService.signInWithGitHub();
+                                        },
+                                        icon: const Icon(Icons.code, size: 18),
+                                        label: const Text('GitHub'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF333333),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                
+                                // Native mobile info
+                                if (!kIsWeb) ...[
                                   const SizedBox(height: 12),
-                                  
-                                  // OAuth buttons for web only
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton.icon(
-                                          onPressed: authService.isLoading ? null : () async {
-                                            await authService.signInWithGoogle();
-                                          },
-                                          icon: const Text('G', style: TextStyle(fontWeight: FontWeight.bold)),
-                                          label: const Text('Google'),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF4285F4),
-                                            foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: ElevatedButton.icon(
-                                          onPressed: authService.isLoading ? null : () async {
-                                            await authService.signInWithGitHub();
-                                          },
-                                          icon: const Icon(Icons.code, size: 18),
-                                          label: const Text('GitHub'),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: const Color(0xFF333333),
-                                            foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ] else ...[
-                                  // Mobile-specific message
-                                  const SizedBox(height: 16),
                                   Container(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Colors.blue[50],
-                                      border: Border.all(color: Colors.blue[300]!),
-                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.green[50],
+                                      border: Border.all(color: Colors.green[300]!),
+                                      borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Row(
                                       children: [
-                                        Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
-                                        const SizedBox(width: 8),
+                                        Icon(Icons.check_circle_outline, color: Colors.green[700], size: 16),
+                                        const SizedBox(width: 6),
                                         Expanded(
                                           child: Text(
-                                            'Native mobile app - Use email/password for secure authentication',
+                                            'Native OAuth powered by Appwrite SDK v18',
                                             style: TextStyle(
-                                              color: Colors.blue[700],
-                                              fontSize: 12,
+                                              color: Colors.green[700],
+                                              fontSize: 11,
                                             ),
                                           ),
                                         ),

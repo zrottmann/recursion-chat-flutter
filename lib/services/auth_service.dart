@@ -80,11 +80,11 @@ class AuthService extends ChangeNotifier {
           failure: 'https://chat.recursionsystems.com',
         );
       } else {
-        // Mobile platforms - use localhost for OAuth callback
+        // Mobile platforms - use Appwrite's built-in mobile OAuth
+        // The SDK v18+ handles mobile OAuth redirects automatically
         await _account.createOAuth2Session(
           provider: provider,
-          success: 'http://localhost',
-          failure: 'http://localhost',
+          // For mobile, we can omit success/failure URLs and let Appwrite handle it
         );
       }
 
