@@ -237,7 +237,9 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   ),
                                 ),
                                 
-                                // ULTRATHINK OAuth - now available on all platforms
+                                // OAuth temporarily disabled - use email/password
+                                // Uncomment below when Google OAuth is configured in Appwrite Console
+                                /*
                                 const SizedBox(height: 16),
                                 const Divider(),
                                 const SizedBox(height: 16),
@@ -248,7 +250,6 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 
-                                // OAuth button - Google only
                                 ElevatedButton.icon(
                                   onPressed: authService.isLoading ? null : () async {
                                     await authService.signInWithGoogle();
@@ -262,6 +263,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                     minimumSize: const Size(double.infinity, 48),
                                   ),
                                 ),
+                                */
                                 
                                 const SizedBox(height: 12),
                                 
