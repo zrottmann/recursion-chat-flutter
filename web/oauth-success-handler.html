@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OAuth Success - Recursion Chat</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .success {
+            color: #10b981;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .info {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .code {
+            background: #1f2937;
+            color: #10b981;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .error {
+            color: #ef4444;
+            background: #fee2e2;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success">✅</div>
+        <h1>OAuth Authentication Successful!</h1>
+        
+        <div class="info">
+            <strong>What happened:</strong><br>
+            You successfully authenticated with Google! However, Appwrite redirected you to its console instead of back to the app.
+        </div>
+
+        <div id="session-info"></div>
+
+        <h2>Quick Fix Options:</h2>
+        
+        <div class="info">
+            <strong>Option 1: Manual Redirect</strong><br>
+            Click below to go back to Recursion Chat. Your session should be active.
+        </div>
+        <button onclick="redirectToApp()">Go to Recursion Chat</button>
+
+        <div class="info">
+            <strong>Option 2: Configuration Fix</strong><br>
+            To fix this permanently, update your Appwrite platform settings to redirect to <code>chat.recursionsystems.com</code> instead of the Appwrite console.
+        </div>
+    </div>
+
+    <script>
+        // Parse URL to extract session info
+        function parseUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const hash = window.location.hash;
+            
+            const sessionInfo = document.getElementById('session-info');
+            
+            // Check for session in URL
+            const secret = params.get('secret');
+            const key = params.get('key');
+            
+            if (secret || key) {
+                sessionInfo.innerHTML = `
+                    <div class="info" style="background: #d1fae5;">
+                        <strong>✅ Session Detected!</strong><br>
+                        Your authentication was successful. The session has been created.
+                        <div class="code">Session Key: ${key || 'N/A'}</div>
+                    </div>
+                `;
+                
+                // Store session info in localStorage for the app to pick up
+                if (key && secret) {
+                    localStorage.setItem('appwrite_session_key', key);
+                    localStorage.setItem('appwrite_session_secret', secret);
+                    localStorage.setItem('appwrite_session_timestamp', Date.now().toString());
+                }
+            } else {
+                sessionInfo.innerHTML = `
+                    <div class="error">
+                        No session information found in URL. You may need to try logging in again.
+                    </div>
+                `;
+            }
+        }
+        
+        function redirectToApp() {
+            // Redirect to the main app
+            window.location.href = 'https://chat.recursionsystems.com';
+        }
+        
+        // Auto-redirect after 3 seconds
+        setTimeout(() => {
+            console.log('Auto-redirecting to app...');
+            redirectToApp();
+        }, 3000);
+        
+        // Parse URL on load
+        parseUrl();
+    </script>
+</body>
+</html>

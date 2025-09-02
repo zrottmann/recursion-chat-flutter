@@ -106,18 +106,41 @@
 
   <!-- This script installs service_worker.js to provide PWA functionality -->
   <script>
-    var serviceWorkerVersion = null;
-    var scriptLoaded = false;
-    function loadMainDartJs() {
-      if (scriptLoaded) {
-        return;
+    // Handle OAuth callbacks
+    function handleOAuthCallback() {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      
+      // Check if this is an OAuth callback
+      if (hash.includes('access_token') || search.includes('code=') || 
+          window.location.pathname.includes('/auth/success') ||
+          window.location.pathname.includes('/oauth/success')) {
+        console.log('OAuth callback detected, cleaning URL...');
+        // Clean the URL and reload to trigger proper session check
+        window.history.replaceState({}, document.title, '/');
+        // Small delay to ensure session is established
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+        return true;
       }
-      scriptLoaded = true;
-      var scriptTag = document.createElement('script');
-      scriptTag.src = 'main.dart.js';
-      scriptTag.type = 'application/javascript';
-      document.body.append(scriptTag);
+      return false;
     }
+    
+    // Check for OAuth callback before loading app
+    if (!handleOAuthCallback()) {
+      var serviceWorkerVersion = null;
+      var scriptLoaded = false;
+      function loadMainDartJs() {
+        if (scriptLoaded) {
+          return;
+        }
+        scriptLoaded = true;
+        var scriptTag = document.createElement('script');
+        scriptTag.src = 'main.dart.js';
+        scriptTag.type = 'application/javascript';
+        document.body.append(scriptTag);
+      }
 
     if ('serviceWorker' in navigator) {
       // Service workers are supported. Use them.
