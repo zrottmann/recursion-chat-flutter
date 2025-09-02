@@ -4,6 +4,7 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
 import '../config/environment.dart';
+import 'ultrathink_oauth.dart';
 
 class AuthService extends ChangeNotifier {
   late Client _client;
@@ -76,19 +77,31 @@ class AuthService extends ChangeNotifier {
       debugPrint('Appwrite endpoint: ${Environment.appwritePublicEndpoint}');
       debugPrint('Appwrite project: ${Environment.appwriteProjectId}');
 
-      // Use standard Appwrite OAuth for all platforms
-      // The SDK handles platform differences internally
-      debugPrint('Creating OAuth2 session with Appwrite...');
-      
-      await _account.createOAuth2Session(
-        provider: provider,
-        // Let Appwrite handle the redirect URLs internally
-      );
+      if (kIsWeb) {
+        // Use standard Appwrite OAuth for web
+        debugPrint('Web platform: Using standard Appwrite OAuth');
+        await _account.createOAuth2Session(
+          provider: provider,
+        );
+        _currentUser = await _account.get();
+      } else {
+        // Use ULTRATHINK for mobile platforms
+        debugPrint('Mobile platform: Activating ULTRATHINK OAuth solution');
+        
+        // Run ULTRATHINK diagnostics first
+        final ultrathink = UltrathinkOAuth(client: _client, account: _account);
+        await ultrathink.diagnoseOAuthIssues();
+        
+        // Execute ULTRATHINK OAuth
+        if (provider == OAuthProvider.google) {
+          _currentUser = await ultrathink.signInWithGoogle();
+        } else {
+          // Fallback to standard OAuth for other providers
+          await _account.createOAuth2Session(provider: provider);
+          _currentUser = await _account.get();
+        }
+      }
 
-      debugPrint('OAuth session created, checking user session...');
-      
-      // After OAuth, check for user session
-      _currentUser = await _account.get();
       debugPrint('OAuth sign-in successful for user: ${_currentUser?.name}');
       
     } catch (e, stackTrace) {
