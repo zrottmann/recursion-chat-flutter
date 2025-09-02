@@ -248,39 +248,19 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                 ),
                                 const SizedBox(height: 12),
                                 
-                                // OAuth buttons for all platforms with ULTRATHINK
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: authService.isLoading ? null : () async {
-                                          await authService.signInWithGoogle();
-                                        },
-                                        icon: const Text('G', style: TextStyle(fontWeight: FontWeight.bold)),
-                                        label: const Text('Google'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFF4285F4),
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(vertical: 12),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: ElevatedButton.icon(
-                                        onPressed: authService.isLoading ? null : () async {
-                                          await authService.signInWithGitHub();
-                                        },
-                                        icon: const Icon(Icons.code, size: 18),
-                                        label: const Text('GitHub'),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: const Color(0xFF333333),
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(vertical: 12),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                // OAuth button - Google only
+                                ElevatedButton.icon(
+                                  onPressed: authService.isLoading ? null : () async {
+                                    await authService.signInWithGoogle();
+                                  },
+                                  icon: const Text('G', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                                  label: const Text('Continue with Google'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF4285F4),
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    minimumSize: const Size(double.infinity, 48),
+                                  ),
                                 ),
                                 
                                 const SizedBox(height: 12),

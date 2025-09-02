@@ -59,7 +59,8 @@ class CustomOAuthService {
     final projectId = Environment.appwriteProjectId;
     final providerName = provider.name;
     
-    // Use simple OAuth URL without explicit success/failure
+    // Build OAuth URL that will create a session
+    // The key is to ensure the OAuth completes and creates a session cookie
     return '$baseUrl/account/sessions/oauth2/$providerName?project=$projectId';
   }
 }

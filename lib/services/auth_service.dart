@@ -105,10 +105,28 @@ class AuthService extends ChangeNotifier {
             );
             await customOAuth.signInWithProvider(provider);
             
-            // Wait and check for session after OAuth redirect
-            await Future.delayed(const Duration(seconds: 3));
-            _currentUser = await _account.get();
-            return; // Exit early if successful
+            // Poll for session after OAuth redirect (may take time for deep link)
+            debugPrint('Polling for session after OAuth...');
+            for (int i = 0; i < 10; i++) {
+              await Future.delayed(const Duration(seconds: 2));
+              try {
+                _currentUser = await _account.get();
+                if (_currentUser != null) {
+                  debugPrint('Session found after ${(i + 1) * 2} seconds');
+                  return; // Exit early if successful
+                }
+              } catch (pollError) {
+                debugPrint('Poll attempt ${i + 1} failed: $pollError');
+                if (i == 9) {
+                  // Last attempt, check if it's a real error or just no session
+                  if (!pollError.toString().contains('401') && 
+                      !pollError.toString().contains('unauthorized')) {
+                    throw pollError; // Real error, not just no session
+                  }
+                }
+              }
+            }
+            throw Exception('OAuth completed but session not established after 20 seconds');
           } else {
             throw e;
           }
@@ -198,10 +216,6 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signInWithGoogle() async {
     await signInWithOAuth(OAuthProvider.google);
-  }
-
-  Future<void> signInWithGitHub() async {
-    await signInWithOAuth(OAuthProvider.github);
   }
 
   Future<void> signOut() async {
