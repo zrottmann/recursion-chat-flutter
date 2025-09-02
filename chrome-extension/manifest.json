@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Recursion Chat OAuth Redirect",
+  "version": "1.0",
+  "description": "Automatically redirects Appwrite OAuth success page to Recursion Chat",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://cloud.appwrite.io/*",
+    "https://chat.recursionsystems.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://cloud.appwrite.io/console/auth/oauth2/success*"],
+      "js": ["redirect.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  }
+}

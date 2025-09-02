@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Completing OAuth...</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .message {
+            color: #666;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+        .error {
+            color: #ef4444;
+            background: #fee2e2;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success {
+            color: #10b981;
+            background: #d1fae5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .code {
+            background: #f3f4f6;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Completing OAuth Authentication</h1>
+        <div class="spinner"></div>
+        <div id="status" class="message">
+            Processing authentication...
+        </div>
+        <div id="details"></div>
+    </div>
+
+    <script>
+        // ULTRATHINK OAuth Session Extractor
+        function extractSessionFromUrl() {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            const hash = url.hash;
+            
+            // Extract session parameters
+            const sessionKey = params.get('key');
+            const sessionSecret = params.get('secret');
+            const project = params.get('project');
+            const domain = params.get('domain');
+            
+            console.log('ULTRATHINK: Extracting session from URL');
+            console.log('Session Key:', sessionKey);
+            console.log('Project:', project);
+            console.log('Domain:', domain);
+            
+            return {
+                key: sessionKey,
+                secret: sessionSecret,
+                project: project,
+                domain: domain
+            };
+        }
+        
+        function setAppwriteSession(sessionData) {
+            if (!sessionData.key || !sessionData.secret) {
+                throw new Error('Invalid session data');
+            }
+            
+            // Set Appwrite session in localStorage
+            // This mimics what Appwrite SDK does internally
+            const cookieFallback = {
+                [sessionData.key]: sessionData.secret
+            };
+            
+            localStorage.setItem('cookieFallback', JSON.stringify(cookieFallback));
+            localStorage.setItem(`${sessionData.key}`, sessionData.secret);
+            localStorage.setItem('appwrite_session_' + sessionData.project, JSON.stringify({
+                key: sessionData.key,
+                secret: sessionData.secret,
+                timestamp: Date.now()
+            }));
+            
+            console.log('ULTRATHINK: Session stored in localStorage');
+        }
+        
+        function handleOAuthCallback() {
+            const statusEl = document.getElementById('status');
+            const detailsEl = document.getElementById('details');
+            
+            try {
+                // Extract session from URL
+                const sessionData = extractSessionFromUrl();
+                
+                if (sessionData.key && sessionData.secret) {
+                    // Session found!
+                    statusEl.className = 'success';
+                    statusEl.innerHTML = '✅ Authentication Successful!';
+                    
+                    detailsEl.innerHTML = `
+                        <div class="message">
+                            Session has been established. Redirecting to Recursion Chat...
+                        </div>
+                        <div class="code">
+                            Session Key: ${sessionData.key}
+                        </div>
+                    `;
+                    
+                    // Store session
+                    setAppwriteSession(sessionData);
+                    
+                    // Redirect to main app
+                    setTimeout(() => {
+                        window.location.href = 'https://chat.recursionsystems.com';
+                    }, 2000);
+                    
+                } else {
+                    // No session in URL
+                    statusEl.className = 'error';
+                    statusEl.innerHTML = '❌ No session data found';
+                    
+                    detailsEl.innerHTML = `
+                        <div class="message">
+                            Unable to extract session from URL. 
+                            This page should be accessed from Appwrite OAuth callback.
+                        </div>
+                        <button onclick="window.location.href='https://chat.recursionsystems.com'">
+                            Go to Recursion Chat
+                        </button>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('ULTRATHINK: Error handling OAuth callback:', error);
+                statusEl.className = 'error';
+                statusEl.innerHTML = '❌ Error processing authentication';
+                
+                detailsEl.innerHTML = `
+                    <div class="message">
+                        ${error.message}
+                    </div>
+                    <button onclick="window.location.href='https://chat.recursionsystems.com'">
+                        Try Again
+                    </button>
+                `;
+            }
+        }
+        
+        // Check if this is being opened from Appwrite console redirect
+        if (window.location.href.includes('project=') && window.location.href.includes('secret=')) {
+            handleOAuthCallback();
+        } else {
+            // Manual navigation to this page
+            document.getElementById('status').className = 'message';
+            document.getElementById('status').innerHTML = 'Waiting for OAuth callback...';
+            document.getElementById('details').innerHTML = `
+                <div class="message">
+                    This page handles OAuth redirects from Appwrite.
+                    <br><br>
+                    If you're seeing this, you may need to:
+                    <ol style="text-align: left;">
+                        <li>Go back to Recursion Chat</li>
+                        <li>Click "Continue with Google"</li>
+                        <li>Complete the OAuth flow</li>
+                    </ol>
+                </div>
+                <button onclick="window.location.href='https://chat.recursionsystems.com'">
+                    Go to Recursion Chat
+                </button>
+            `;
+        }
+    </script>
+</body>
+</html>
