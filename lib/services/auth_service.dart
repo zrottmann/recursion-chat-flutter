@@ -4,7 +4,6 @@ import 'package:appwrite/appwrite.dart';
 import 'package:appwrite/enums.dart';
 import 'package:appwrite/models.dart';
 import '../config/environment.dart';
-import 'custom_oauth_service.dart';
 
 class AuthService extends ChangeNotifier {
   late Client _client;
@@ -77,61 +76,14 @@ class AuthService extends ChangeNotifier {
       debugPrint('Appwrite endpoint: ${Environment.appwritePublicEndpoint}');
       debugPrint('Appwrite project: ${Environment.appwriteProjectId}');
 
-      if (kIsWeb) {
-        // Web platform - use standard OAuth
-        debugPrint('Using web OAuth flow');
-        await _account.createOAuth2Session(
-          provider: provider,
-        );
-      } else {
-        // Mobile platform - try multiple approaches
-        debugPrint('Using mobile OAuth with fallback strategies');
-        
-        try {
-          // Approach 1: Try standard SDK OAuth first
-          debugPrint('Trying standard SDK OAuth...');
-          await _account.createOAuth2Session(
-            provider: provider,
-          );
-        } catch (e) {
-          debugPrint('Standard OAuth failed: $e');
-          
-          if (e.toString().contains('canceled') || e.toString().contains('CANCELED')) {
-            // Approach 2: Use custom OAuth service with URL launcher
-            debugPrint('Trying custom OAuth service with URL launcher...');
-            final customOAuth = CustomOAuthService(
-              client: _client,
-              account: _account,
-            );
-            await customOAuth.signInWithProvider(provider);
-            
-            // Poll for session after OAuth redirect (may take time for deep link)
-            debugPrint('Polling for session after OAuth...');
-            for (int i = 0; i < 10; i++) {
-              await Future.delayed(const Duration(seconds: 2));
-              try {
-                _currentUser = await _account.get();
-                if (_currentUser != null) {
-                  debugPrint('Session found after ${(i + 1) * 2} seconds');
-                  return; // Exit early if successful
-                }
-              } catch (pollError) {
-                debugPrint('Poll attempt ${i + 1} failed: $pollError');
-                if (i == 9) {
-                  // Last attempt, check if it's a real error or just no session
-                  if (!pollError.toString().contains('401') && 
-                      !pollError.toString().contains('unauthorized')) {
-                    throw pollError; // Real error, not just no session
-                  }
-                }
-              }
-            }
-            throw Exception('OAuth completed but session not established after 20 seconds');
-          } else {
-            throw e;
-          }
-        }
-      }
+      // Use standard Appwrite OAuth for all platforms
+      // The SDK handles platform differences internally
+      debugPrint('Creating OAuth2 session with Appwrite...');
+      
+      await _account.createOAuth2Session(
+        provider: provider,
+        // Let Appwrite handle the redirect URLs internally
+      );
 
       debugPrint('OAuth session created, checking user session...');
       

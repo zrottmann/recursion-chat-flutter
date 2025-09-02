@@ -237,9 +237,7 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                   ),
                                 ),
                                 
-                                // OAuth temporarily disabled - use email/password
-                                // Uncomment below when Google OAuth is configured in Appwrite Console
-                                /*
+                                // Google OAuth with Appwrite
                                 const SizedBox(height: 16),
                                 const Divider(),
                                 const SizedBox(height: 16),
@@ -263,7 +261,6 @@ class _EmailLoginScreenState extends State<EmailLoginScreen> {
                                     minimumSize: const Size(double.infinity, 48),
                                   ),
                                 ),
-                                */
                                 
                                 const SizedBox(height: 12),
                                 
